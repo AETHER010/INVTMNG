@@ -5,6 +5,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -17,6 +18,7 @@ const Supplier = ({navigation}) => {
   const Api_ULR = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState();
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchApiData();
@@ -65,6 +67,14 @@ const Supplier = ({navigation}) => {
     }
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   return (
     <View>
       <View style={styles.SupplierContainer}>
@@ -101,7 +111,10 @@ const Supplier = ({navigation}) => {
           onPress={() => navigation.navigate('NewSupplier')}
         />
       </View>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }>
         {loading ? (
           <Text>Loading...</Text>
         ) : (

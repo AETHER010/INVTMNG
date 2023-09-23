@@ -1,5 +1,12 @@
 import {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
@@ -11,6 +18,8 @@ const Purchase = ({navigation}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState('');
   const [formattedate, setFormattedDate] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
   useEffect(() => {
     fetchApiData();
     const apidate = data.created_date;
@@ -36,8 +45,19 @@ const Purchase = ({navigation}) => {
     navigation.navigate('ViewPurchase', {id});
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
       <View>
         <View style={styles.PurchaseContainer}>
           <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -69,6 +89,7 @@ const Purchase = ({navigation}) => {
             onPress={() => navigation.navigate('NewPurchase')}
           />
         </View>
+
         {loading ? (
           <Text>Loading...</Text>
         ) : (

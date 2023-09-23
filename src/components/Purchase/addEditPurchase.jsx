@@ -27,7 +27,7 @@ const NewPurchase = ({navigation, route}) => {
   const [billId, setBillId] = useState('');
 
   const [action, setAction] = useState('false');
-  const [action2, setAction2] = useState('false');
+  const [chargeBillId, setChargeBillId] = useState('');
 
   const [unConfirmProducts, setUnConfirmProducts] = useState([]);
 
@@ -128,6 +128,7 @@ const NewPurchase = ({navigation, route}) => {
       // console.log('API response for unconfirm products:', response.data.data);
       setGrandTotal(response.data.data.total_price);
       setCommission(response.data.data.charge_percentage);
+      setChargeBillId(response.data.data.id);
       // console.log('asdadsasd', response.data.data.charge_percentage);
       const apiData = response.data.data;
       const items = apiData.unconfirmpurchase_items || [];
@@ -217,11 +218,12 @@ const NewPurchase = ({navigation, route}) => {
       charge: commission,
     };
 
-    console.log(supplierId);
+    console.log(chargeBillId);
+    console.log(formData);
 
     try {
       await axios.post(
-        `${Api_Url}/bill/apis/purchase/charge/${supplierId}/`,
+        `${Api_Url}/bill/apis/purchase/charge/${chargeBillId}/`,
         formData,
       );
       Alert.alert('Success', 'Charge Added Successfully');
@@ -520,8 +522,8 @@ const NewPurchase = ({navigation, route}) => {
             <Text style={{color: 'black', marginTop: 3}}>Commission:</Text>
             <TextInput
               style={styles.CommisionText}
-              onTextChange={setCommission}>
-              {commission}{' '}
+              onChangeText={setCommission}>
+              {commission}
             </TextInput>
             <Text style={{color: 'black', marginTop: 3}}>% </Text>
           </View>

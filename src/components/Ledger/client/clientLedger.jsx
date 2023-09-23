@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import {Table, TableWrapper, Row} from 'react-native-table-component';
 import {Button} from 'react-native-elements';
@@ -16,7 +17,7 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon2 from 'react-native-vector-icons/AntDesign';
 
-export default class ExampleThree extends Component {
+export default class ClientLedger extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -38,7 +39,7 @@ export default class ExampleThree extends Component {
   getApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/report/apis/ledger/customer/list/?page=1`,
+        `${Api_Url}/report/apis/ledger/customer/list/?page=1&page_size=100`,
       );
       const responseData = response.data.data;
 
@@ -50,7 +51,6 @@ export default class ExampleThree extends Component {
     }
   };
 
-  // Function to handle date changes for From and To dates
   handleDateChange = (date, type) => {
     if (type === 'from') {
       this.setState({fromDate: date, showFromDatePicker: false});
@@ -134,7 +134,9 @@ export default class ExampleThree extends Component {
           />
         </View>
 
-        <ScrollView horizontal={true}>
+        <ScrollView
+          horizontal={true}
+          style={{maxHeight: Dimensions.get('window').height - 200}}>
           <View>
             <Table>
               <Row

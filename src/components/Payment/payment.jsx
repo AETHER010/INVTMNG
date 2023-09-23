@@ -1,5 +1,12 @@
 import {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Api_Url} from '../../utilities/api';
@@ -13,6 +20,7 @@ const Payment = ({navigation}) => {
   const [loading, setLoading] = useState('');
   const [formattedate, setFormattedDate] = useState('');
   const [action, setAction] = useState('supplier');
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     setAction('supplier');
@@ -26,30 +34,37 @@ const Payment = ({navigation}) => {
     setAction('supplier');
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   return (
     <View>
-      <ScrollView>
-        <View style={styles.PaymentContainer}>
-          <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-            <Icon
-              style={styles.Icons}
-              name="arrow-back"
-              onPress={() => navigation.navigate('Home2')}
-            />
-            <Text style={styles.text}>Payment</Text>
-            <Icon style={styles.Icons} name="person-circle-outline"></Icon>
-          </View>
-          <View style={styles.division}>
-            <Text style={styles.text1} onPress={changeSupplier}>
-              Supplier
-            </Text>
-            <View style={styles.text2}></View>
-            <Text style={styles.text1} onPress={changeCustomer}>
-              Clients
-            </Text>
-          </View>
+      <View style={styles.PaymentContainer}>
+        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+          <Icon
+            style={styles.Icons}
+            name="arrow-back"
+            onPress={() => navigation.navigate('Home2')}
+          />
+          <Text style={styles.text}>Payment</Text>
+          <Icon style={styles.Icons} name="person-circle-outline"></Icon>
         </View>
-        {/* <View style={styles.SecondContainer}>
+        <View style={styles.division}>
+          <Text style={styles.text1} onPress={changeSupplier}>
+            Supplier
+          </Text>
+          <View style={styles.text2}></View>
+          <Text style={styles.text1} onPress={changeCustomer}>
+            Clients
+          </Text>
+        </View>
+      </View>
+      {/* <View style={styles.SecondContainer}>
           <View style={styles.Search}>
             <TextInput style={styles.input} placeholder="Search..." />
             <Icon
@@ -65,7 +80,10 @@ const Payment = ({navigation}) => {
             onPress={() => navigation.navigate('NewPayment')}
           />
         </View> */}
-
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }>
         <View>
           {action === 'supplier' ? <Supplier Api_Url={Api_Url} /> : <Client />}
         </View>

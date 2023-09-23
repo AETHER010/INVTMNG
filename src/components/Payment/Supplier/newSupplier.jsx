@@ -5,6 +5,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -22,6 +23,7 @@ const NewPaymentSupplier = ({navigation}) => {
   const [selectedDoc, setSelectedDoc] = useState([]);
   const [sellingPrice, setLaunchedPrice] = useState('');
   const [evidence, setEvidence] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   const paymentData = ['Cash', 'E-Pay'];
 
@@ -109,148 +111,165 @@ const NewPaymentSupplier = ({navigation}) => {
     console.log('customerId', cname);
   };
 
-  return (
-    <View style={styles.NewClientContainer}>
-      <Icon
-        style={styles.Icons}
-        name="arrow-back"
-        onPress={() => navigation.navigate('Payment')}
-      />
-      <View style={styles.formContainer}>
-        <Text style={styles.text2}>Create Supplier Payment</Text>
+  const handleRefresh = () => {
+    setRefreshing(true);
 
-        <View
-          style={{
-            // flexDirection: 'row',
-            // flexWrap: 'wrap',
-            // justifyContent: 'space-between',
-            // padding: 5,
-            marginTop: 18,
-          }}>
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  return (
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
+      <View style={styles.NewClientContainer}>
+        <Icon
+          style={styles.Icons}
+          name="arrow-back"
+          onPress={() => navigation.navigate('Payment')}
+        />
+        <View style={styles.formContainer}>
+          <Text style={styles.text2}>Create Supplier Payment</Text>
+
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              padding: 2,
+              // flexDirection: 'row',
+              // flexWrap: 'wrap',
+              // justifyContent: 'space-between',
+              // padding: 5,
+              marginTop: 18,
             }}>
-            <Text style={styles.label}>Supplier:</Text>
-            <ModalDropdown
-              style={styles.Input}
-              defaultValue="Select Supplier..."
-              options={customer.map(item => item.name)}
-              onSelect={index => handleProductSelection(index)}
-              defaultIndex={0}
-              animated={true}
-              isFullWidth={true}
-              textStyle={styles.dropdownText}
-              showsVerticalScrollIndicator={true}
-              dropdownTextStyle={styles.dropdownText}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              padding: 2,
-            }}>
-            <Text style={styles.label}>Amount:</Text>
-            <TextInput
-              style={styles.Input}
-              value={amount}
-              onChangeText={setAmount}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              padding: 2,
-            }}>
-            <Text style={styles.label}>Payment Method:</Text>
-            {/* <TextInput
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: 2,
+              }}>
+              <Text style={styles.label}>Supplier:</Text>
+              <ModalDropdown
+                style={styles.Input}
+                defaultValue="Select Supplier..."
+                options={customer.map(item => item.name)}
+                onSelect={index => handleProductSelection(index)}
+                defaultIndex={0}
+                animated={true}
+                isFullWidth={true}
+                textStyle={styles.dropdownText}
+                showsVerticalScrollIndicator={true}
+                dropdownTextStyle={styles.dropdownText}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: 2,
+              }}>
+              <Text style={styles.label}>Amount:</Text>
+              <TextInput
+                style={styles.Input}
+                value={amount}
+                onChangeText={setAmount}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: 2,
+              }}>
+              <Text style={styles.label}>Payment Method:</Text>
+              {/* <TextInput
               style={styles.Input}
               value={sellingPrice}
               // onChangeText={setSellingPrice}
             /> */}
-            <ModalDropdown
-              style={styles.Input}
-              defaultValue="Select Payment..."
-              options={paymentData}
-              // onSelect={index => handleProductSelection(index)}
-              defaultIndex={0}
-              animated={true}
-              isFullWidth={true}
-              textStyle={styles.dropdownText}
-              showsVerticalScrollIndicator={true}
-              dropdownTextStyle={styles.dropdownText}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              padding: 2,
-            }}>
-            <Text style={styles.label}>Evidence:</Text>
-            {/* <TextInput
+              <ModalDropdown
+                style={styles.Input}
+                defaultValue="Select Payment..."
+                options={paymentData}
+                // onSelect={index => handleProductSelection(index)}
+                defaultIndex={0}
+                animated={true}
+                isFullWidth={true}
+                textStyle={styles.dropdownText}
+                showsVerticalScrollIndicator={true}
+                dropdownTextStyle={styles.dropdownText}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: 2,
+              }}>
+              <Text style={styles.label}>Evidence:</Text>
+              {/* <TextInput
               style={styles.Input}
               value={evidence}
               type="file"
               // onChangeText={setSellingPrice}
             /> */}
-            <View style={styles.fileInput}>
-              <Text
-                style={{
-                  color: 'black',
-                  backgroundColor: '#CED4DA',
-                  marginRight: 8,
-                  padding: 4,
-                }}
-                onPress={pickDocument}>
-                Pick Document
-              </Text>
-              <View style={{overflow: 'hidden'}}>
-                {selectedDoc.length > 0 ? (
-                  <Text
-                    style={{
-                      color: 'black',
-                      fontSize: 15,
-                      paddingVertical: 4,
-                      width: 90,
-                    }}>
-                    {selectedDoc[0].name}
-                  </Text>
-                ) : (
-                  <Text
-                    style={{color: 'black', fontSize: 15, paddingVertical: 4}}>
-                    No Doc Chosen
-                  </Text>
-                )}
+              <View style={styles.fileInput}>
+                <Text
+                  style={{
+                    color: 'black',
+                    backgroundColor: '#CED4DA',
+                    marginRight: 8,
+                    padding: 4,
+                  }}
+                  onPress={pickDocument}>
+                  Pick Document
+                </Text>
+                <View style={{overflow: 'hidden'}}>
+                  {selectedDoc.length > 0 ? (
+                    <Text
+                      style={{
+                        color: 'black',
+                        fontSize: 15,
+                        paddingVertical: 4,
+                        width: 90,
+                      }}>
+                      {selectedDoc[0].name}
+                    </Text>
+                  ) : (
+                    <Text
+                      style={{
+                        color: 'black',
+                        fontSize: 15,
+                        paddingVertical: 4,
+                      }}>
+                      No Doc Chosen
+                    </Text>
+                  )}
+                </View>
               </View>
             </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: 2,
+              }}>
+              <Text style={styles.label}>Remarks:</Text>
+              <TextInput
+                style={styles.Input}
+                value={remarks}
+                onChangeText={setRemarks}
+              />
+            </View>
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              padding: 2,
-            }}>
-            <Text style={styles.label}>Remarks:</Text>
-            <TextInput
-              style={styles.Input}
-              value={remarks}
-              onChangeText={setRemarks}
-            />
-          </View>
-        </View>
 
-        <Button
-          buttonStyle={styles.Button}
-          onPress={HandleformSubmit}
-          title="Create"
-        />
+          <Button
+            buttonStyle={styles.Button}
+            onPress={HandleformSubmit}
+            title="Create"
+          />
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

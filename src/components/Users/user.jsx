@@ -1,5 +1,12 @@
 import {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, ScrollView, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  RefreshControl,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {Button} from 'react-native-elements';
@@ -8,23 +15,18 @@ import {Api_Url} from '../../utilities/api';
 const User = ({navigation}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState();
-
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchApiData();
-  }, [page]);
+  }, []);
 
   const fetchApiData = async () => {
-    console.log('page number', page);
     try {
       const response = await axios.get(
-        `${Api_Url}/accounts/apis/list/user/?page=${page}&page_size=${limit}`,
+        `${Api_Url}/accounts/apis/list/user/?page=1&page_size=100`,
       );
       setData(response.data.data);
-      setTotalPages(Math.ceil(response.data.count / limit));
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -60,105 +62,88 @@ const User = ({navigation}) => {
     fetchApiData();
   };
 
-  return (
-    <ScrollView>
-      <View>
-        <View style={styles.UserContainer}>
-          <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-            <Icon
-              style={styles.Icons}
-              name="arrow-back"
-              onPress={() => navigation.navigate('Home2')}
-            />
-            <Text style={styles.text}>User</Text>
-            <Icon
-              style={styles.Icons}
-              name="person-circle-outline"
-              onPress={() => navigation.navigate('UserProfile')}></Icon>
-          </View>
-        </View>
-        <View
-          style={{
-            alignItems: 'flex-end',
-          }}>
-          <Button
-            buttonStyle={styles.Button}
-            title="+ Create"
-            onPress={() => navigation.navigate('NewUser')}
-          />
-        </View>
-        <ScrollView>
-          <View>
-            {loading ? (
-              <Text>Loading...</Text>
-            ) : (
-              data.map((item, index) => (
-                <View
-                  key={index}
-                  style={{justifyContent: 'center', alignItems: 'center'}}>
-                  <View style={[styles.Card, styles.ShadowProps]}>
-                    <Text style={{fontSize: 18, color: '#000'}}>
-                      UserId:{item.pk}
-                    </Text>
+  const handleRefresh = () => {
+    setRefreshing(true);
 
-                    <View style={styles.card2}>
-                      <Text style={{fontSize: 20, color: '#000'}}>
-                        Username: {item.username}
-                      </Text>
-                      {item.is_blocked ? (
-                        <Button
-                          buttonStyle={[
-                            styles.Button2,
-                            {backgroundColor: 'red'},
-                          ]}
-                          title="Block"
-                          onPress={() => handleUnblock(item.username)}
-                        />
-                      ) : (
-                        <Button
-                          buttonStyle={[
-                            styles.Button2,
-                            {backgroundColor: '#3A39A0'},
-                          ]}
-                          title="Unblock"
-                          onPress={() => handleBlock(item.username)}
-                        />
-                      )}
-                    </View>
-                    <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-                      Role: {item.role}
-                    </Text>
-                  </View>
-                </View>
-              ))
-            )}
-          </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Button
-              buttonStyle={styles.Button}
-              title="Previous"
-              onPress={() => {
-                if (page > 1) {
-                  setPage(page - 1);
-                  fetchApiData();
-                }
-              }}
-            />
-            <Button
-              buttonStyle={styles.Button}
-              title="Next"
-              onPress={() => {
-                if (page < totalPages) {
-                  console.log('Next');
-                  setPage(page + 1);
-                  fetchApiData();
-                }
-              }}
-            />
-          </View>
-        </ScrollView>
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  return (
+    <View>
+      <View style={styles.UserContainer}>
+        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+          <Icon
+            style={styles.Icons}
+            name="arrow-back"
+            onPress={() => navigation.navigate('Home2')}
+          />
+          <Text style={styles.text}>User</Text>
+          <Icon
+            style={styles.Icons}
+            name="person-circle-outline"
+            onPress={() => navigation.navigate('UserProfile')}></Icon>
+        </View>
       </View>
-    </ScrollView>
+      <View
+        style={{
+          alignItems: 'flex-end',
+        }}>
+        <Button
+          buttonStyle={styles.Button}
+          title="+ Create"
+          onPress={() => navigation.navigate('NewUser')}
+        />
+      </View>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }>
+        <View>
+          {loading ? (
+            <Text>Loading...</Text>
+          ) : (
+            data.map((item, index) => (
+              <View
+                key={index}
+                style={{justifyContent: 'center', alignItems: 'center'}}>
+                <View style={[styles.Card, styles.ShadowProps]}>
+                  <Text style={{fontSize: 18, color: '#000'}}>
+                    UserId:{item.pk}
+                  </Text>
+
+                  <View style={styles.card2}>
+                    <Text style={{fontSize: 20, color: '#000'}}>
+                      Username: {item.username}
+                    </Text>
+                    {item.is_blocked ? (
+                      <Button
+                        buttonStyle={[styles.Button2, {backgroundColor: 'red'}]}
+                        title="Block"
+                        onPress={() => handleUnblock(item.username)}
+                      />
+                    ) : (
+                      <Button
+                        buttonStyle={[
+                          styles.Button2,
+                          {backgroundColor: '#3A39A0'},
+                        ]}
+                        title="Unblock"
+                        onPress={() => handleBlock(item.username)}
+                      />
+                    )}
+                  </View>
+                  <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
+                    Role: {item.role}
+                  </Text>
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 

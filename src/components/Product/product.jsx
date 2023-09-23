@@ -1,6 +1,13 @@
 import axios from 'axios';
 import {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Api_Url} from '../../utilities/api';
@@ -8,6 +15,7 @@ import {Api_Url} from '../../utilities/api';
 const Product = ({navigation}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState();
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchApiData();
@@ -28,40 +36,50 @@ const Product = ({navigation}) => {
     navigation.navigate('NewProduct', {index, pk});
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   return (
     <View>
-      <ScrollView>
-        <View style={styles.ProductContainer}>
-          <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-            <Icon
-              style={styles.Icons}
-              name="arrow-back"
-              onPress={() => navigation.navigate('Home2')}
-            />
-            <Text style={styles.text}>Product</Text>
-            <Icon
-              style={styles.Icons}
-              name="person-circle-outline"
-              onPress={() => navigation.navigate('UserProfile')}></Icon>
-          </View>
+      <View style={styles.ProductContainer}>
+        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+          <Icon
+            style={styles.Icons}
+            name="arrow-back"
+            onPress={() => navigation.navigate('Home2')}
+          />
+          <Text style={styles.text}>Product</Text>
+          <Icon
+            style={styles.Icons}
+            name="person-circle-outline"
+            onPress={() => navigation.navigate('UserProfile')}></Icon>
         </View>
-        <View style={styles.SecondContainer}>
-          <View style={styles.Search}>
-            <TextInput style={styles.input} placeholder="Search..." />
-            <Icon
-              name="search"
-              size={24}
-              color="#888"
-              style={styles.searchIcon}
-            />
-          </View>
-          <Button
-            buttonStyle={styles.Button}
-            title="+ Create"
-            onPress={() => navigation.navigate('NewProduct')}
+      </View>
+      <View style={styles.SecondContainer}>
+        <View style={styles.Search}>
+          <TextInput style={styles.input} placeholder="Search..." />
+          <Icon
+            name="search"
+            size={24}
+            color="#888"
+            style={styles.searchIcon}
           />
         </View>
-
+        <Button
+          buttonStyle={styles.Button}
+          title="+ Create"
+          onPress={() => navigation.navigate('NewProduct')}
+        />
+      </View>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }>
         {loading ? (
           <Text>Loading...</Text>
         ) : (

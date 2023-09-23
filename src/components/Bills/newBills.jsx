@@ -27,7 +27,7 @@ const NewBills = ({navigation, route}) => {
   const [billId, setBillId] = useState('');
 
   const [action, setAction] = useState('false');
-  const [action2, setAction2] = useState('false');
+  const [chargeBillId, setChargeBillId] = useState('');
 
   const [unConfirmProducts, setUnConfirmProducts] = useState([]);
 
@@ -125,9 +125,10 @@ const NewBills = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/bill/apis/sales/unconfirm-bill/${id}/`,
       );
-      // console.log('API response for unconfirm products:', response.data.data);
+      console.log('API response for unconfirm products:', response.data.data);
       setGrandTotal(response.data.data.total_price);
       setCommission(response.data.data.charge_percentage);
+      setChargeBillId(response.data.data.id);
       // console.log('asdadsasd', response.data.data.charge_percentage);
       const apiData = response.data.data;
       const items = apiData.unconfirmsalesbill_item || [];
@@ -213,6 +214,7 @@ const NewBills = ({navigation, route}) => {
   };
 
   const handleIssuCharge = async () => {
+    console.log(chargeBillId, 'cbascks');
     const formData = {
       charge: commission,
     };
@@ -221,7 +223,7 @@ const NewBills = ({navigation, route}) => {
 
     try {
       await axios.post(
-        `${Api_Url}/bill/apis/sales/charge/${supplierId}/`,
+        `${Api_Url}/bill/apis/sales/charge/${chargeBillId}/`,
         formData,
       );
       Alert.alert('Success', 'Charge Added Successfully');
@@ -264,7 +266,7 @@ const NewBills = ({navigation, route}) => {
           <Text style={styles.label}>Customer:</Text>
           <ModalDropdown
             style={styles.Input}
-            defaultValue="Select Supplier..."
+            defaultValue="Select Customer..."
             options={supplier.map(item => item.name)}
             onSelect={index => handleProductSelection(index)}
             defaultIndex={0}
@@ -520,7 +522,7 @@ const NewBills = ({navigation, route}) => {
             <Text style={{color: 'black', marginTop: 3}}>Commission:</Text>
             <TextInput
               style={styles.CommisionText}
-              onTextChange={setCommission}>
+              onChangeText={setCommission}>
               {commission}{' '}
             </TextInput>
             <Text style={{color: 'black', marginTop: 3}}>% </Text>

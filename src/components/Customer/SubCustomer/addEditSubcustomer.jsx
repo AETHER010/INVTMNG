@@ -19,56 +19,62 @@ const NewSubCustomer = ({navigation, route}) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    console.log(data);
-    if (route && route.params) {
-      fetchApiData(route.params.pk);
+    console.log(route);
+    if (route.params && route.params.scid) {
+      fetchApiData(route.params.scid);
     }
-    console.log('Fetching', data.name);
-    setName(data.name);
-    setContact_number(data.contact_number);
-  }, []);
+  }, [route]);
 
   const fetchApiData = async id => {
     try {
       const response = await axios.get(
-        `${Api_url}/accounts/apis/customer/${id}`,
+        `${Api_url}/accounts/apis/subcustomer/${id}`,
       );
-      console.log('API response:', response.data);
-      setData(response.data);
+      console.log('API response:', response.data.data[0]);
+      setData(response.data.data[0]);
+
+      setName(response.data.data[0].name);
+      setContact_number(response.data.data[0].contact_number);
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while fetching data.');
     }
   };
 
-  const HandleformSubmit = async id => {
+  const HandleformSubmit = async () => {
+    const id = route.params.pk;
     const formData = {
       name: name,
       contact_number: contact_number,
     };
 
+    console.log('Form submit', formData);
+
     try {
       const response = await axios.post(
-        `${Api_url}/accounts/apis/subcustomer/${id}`,
+        `${Api_url}/accounts/apis/subcustomer/${id}/`,
         formData,
       );
       console.log('API response:', response.data);
       Alert.alert('Success', 'Data submitted successfully!');
+      navigation.navigate('SubCustomer');
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
-  const handleUpdate = async ({id, id2}) => {
+  const handleUpdate = async id => {
     const formData = {
       name: name,
       contact_number: contact_number,
     };
 
+    console.log('Form submit', formData);
+
     try {
       const response = await axios.put(
-        `${Api_url}/accounts/apis/subcustomer/${id}/${id2}`,
+        `${Api_url}/accounts/apis/subcustomer/${id}/`,
         formData,
       );
       console.log('API response:', response.data);
@@ -126,17 +132,12 @@ const NewSubCustomer = ({navigation, route}) => {
           />
         </View>
         <View style={{flexDirection: 'row'}}>
-          {route && route.params ? (
+          {route.params && route.params.scid ? (
             <View>
               <Button
                 buttonStyle={styles.Button}
                 title="Update"
                 onPress={() => handleUpdate(data.pk)}
-              />
-              <Button
-                buttonStyle={styles.Button2}
-                title="Sub Customer"
-                onPress={() => handlesubcustomer(data.pk)}
               />
             </View>
           ) : (
@@ -179,14 +180,17 @@ const styles = StyleSheet.create({
   text2: {
     fontSize: 20,
     textDecorationLine: 'underline',
+    color: '#000',
   },
   label: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#000',
   },
   Input: {
     height: 40,
     width: 220,
+    color: '#000',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

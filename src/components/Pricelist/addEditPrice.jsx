@@ -50,7 +50,7 @@ const AddPriceList = ({navigation, route}) => {
     console.log(formData);
     try {
       const response = await axios.post(
-        `${Api_Url}/accounts/apis/subcustomer/product/create/${subCId}`,
+        `${Api_Url}/accounts/apis/subcustomer/product/create/${subCId}/`,
         formData,
       );
       console.log('API response:', response.data);

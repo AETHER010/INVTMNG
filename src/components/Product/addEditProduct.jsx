@@ -28,6 +28,7 @@ const NewProduct = ({navigation, route}) => {
     console.log(route);
     if (route && route.params) {
       GetSupplierList();
+      getProductData();
     }
     GetSupplierList();
     // getProductData();
@@ -38,6 +39,7 @@ const NewProduct = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/accounts/apis/suppliers?search=`,
       );
+      console.log('API error:', response.data.data);
       setData(response.data.data);
 
       if (route.params && route.params.index) {
@@ -51,12 +53,17 @@ const NewProduct = ({navigation, route}) => {
   };
 
   const getProductData = async () => {
+    console.log('Get Product Data', route.params.pk);
     try {
       const response = await axios.get(
-        `${Api_Url}/products/apis/products/${route.params.id}`,
+        `${Api_Url}/products/apis/products/${route.params.pk}`,
       );
 
-      console.log('getting products', response.data);
+      console.log('getting products', response.data.stock);
+      // setSelectedSupplierName(response.data.name);
+      setName(response.data.name);
+      setSellingPrice(response.data.standard_price.toString());
+      setStock(response.data.stock.toString());
     } catch (error) {
       console.error('API error:', error);
       // Alert.alert('Error', 'An error occurred while getting data.');
@@ -78,6 +85,7 @@ const NewProduct = ({navigation, route}) => {
       );
       console.log('API response:', response.data);
       Alert.alert('Success', 'Data submitted successfully!');
+      navigation.navigate('Product');
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while submitting data.');
@@ -88,6 +96,27 @@ const NewProduct = ({navigation, route}) => {
     const selected = data[index];
     const selectedSupplier = selected.pk;
     setSupplier(selectedSupplier);
+  };
+
+  const HandleUpdate = async () => {
+    const formData = {
+      name: name,
+
+      standard_price: sellingPrice,
+    };
+    console.log(formData, 'formdata');
+    try {
+      const response = await axios.put(
+        `${Api_Url}/products/apis/products/${route.params.pk}`,
+        formData,
+      );
+      console.log('API response:', response.data);
+      Alert.alert('Success', 'Data updated successfully!');
+      navigation.navigate('Product');
+    } catch (error) {
+      console.error('API error:', error);
+      Alert.alert('Error', 'An error occurred while submitting data.');
+    }
   };
 
   return (
@@ -158,11 +187,15 @@ const NewProduct = ({navigation, route}) => {
           {route && route.params ? (
             <Button
               buttonStyle={styles.Button}
+              title="Update"
+              onPress={HandleUpdate}
+            />
+          ) : (
+            <Button
+              buttonStyle={styles.Button}
               onPress={HandleformSubmit}
               title="Create"
             />
-          ) : (
-            <Button buttonStyle={styles.Button} title="Update" />
           )}
         </View>
       </View>

@@ -1,5 +1,12 @@
 import {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
@@ -30,15 +37,16 @@ const SubCustomer = ({navigation, route}) => {
     }
   };
 
-  const handleUpdate = async pk => {
-    navigation.navigate('NewCustomer', {pk});
+  const handleNavigationSC = async () => {
+    const pk = route.params.id;
+    navigation.navigate('NewSubCustomer', {pk});
   };
 
   const handleEnable = async pk => {
     try {
       await axios.post(`${Api_Url}/accounts/apis/subcustomer/enable/${pk}/`);
       Alert.alert('User enabled successfully');
-      fetchApiData();
+      fetchApiData(route.params.id);
     } catch (error) {
       console.log('error', error);
     } finally {
@@ -50,7 +58,7 @@ const SubCustomer = ({navigation, route}) => {
     try {
       await axios.post(`${Api_Url}/accounts/apis/subcustomer/disable/${pk}/`);
       Alert.alert('User disabled successfully');
-      fetchApiData();
+      fetchApiData(route.params.id);
     } catch (error) {
       console.log('error', error);
     } finally {
@@ -61,6 +69,10 @@ const SubCustomer = ({navigation, route}) => {
   const handleNavigation = id => {
     console.log('navigation', id);
     navigation.navigate('PriceList', {id});
+  };
+
+  const handleUpdate = async scid => {
+    navigation.navigate('NewSubCustomer', {scid});
   };
 
   return (
@@ -90,7 +102,7 @@ const SubCustomer = ({navigation, route}) => {
           <Button
             buttonStyle={styles.Button}
             title="+ Create"
-            onPress={() => navigation.navigate('NewSubCustomer')}
+            onPress={handleNavigationSC}
           />
         </View>
 
@@ -136,7 +148,7 @@ const SubCustomer = ({navigation, route}) => {
                     size={18}
                     color="#fff"
                     style={styles.sideIcon}
-                    onPress={handleDisable}
+                    onPress={() => handleUpdate(item.pk)}
                   />
                 </View>
               </View>
