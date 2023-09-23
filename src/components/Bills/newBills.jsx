@@ -74,7 +74,7 @@ const NewBills = ({navigation, route}) => {
         `${Api_Url}/bill/apis/sales/unconfirm-bill/${supplierId}/`,
         formData,
       );
-      console.log('API responsed after form submission:', response.data);
+      // console.log('API responsed after form submission:', response.data);
       gettingSupplierProducts(supplierId);
       setPrice('');
       setProduct([]);
@@ -95,7 +95,7 @@ const NewBills = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/bill/apis/sales/subcustomer/products/${selectedData.pk}`,
       );
-      console.log('API response for Product:', response.data);
+      // console.log('API response for Product:', response.data);
       setProduct(response.data);
     } catch (error) {
       console.error('API error:', error);
@@ -112,7 +112,7 @@ const NewBills = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/bill/apis/sales/suppliers/products/price/${supplierId}/${selectedProduct.pk}`,
       );
-      console.log('API response454:', response.data);
+      // console.log('API response454:', response.data);
       setPrice(response.data.lastpurchaseprice);
     } catch (error) {
       console.error('API error:', error);
@@ -125,16 +125,16 @@ const NewBills = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/bill/apis/sales/unconfirm-bill/${id}/`,
       );
-      console.log('API response for unconfirm products:', response.data.data);
+      // console.log('API response for unconfirm products:', response.data.data);
       setGrandTotal(response.data.data.total_price);
       setCommission(response.data.data.charge_percentage);
-      console.log('asdadsasd', response.data.data.charge_percentage);
+      // console.log('asdadsasd', response.data.data.charge_percentage);
       const apiData = response.data.data;
       const items = apiData.unconfirmsalesbill_item || [];
       setBillId(apiData.id);
 
       setUnConfirmProducts(items);
-      console.log('Product issues bills', unConfirmProducts);
+      // console.log('Product issues bills', unConfirmProducts);
     } catch (error) {
       console.error('API error:', error);
       // Alert.alert('Error', 'An error occurred while getting Product data.');
@@ -155,9 +155,11 @@ const NewBills = ({navigation, route}) => {
 
   useEffect(() => {
     console.log('selectedUpdate:', selectedUpdate);
-    console.log('selected', selectedUpdate.quantity);
-    console.log('selected', viewProduct);
-  }, [selectedUpdate, newPrice, newQuantity]);
+    setNewPrice(selectedUpdate.per_unit_price);
+    setNewQuantity(selectedUpdate.quantity);
+    console.log('qunatity', selectedUpdate.quantity);
+    console.log('price', selectedUpdate.per_unit_price);
+  }, [selectedUpdate]);
 
   const handleDelete = () => {
     console.log('delete');
@@ -171,17 +173,9 @@ const NewBills = ({navigation, route}) => {
     setViewProduct('true');
 
     setSelectedUpdate(unConfirmProducts[index]);
-    setNewPrice(selectedUpdate.price);
-    setNewQuantity(selectedUpdate.quantity);
-    console.log('qunatity', selectedUpdate.quantity);
-    console.log('price', selectedUpdate.price);
   };
 
   const handleDeleteProduct = async id => {
-    const formData = {
-      quantity: newQuantity,
-      per_unit_price: newPrice,
-    };
     try {
       await axios.delete(
         `${Api_Url}/bill/apis/sales/update-delete-unconfirm-bill/${id}/`,
@@ -196,14 +190,21 @@ const NewBills = ({navigation, route}) => {
   };
 
   const handleUpdateProduct = async id => {
+    const formData = {
+      quantity: newQuantity,
+      per_unit_price: newPrice,
+    };
+
+    console.log(formData);
+
     try {
       await axios.put(
         `${Api_Url}/bill/apis/sales/update-delete-unconfirm-bill/${id}/`,
         formData,
       );
       Alert.alert('Success', 'Product Updated Successfully');
-      gettingSupplierProducts(supplierId);
       setAction('false');
+      setViewProduct('false');
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
@@ -215,15 +216,19 @@ const NewBills = ({navigation, route}) => {
     const formData = {
       charge: commission,
     };
+
+    console.log(supplierId);
+
     try {
-      await axios.put(`${Api_Url}/apis/sales/charge/${supplierId}/`, formData);
-      Alert.alert('Success', 'Product Updated Successfully');
-      gettingSupplierProducts(supplierId);
-      setAction('false');
+      await axios.post(
+        `${Api_Url}/bill/apis/sales/charge/${supplierId}/`,
+        formData,
+      );
+      Alert.alert('Success', 'Charge Added Successfully');
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
-      Alert.alert('Error', 'An error occurred while Updaing product.');
+      Alert.alert('Error', 'An error occurred while addin product.');
     }
   };
 
@@ -359,7 +364,7 @@ const NewBills = ({navigation, route}) => {
                         ) : (
                           <TextInput
                             style={[styles.updateInput, {color: '#000'}]}
-                            value={updatedPrice.toString()}
+                            value={updatedPrice}
                             onChangeText={setUpdatedPrice}
                             editable={true}
                           />
@@ -377,7 +382,7 @@ const NewBills = ({navigation, route}) => {
                         ) : (
                           <TextInput
                             style={[styles.updateInput, {color: '#000'}]}
-                            value={updatedQuantity.toString()}
+                            value={updatedQuantity}
                             onChangeText={setUpdatedQuantity}
                             editable={true}
                           />
@@ -459,7 +464,7 @@ const NewBills = ({navigation, route}) => {
                     </Text>
                     <TextInput
                       style={[styles.updateInput, {color: '#000'}]}
-                      value={selectedUpdate.per_unit_price.toString()}
+                      value={newPrice.toString()}
                       onChangeText={setNewPrice}
                       editable={true}
                     />
@@ -471,7 +476,7 @@ const NewBills = ({navigation, route}) => {
 
                     <TextInput
                       style={[styles.updateInput, {color: '#000'}]}
-                      value={selectedUpdate.quantity.toString()}
+                      value={newQuantity.toString()}
                       onChangeText={setNewQuantity}
                       editable={true}
                     />
@@ -513,13 +518,15 @@ const NewBills = ({navigation, route}) => {
           <Text style={{color: 'black', marginBottom: 5}}>Sub Total: </Text>
           <View style={{color: 'black', flexDirection: 'row'}}>
             <Text style={{color: 'black', marginTop: 3}}>Commission:</Text>
-            <TextInput style={styles.CommisionText} onChange={setCommission}>
+            <TextInput
+              style={styles.CommisionText}
+              onTextChange={setCommission}>
               {commission}{' '}
             </TextInput>
             <Text style={{color: 'black', marginTop: 3}}>% </Text>
           </View>
           <Button
-            buttonStyle={styles.Button2}
+            buttonStyle={styles.Button3}
             title="Add"
             onPress={handleIssuCharge}
           />
@@ -609,6 +616,16 @@ const styles = StyleSheet.create({
   Button2: {
     height: 40,
     width: 90,
+    fontSize: 14,
+    backgroundColor: '#3A39A0',
+    color: '#000',
+    borderRadius: 10,
+    padding: 8,
+    fontSize: 18,
+  },
+  Button3: {
+    height: 40,
+    width: 50,
     fontSize: 14,
     backgroundColor: '#3A39A0',
     color: '#000',

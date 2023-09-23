@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {Api_Url} from '../../utilities/api';
 
 const Product = ({navigation}) => {
   const [data, setData] = useState([]);
@@ -14,9 +15,7 @@ const Product = ({navigation}) => {
 
   const fetchApiData = async () => {
     try {
-      const response = await axios.get(
-        'https://ims.itnepalsoultions.com.pujanrajrai.com.np/products/apis/products',
-      );
+      const response = await axios.get(`${Api_Url}/products/apis/products`);
       setData(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -25,8 +24,8 @@ const Product = ({navigation}) => {
     }
   };
 
-  const handleUpdate = async index => {
-    navigation.navigate('NewProduct', {index});
+  const handleUpdate = async (index, pk) => {
+    navigation.navigate('NewProduct', {index, pk});
   };
 
   return (
@@ -86,7 +85,7 @@ const Product = ({navigation}) => {
                   </Text>
                   <Button
                     buttonStyle={styles.Button2}
-                    // onPress={() => handleUpdate(index)}
+                    onPress={() => handleUpdate(index, item.pk)}
                     title="View Detaiils"
                   />
                 </View>

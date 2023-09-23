@@ -1,5 +1,4 @@
-import React, {Component, useState} from 'react';
-
+import React, {Component} from 'react';
 import {
   StyleSheet,
   View,
@@ -9,13 +8,13 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Table, TableWrapper, Row} from 'react-native-table-component';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {Button} from 'react-native-elements';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
 import axios from 'axios'; // Import Axios for API requests
 import {Api_Url} from '../../../utilities/api';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon2 from 'react-native-vector-icons/AntDesign';
 
 export default class ExampleThree extends Component {
   constructor(props) {
@@ -39,11 +38,11 @@ export default class ExampleThree extends Component {
   getApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/report/apis/ledger/suppliers/list/?page=2`,
+        `${Api_Url}/report/apis/ledger/suppliers/list/?page=1`,
       );
       const responseData = response.data.data;
 
-      console.log(responseData, 'dsfhjgsjdhf'); // Assuming the API response is an object with a data property
+      console.log(responseData, 'dsfhjgsjdhf');
       this.setState({data: responseData, loading: false});
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -51,8 +50,16 @@ export default class ExampleThree extends Component {
     }
   };
 
+  // Function to handle date changes for From and To dates
+  handleDateChange = (date, type) => {
+    if (type === 'from') {
+      this.setState({fromDate: date, showFromDatePicker: false});
+    } else if (type === 'to') {
+      this.setState({toDate: date, showToDatePicker: false});
+    }
+  };
+
   render() {
-    const state = this.state;
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
       this.state.data && this.state.data.length > 0
@@ -67,14 +74,12 @@ export default class ExampleThree extends Component {
               Debit,
               balance,
             }) => [
-              moment(created_date).format('MMMDD,YYYY'),
+              moment(created_date).format('MMM DD, YYYY'), // Fixed date format
               suppliers,
               particular,
               _type === 'Credit' ? (
                 <Text style={{color: 'green'}}>{amount}</Text>
               ) : null,
-              // Credit !== null ? Credit : null,
-              // Debit !== null ? Debit : null,
               _type === 'Debit' ? (
                 <Text style={{color: 'red'}}>{amount}</Text>
               ) : null,
@@ -86,16 +91,45 @@ export default class ExampleThree extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.SecondContainer}>
-          <Text style={styles.textDisplay}> Supplier</Text>
-          <Text
-            style={styles.textDisplay}
-            onPress={() => this.setState({showDatePicker: true})}>
-            Select Date
-          </Text>
-
-          <Button
-            buttonStyle={styles.Button}
-            title="Export"
+          <Text style={styles.textDisplay}>Supplier</Text>
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={() => this.setState({showFromDatePicker: true})}>
+            {fromDate ? (
+              <Text>{moment(fromDate).format('MMM DD, YYYY')}</Text>
+            ) : (
+              <Text>Select From Date</Text>
+            )}
+          </TouchableOpacity>
+          {showFromDatePicker && (
+            <DateTimePicker
+              value={fromDate}
+              mode="date"
+              display="default"
+              onChange={(event, date) => this.handleDateChange(date, 'from')}
+            />
+          )}
+          <Icon2 style={styles.swapIcon} name="swap"></Icon2>
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={() => this.setState({showToDatePicker: true})}>
+            {toDate ? (
+              <Text>{moment(toDate).format('MMM DD, YYYY')}</Text>
+            ) : (
+              <Text>Select To Date</Text>
+            )}
+          </TouchableOpacity>
+          {showToDatePicker && (
+            <DateTimePicker
+              value={toDate}
+              mode="date"
+              display="default"
+              onChange={(event, date) => this.handleDateChange(date, 'to')}
+            />
+          )}
+          <Icon
+            style={styles.Button}
+            name="download"
             // onPress={handleSupplierLedger}
           />
         </View>
@@ -104,8 +138,8 @@ export default class ExampleThree extends Component {
           <View>
             <Table>
               <Row
-                data={state.tableHead}
-                widthArr={state.widthArr}
+                data={this.state.tableHead}
+                widthArr={this.state.widthArr}
                 style={styles.header}
                 textStyle={styles.text}
               />
@@ -116,7 +150,7 @@ export default class ExampleThree extends Component {
                   <Row
                     key={index}
                     data={rowData}
-                    widthArr={state.widthArr}
+                    widthArr={this.state.widthArr}
                     style={[
                       styles.row,
                       index % 2 && {backgroundColor: '#F7F6E7'},
@@ -160,52 +194,39 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     backgroundColor: '#fff',
   },
-  Search: {
-    marginTop: 10,
-    flexDirection: 'row',
-    // justifyContent: "space-evenly",
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRightWidth: 1,
-    borderLeftWidth: 1,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    height: 40,
-    width: 220,
+  datePickerButton: {
+    backgroundColor: '#3A39A0',
+    paddingHorizontal: 8,
+    paddingVertical: 10,
     borderRadius: 9,
-    borderBlockColor: '#3A39A0',
-  },
-  input: {
-    margin: 2,
-    padding: 7,
-    width: 170,
-    color: '#000',
-  },
-  searchIcon: {
-    borderLeftWidth: 2,
-    borderLeftColor: '#3A39A0',
-    paddingLeft: 6,
-    marginLeft: 8,
-    color: '#3A39A0',
+    marginVertical: 10,
   },
   Button: {
-    marginTop: 9,
-    height: 40,
-    width: 80,
-    fontSize: 14,
+    marginTop: 14,
+    height: 30,
+    width: 30,
+    fontSize: 24,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',
-    borderRadius: 10,
+    borderRadius: 14,
+    textAlign: 'center',
+    paddingTop: 4,
   },
   textDisplay: {
     color: '#000',
     marginTop: 9,
     height: 40,
-    width: 80,
+    width: 120,
     borderWidth: 1,
     borderColor: '#3A39A0',
     textAlign: 'center',
     paddingTop: 7,
     borderRadius: 10,
+  },
+
+  swapIcon: {
+    color: '#000',
+    fontSize: 25,
+    marginTop: 17,
   },
 });

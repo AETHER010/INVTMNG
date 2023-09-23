@@ -75,7 +75,7 @@ const NewPaymentSupplier = ({navigation}) => {
     // });
 
     const formData = {
-      customer: cname,
+      suppliers: cname,
       amount: amount,
       remarks: remarks,
     };
@@ -94,6 +94,7 @@ const NewPaymentSupplier = ({navigation}) => {
       );
       console.log('API response:', response.data);
       Alert.alert('Success', 'Data submitted successfully!');
+      navigation.navigate('Payment');
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while submitting data.');
@@ -135,7 +136,7 @@ const NewPaymentSupplier = ({navigation}) => {
             <Text style={styles.label}>Supplier:</Text>
             <ModalDropdown
               style={styles.Input}
-              defaultValue="Select Client..."
+              defaultValue="Select Supplier..."
               options={customer.map(item => item.name)}
               onSelect={index => handleProductSelection(index)}
               defaultIndex={0}

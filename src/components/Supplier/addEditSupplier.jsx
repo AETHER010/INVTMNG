@@ -10,9 +10,10 @@ import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
+import {Api_Url} from '../../utilities/api';
 
 const NewSupplier = ({navigation, route}) => {
-  const Api_ULR = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
+  // const Api_ULR = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
 
   const [name, setName] = useState('');
   const [contact_number, setContact_number] = useState('');
@@ -23,18 +24,18 @@ const NewSupplier = ({navigation, route}) => {
     if (route && route.params) {
       fetchApiData(route.params.pk);
     }
-    setName(data.name);
-    setContact_number(data.contact_number);
-  }, []);
+  }, [route]);
 
   const fetchApiData = async id => {
     console.log('params value', id);
     try {
       const response = await axios.get(
-        `${Api_ULR}/accounts/apis/suppliers/${id}`,
+        `${Api_Url}/accounts/apis/suppliers/${id}`,
       );
       console.log('API response:', response.data);
       setData(response.data);
+      setName(response.data.name || '');
+      setContact_number(response.data.contact_number || '');
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while submitting data.');
@@ -49,7 +50,7 @@ const NewSupplier = ({navigation, route}) => {
 
     try {
       const response = await axios.post(
-        `${Api_ULR}/accounts/apis/suppliers/`,
+        `${Api_Url}/accounts/apis/suppliers/`,
         formData,
       );
       console.log('API response:', response.data);
@@ -67,13 +68,16 @@ const NewSupplier = ({navigation, route}) => {
       contact_number: contact_number,
     };
 
+    console.log('API response:', formData);
+
     try {
       const response = await axios.put(
-        `${Api_ULR}/accounts/apis/suppliers/${id}`,
+        `${Api_Url}/accounts/apis/suppliers/${id}/`,
         formData,
       );
       console.log('API response:', response.data);
       Alert.alert('Success', 'Data submitted successfully!');
+      navigation.navigate('Supplier');
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while submitting data.');
@@ -101,7 +105,11 @@ const NewSupplier = ({navigation, route}) => {
         </View>
       </View>
       <View style={styles.formContainer}>
-        <Text style={styles.text2}>Create Supplier</Text>
+        {route && route.params ? (
+          <Text style={styles.text2}>Update Supplier</Text>
+        ) : (
+          <Text style={styles.text2}>Create Supplier</Text>
+        )}
         <View
           style={{
             flexDirection: 'row',

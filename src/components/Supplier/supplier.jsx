@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#3A39A0',
     padding: 3,
+    borderRadius: 9,
   },
 });
 

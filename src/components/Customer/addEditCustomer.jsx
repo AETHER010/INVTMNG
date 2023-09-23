@@ -5,41 +5,49 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Dimensions,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
+import {Api_Url} from '../../utilities/api';
 
 const NewSupplier = ({navigation, route}) => {
-  const Api_url = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
+  // const Api_url = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
   const [name, setName] = useState('');
   const [contact_number, setContact_number] = useState('');
-  const [customerId, setCustomerId] = useState('');
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    console.log(data);
+    console.log('iadsfads', route.params);
     if (route && route.params) {
       fetchApiData(route.params.pk);
     }
     console.log('Fetching', data.name);
-    setName(data.name);
-    setContact_number(data.contact_number);
-  }, []);
+    // setName(data.name || '');
+    // setContact_number(data.contact_number || '');
+  }, [route]);
 
   const fetchApiData = async id => {
     try {
       const response = await axios.get(
-        `${Api_url}/accounts/apis/customer/${id}`,
+        `${Api_Url}/accounts/apis/customer/${id}`,
       );
       console.log('API response:', response.data);
       setData(response.data);
+      setName(response.data.name || '');
+      setContact_number(response.data.contact_number || '');
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while fetching data.');
     }
   };
+
+  useEffect(() => {
+    console.log('Fetching', data.name);
+    console.log('Fetching', data.name);
+  }, [data]);
 
   const HandleformSubmit = async () => {
     const formData = {
@@ -49,26 +57,29 @@ const NewSupplier = ({navigation, route}) => {
 
     try {
       const response = await axios.post(
-        `${Api_url}/accounts/apis/customer/`,
+        `${Api_Url}/accounts/apis/customer/`,
         formData,
       );
       console.log('API response:', response.data);
       Alert.alert('Success', 'Data submitted successfully!');
+      navigation.navigate('Customer');
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
-  const handleUpdate = async id => {
+  const handleUpdate = async () => {
     const formData = {
       name: name,
       contact_number: contact_number,
     };
 
+    console.log('API response:', formData);
+
     try {
       const response = await axios.put(
-        `${Api_url}/accounts/apis/customer/${id}`,
+        `${Api_Url}/accounts/apis/customer/${route.params.pk}/`,
         formData,
       );
       console.log('API response:', response.data);
@@ -111,20 +122,20 @@ const NewSupplier = ({navigation, route}) => {
             padding: 5,
             marginTop: 18,
           }}>
-          <Text style={styles.label}>CustomerId:</Text>
-          <TextInput style={styles.Input} editable={false} value={customerId} />
           <Text style={styles.label}>Customer:</Text>
           <TextInput
             style={styles.Input}
-            value={name || ''}
-            onChangeText={setName}
+            value={name}
+            onChangeText={text => setName(text)}
+            editable={true}
           />
 
           <Text style={styles.label}>Contact Number:</Text>
           <TextInput
             style={styles.Input}
-            value={contact_number || ''}
-            onChangeText={setContact_number}
+            value={contact_number}
+            onChangeText={text => setContact_number(text)}
+            editable={true}
           />
         </View>
         <View style={{flexDirection: 'row'}}>
@@ -133,7 +144,7 @@ const NewSupplier = ({navigation, route}) => {
               <Button
                 buttonStyle={styles.Button}
                 title="Update"
-                onPress={() => handleUpdate(data.pk)}
+                onPress={() => handleUpdate()}
               />
               <Button
                 buttonStyle={styles.Button2}
@@ -154,6 +165,7 @@ const NewSupplier = ({navigation, route}) => {
   );
 };
 
+const screenWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   SupplierContainer: {
     display: 'flex',
@@ -190,7 +202,7 @@ const styles = StyleSheet.create({
   },
   Input: {
     height: 40,
-    width: 220,
+    width: screenWidth > 400 ? 220 : 180,
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

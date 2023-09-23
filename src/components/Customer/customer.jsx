@@ -71,13 +71,8 @@ const Customer = ({navigation}) => {
               key={index}
               style={{justifyContent: 'center', alignItems: 'center'}}>
               <View style={[styles.Card, styles.ShadowProps]}>
-                <View style={styles.card2}>
+                <View>
                   <Text style={{fontSize: 18, color: '#000'}}>{item.name}</Text>
-                  <Button
-                    buttonStyle={styles.priceButton}
-                    title="Price List"
-                    onPress={() => navigation.navigate('PriceList')}
-                  />
                 </View>
                 <Text style={{fontSize: 14, color: '#000'}}>
                   {item.contact_number}

@@ -35,7 +35,6 @@ const NewPurchase = ({navigation, route}) => {
 
   const [updatedPrice, setUpdatedPrice] = useState('');
   const [updatedQuantity, setUpdatedQuantity] = useState('');
-
   const [selectedUpdate, setSelectedUpdate] = useState([]);
 
   const [viewProduct, setViewProduct] = useState('false');
@@ -75,7 +74,7 @@ const NewPurchase = ({navigation, route}) => {
         `${Api_Url}/bill/apis/purchase/unconfirm/bill/${supplierId}/`,
         formData,
       );
-      console.log('API responsed after form submission:', response.data);
+      // console.log('API responsed after form submission:', response.data);
       gettingSupplierProducts(supplierId);
       setPrice('');
       setProduct([]);
@@ -96,7 +95,7 @@ const NewPurchase = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/bill/apis/purchase/suppliers/products/${selectedData.pk}`,
       );
-      console.log('API response for Product:', response.data);
+      // console.log('API response for Product:', response.data);
       setProduct(response.data);
     } catch (error) {
       console.error('API error:', error);
@@ -126,18 +125,19 @@ const NewPurchase = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/bill/apis/purchase/unconfirm/bill/${id}/`,
       );
-      console.log('API response for unconfirm products:', response.data);
+      // console.log('API response for unconfirm products:', response.data.data);
       setGrandTotal(response.data.data.total_price);
       setCommission(response.data.data.charge_percentage);
+      // console.log('asdadsasd', response.data.data.charge_percentage);
       const apiData = response.data.data;
       const items = apiData.unconfirmpurchase_items || [];
       setBillId(apiData.id);
 
       setUnConfirmProducts(items);
-      console.log('Product issues bills', items);
+      // console.log('Product issues bills', unConfirmProducts);
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while getting Product data.');
+      // Alert.alert('Error', 'An error occurred while getting Product data.');
     }
   };
 
@@ -155,32 +155,27 @@ const NewPurchase = ({navigation, route}) => {
 
   useEffect(() => {
     console.log('selectedUpdate:', selectedUpdate);
-    console.log('selected', selectedUpdate.quantity);
-    console.log('selected', viewProduct);
-  }, [selectedUpdate, newPrice, newQuantity]);
+    setNewPrice(selectedUpdate.per_unit_price);
+    setNewQuantity(selectedUpdate.quantity);
+    console.log('qunatity', selectedUpdate.quantity);
+    console.log('price', selectedUpdate.per_unit_price);
+  }, [selectedUpdate]);
 
-  const handleDelete = async id => {
+  const handleDelete = () => {
+    console.log('delete');
     setAction('false');
     setViewProduct('false');
     gettingSupplierProducts(supplierId);
   };
 
-  const handleUpdateAction = async id => {
+  const handleUpdateAction = async (id, index) => {
     setAction('true');
     setViewProduct('true');
 
     setSelectedUpdate(unConfirmProducts[index]);
-    setNewPrice(selectedUpdate.price);
-    setNewQuantity(selectedUpdate.quantity);
-    console.log('qunatity', selectedUpdate.quantity);
-    console.log('price', selectedUpdate.price);
   };
 
   const handleDeleteProduct = async id => {
-    const formData = {
-      quantity: newQuantity,
-      per_unit_price: newPrice,
-    };
     try {
       await axios.delete(
         `${Api_Url}/bill/apis/purchase/update-delete-unconfirm-bill/${id}/`,
@@ -195,14 +190,21 @@ const NewPurchase = ({navigation, route}) => {
   };
 
   const handleUpdateProduct = async id => {
+    const formData = {
+      quantity: newQuantity,
+      per_unit_price: newPrice,
+    };
+
+    console.log(formData);
+
     try {
       await axios.put(
         `${Api_Url}/bill/apis/purchase/update-delete-unconfirm-bill/${id}/`,
         formData,
       );
       Alert.alert('Success', 'Product Updated Successfully');
-      gettingSupplierProducts(supplierId);
       setAction('false');
+      setViewProduct('false');
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
@@ -214,18 +216,19 @@ const NewPurchase = ({navigation, route}) => {
     const formData = {
       charge: commission,
     };
+
+    console.log(supplierId);
+
     try {
-      await axios.put(
+      await axios.post(
         `${Api_Url}/bill/apis/purchase/charge/${supplierId}/`,
         formData,
       );
-      Alert.alert('Success', 'Product Updated Successfully');
-      gettingSupplierProducts(supplierId);
-      setAction('false');
+      Alert.alert('Success', 'Charge Added Successfully');
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
-      Alert.alert('Error', 'An error occurred while Updaing product.');
+      Alert.alert('Error', 'An error occurred while addin product.');
     }
   };
 
@@ -250,7 +253,6 @@ const NewPurchase = ({navigation, route}) => {
         </View>
       </View>
       <View style={styles.formContainer}>
-        <Text style={styles.text2}>Create Purchase</Text>
         <View
           style={{
             flexDirection: 'row',
@@ -304,7 +306,7 @@ const NewPurchase = ({navigation, route}) => {
               <Text style={styles.label}>Cost Price:</Text>
               <TextInput
                 style={styles.priceInput}
-                value={price !== null ? price.toString() : ''}
+                value={price}
                 onChangeText={setPrice}
                 editable={true}
               />
@@ -362,14 +364,14 @@ const NewPurchase = ({navigation, route}) => {
                         ) : (
                           <TextInput
                             style={[styles.updateInput, {color: '#000'}]}
-                            value={updatedPrice.toString()}
+                            value={updatedPrice}
                             onChangeText={setUpdatedPrice}
                             editable={true}
                           />
                         )}
                       </View>
                       <View style={{flexDirection: 'row', marginTop: 4}}>
-                        <Text style={{fontSize: 18, color: '#000', padding: 5}}>
+                        <Text style={{fontSize: 18, color: '#000', padding: 3}}>
                           quantity:
                         </Text>
                         {action === 'false' ? (
@@ -380,7 +382,7 @@ const NewPurchase = ({navigation, route}) => {
                         ) : (
                           <TextInput
                             style={[styles.updateInput, {color: '#000'}]}
-                            value={updatedQuantity.toString()}
+                            value={updatedQuantity}
                             onChangeText={setUpdatedQuantity}
                             editable={true}
                           />
@@ -388,7 +390,7 @@ const NewPurchase = ({navigation, route}) => {
                       </View>
                       <View style={styles.card2}>
                         <Text
-                          style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
+                          style={{fontSize: 16, paddingTop: 3, color: '#000'}}>
                           Total Amount: {item.total_price}
                         </Text>
 
@@ -400,17 +402,28 @@ const NewPurchase = ({navigation, route}) => {
                             style={[
                               styles.Icons2,
                               {backgroundColor: '#3A39A0', marginLeft: 4},
+                              action === 'true' && {
+                                color: 'green',
+                                backgroundColor: 'transparent',
+                                size: '16px',
+                              },
                             ]}
                             name="square-edit-outline"
-                            onPress={id => handleUpdateAction(item.pk, index)}
+                            // name={
+                            //   action === 'true'
+                            //     ? 'check-circle'
+                            //     : 'square-edit-outline'
+                            // }
+                            onPress={() => handleUpdateAction(item.pk, index)}
                           />
                           <Icon
                             style={[
                               styles.Icons2,
                               {backgroundColor: '#FF0000'},
                             ]}
+                            // name={action === 'true' ? 'close-circle' : 'delete'}
                             name="delete"
-                            onPress={() => handleDelete(item.pk)}
+                            onPress={() => handleDeleteProduct(item.pk)}
                           />
                         </View>
                       </View>
@@ -421,6 +434,20 @@ const NewPurchase = ({navigation, route}) => {
             </View>
           ) : (
             <View>
+              {/* {loading ? (
+                <Text>Loading...</Text>
+              ) : (
+                //   <Text
+                //     style={{
+                //       color: '#000',
+                //       justifyContent: 'center',
+                //       fontSize: 20,
+                //       margin: 5,
+                //     }}>
+                //     No unconfirmed products available!!!
+                //   </Text>
+                // ) : (
+                selectedUpdate.map((item, index) => ( */}
               <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View style={[styles.Card, styles.ShadowProps]}>
                   <Text
@@ -437,7 +464,7 @@ const NewPurchase = ({navigation, route}) => {
                     </Text>
                     <TextInput
                       style={[styles.updateInput, {color: '#000'}]}
-                      value={selectedUpdate.per_unit_price.toString()}
+                      value={newPrice.toString()}
                       onChangeText={setNewPrice}
                       editable={true}
                     />
@@ -449,7 +476,7 @@ const NewPurchase = ({navigation, route}) => {
 
                     <TextInput
                       style={[styles.updateInput, {color: '#000'}]}
-                      value={selectedUpdate.quantity}
+                      value={newQuantity.toString()}
                       onChangeText={setNewQuantity}
                       editable={true}
                     />
@@ -480,6 +507,8 @@ const NewPurchase = ({navigation, route}) => {
                   </View>
                 </View>
               </View>
+              {/* ))
+              )} */}
             </View>
           )}
         </View>
@@ -489,15 +518,18 @@ const NewPurchase = ({navigation, route}) => {
           <Text style={{color: 'black', marginBottom: 5}}>Sub Total: </Text>
           <View style={{color: 'black', flexDirection: 'row'}}>
             <Text style={{color: 'black', marginTop: 3}}>Commission:</Text>
-            <TextInput style={styles.CommisionText}>{commission} </TextInput>
-            <Text style={{color: 'black', marginTop: 3}}>% = </Text>
+            <TextInput
+              style={styles.CommisionText}
+              onTextChange={setCommission}>
+              {commission}{' '}
+            </TextInput>
+            <Text style={{color: 'black', marginTop: 3}}>% </Text>
           </View>
           <Button
-            buttonStyle={styles.Button2}
+            buttonStyle={styles.Button3}
             title="Add"
             onPress={handleIssuCharge}
           />
-
           <Text
             style={{
               fontSize: 16,
@@ -527,7 +559,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
     fontSize: 34,
@@ -543,7 +575,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
     padding: 5,
   },
   text2: {
@@ -591,7 +622,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 8,
     fontSize: 18,
-    marginLeft: 8,
+  },
+  Button3: {
+    height: 40,
+    width: 50,
+    fontSize: 14,
+    backgroundColor: '#3A39A0',
+    color: '#000',
+    borderRadius: 10,
+    padding: 8,
+    fontSize: 18,
   },
   Icons2: {
     color: '#FFF',
@@ -621,7 +661,7 @@ const styles = StyleSheet.create({
     height: 150,
     width: 350,
     padding: 8,
-    margin: 14,
+    margin: 5,
     borderRadius: 10,
   },
   ShadowProps: {

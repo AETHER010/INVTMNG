@@ -13,81 +13,64 @@ import axios from 'axios';
 import ModalDropdown from 'react-native-modal-dropdown';
 import {Api_Url} from '../../utilities/api';
 
-const NewProduct = ({navigation, route}) => {
+const AddPriceList = ({navigation, route}) => {
+  const subCId = route.params.ScId;
+
   const [name, setName] = useState('');
-  const [supplier, setSupplier] = useState('');
-  const [sellingPrice, setSellingPrice] = useState('');
-  const [stock, setStock] = useState('');
+  const [product, setProduct] = useState('');
+  const [productId, setProductId] = useState('');
+  const [cRate, setCrate] = useState('');
   const [data, setData] = useState([]);
-  const [supplierName, setSupplierName] = useState('');
+  const [standardPrice, setStandardPrice] = useState('');
   const [selectedSupplierIndex, setSelectedSupplierIndex] = useState(0);
-  const [selectedSupplierName, setSelectedSupplierName] =
-    useState('Select Product...');
 
   useEffect(() => {
-    console.log(route);
-    if (route && route.params) {
-      GetSupplierList();
-    }
-    GetSupplierList();
-    // getProductData();
-  }, [route.params]);
+    console.log('Add Price List', route.params);
+    GetProductList(route.params.ScId);
+  }, []);
 
-  const GetSupplierList = async () => {
+  const GetProductList = async id => {
     try {
       const response = await axios.get(
-        `${Api_Url}/accounts/apis/suppliers?search=`,
+        `${Api_Url}/accounts/apis/subcustomer/myproduct/list/${id}`,
       );
-      setData(response.data.data);
-
-      if (route.params && route.params.index) {
-        setSelectedSupplierIndex(route.params.index);
-        setSelectedSupplierName(response.data.data[route.params.index].name);
-      }
-    } catch (error) {
-      console.error('API error:', error);
-      // Alert.alert('Error', 'An error occurred while getting data.');
-    }
-  };
-
-  const getProductData = async () => {
-    try {
-      const response = await axios.get(
-        `${Api_Url}/products/apis/products/${route.params.id}`,
-      );
-
+      setData(response.data);
       console.log('getting products', response.data);
-    } catch (error) {
-      console.error('API error:', error);
-      // Alert.alert('Error', 'An error occurred while getting data.');
-    }
-  };
-
-  const HandleformSubmit = async () => {
-    const formData = {
-      name: name,
-      suppliers: supplier,
-      standard_price: sellingPrice,
-      stock: stock,
-    };
-    console.log(formData);
-    try {
-      const response = await axios.post(
-        `${Api_Url}/products/apis/products/`,
-        formData,
-      );
-      console.log('API response:', response.data);
-      Alert.alert('Success', 'Data submitted successfully!');
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
+  const HandleformSubmit = async () => {
+    const formData = {
+      products: productId,
+      price: cRate,
+    };
+    console.log(formData);
+    try {
+      const response = await axios.post(
+        `${Api_Url}/accounts/apis/subcustomer/product/create/${subCId}`,
+        formData,
+      );
+      console.log('API response:', response.data);
+      Alert.alert('Success', 'Data submitted successfully!');
+      navigation.navigate('PriceList');
+    } catch (error) {
+      console.error('API error:', error);
+      Alert.alert('Error', 'An error occurred while submitting data.');
+    }
+  };
+
+  useEffect(() => {
+    console.log('jsadbfj');
+  }, [product, standardPrice]);
+
   const handleProductSelection = async index => {
-    const selected = data[index];
-    const selectedSupplier = selected.pk;
-    setSupplier(selectedSupplier);
+    setProduct(data[index].name);
+    setStandardPrice(data[index].standard_price);
+    setProductId(data[index].pk);
+    console.log('getting price', data[index].standard_price);
   };
 
   return (
@@ -101,9 +84,9 @@ const NewProduct = ({navigation, route}) => {
           <Icon
             style={styles.Icons}
             name="arrow-back"
-            onPress={() => navigation.navigate('Product')}
+            onPress={() => navigation.navigate('PriceList')}
           />
-          <Text style={styles.text}>Product</Text>
+          <Text style={styles.text}>Price List</Text>
           <Icon
             style={styles.Icons}
             name="person-circle-outline"
@@ -111,11 +94,7 @@ const NewProduct = ({navigation, route}) => {
         </View>
       </View>
       <View style={styles.formContainer}>
-        {route && route.params ? (
-          <Text style={styles.text2}>Update Product</Text>
-        ) : (
-          <Text style={styles.text2}>Create Product</Text>
-        )}
+        <Text style={styles.text2}>Create Price List</Text>
 
         <View
           style={{
@@ -125,10 +104,10 @@ const NewProduct = ({navigation, route}) => {
             padding: 5,
             marginTop: 18,
           }}>
-          <Text style={styles.label}>Supplier:</Text>
+          <Text style={styles.label}>Product Name:</Text>
           <ModalDropdown
             style={styles.Input}
-            defaultValue={selectedSupplierName}
+            defaultValue={route.params ? product : 'Select Product...'}
             options={data.map(item => item.name)}
             onSelect={index => handleProductSelection(index)}
             defaultIndex={selectedSupplierIndex}
@@ -138,32 +117,23 @@ const NewProduct = ({navigation, route}) => {
             showsVerticalScrollIndicator={true}
             dropdownTextStyle={styles.dropdownText}
           />
-          <Text style={styles.label}>Name:</Text>
-          <TextInput style={styles.Input} value={name} onChangeText={setName} />
+          <Text style={styles.label}>Standard Price:</Text>
+          <Text style={styles.Input2}>{standardPrice}</Text>
 
-          <Text style={styles.label}>Selling Price:</Text>
+          <Text style={styles.label}>Customer Rate:</Text>
           <TextInput
             style={styles.Input}
-            value={sellingPrice}
-            onChangeText={setSellingPrice}
-          />
-          <Text style={styles.label}>Stock:</Text>
-          <TextInput
-            style={styles.Input}
-            value={stock}
-            onChangeText={setStock}
+            value={cRate}
+            onChangeText={setCrate}
           />
         </View>
         <View style={{flexDirection: 'row'}}>
-          {route && route.params ? (
-            <Button
-              buttonStyle={styles.Button}
-              onPress={HandleformSubmit}
-              title="Create"
-            />
-          ) : (
-            <Button buttonStyle={styles.Button} title="Update" />
-          )}
+          <Button
+            buttonStyle={styles.Button}
+            onPress={HandleformSubmit}
+            title="Create"
+          />
+          <Button buttonStyle={styles.Button} title="Update" />
         </View>
       </View>
     </View>
@@ -206,15 +176,22 @@ const styles = StyleSheet.create({
   },
   Input: {
     height: 40,
-    width: 250,
+    width: 220,
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,
     paddingHorizontal: 8,
     marginBottom: 16,
+    color: '#000',
+  },
+  Input2: {
+    height: 40,
+    width: 220,
+    paddingHorizontal: 8,
+    fontSize: 20,
+    marginBottom: 16,
     color: '#000000',
   },
-
   Button: {
     height: 40,
     width: 80,
@@ -233,4 +210,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewProduct;
+export default AddPriceList;

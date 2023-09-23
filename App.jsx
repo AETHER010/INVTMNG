@@ -27,9 +27,8 @@ import ViewBills from './src/components/Bills/viewBils';
 import UserProfile from './src/components/Users/userProfile';
 import Report from './src/components/Report/report';
 import ChangePassword from './src/components/Users/changePassword';
-import SupplierLedger from './src/components/Ledger/supplier/supplier';
-import ClientLedger from './src/components/Ledger/client/clientLedger';
-import ExpenseLedger from './src/components/Ledger/Expenses/expenseLedger';
+import NewSubCustomer from './src/components/Customer/SubCustomer/addEditSubcustomer';
+import AddPriceList from './src/components/Pricelist/addEditPrice';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -91,8 +90,10 @@ export default function App() {
           <Stack.Screen name="NewProduct" component={NewProduct} />
           <Stack.Screen name="NewUser" component={NewUser} />
           <Stack.Screen name="PriceList" component={PriceList} />
+          <Stack.Screen name="AddPriceList" component={AddPriceList} />
           <Stack.Screen name="NewPurchase" component={NewPurchase} />
           <Stack.Screen name="SubCustomer" component={SubCustomer} />
+          <Stack.Screen name="NewSubCustomer" component={NewSubCustomer} />
           <Stack.Screen name="PaymentClient" component={PaymentClient} />
           <Stack.Screen name="PaymentSupplier" component={PaymentSupplier} />
           <Stack.Screen name="NewPaymentClient" component={NewPaymentClient} />
