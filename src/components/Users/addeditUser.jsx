@@ -161,13 +161,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-
     marginTop: 10,
     color: '#000',
   },
   Input: {
     height: 40,
-    width: screenWidth > 500 ? 220 : 260,
+    width: screenWidth > 500 ? 230 : 250,
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

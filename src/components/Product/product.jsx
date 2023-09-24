@@ -17,6 +17,9 @@ const Product = ({navigation}) => {
   const [loading, setLoading] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
   useEffect(() => {
     fetchApiData();
   }, []);
@@ -25,6 +28,7 @@ const Product = ({navigation}) => {
     try {
       const response = await axios.get(`${Api_Url}/products/apis/products`);
       setData(response.data.data);
+      setFilteredData(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -37,11 +41,34 @@ const Product = ({navigation}) => {
   };
 
   const handleRefresh = () => {
+    setSearchQuery('');
     setRefreshing(true);
 
+    setRefreshing(true);
+    fetchApiData();
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
+  };
+
+  useEffect(() => {
+    filterData();
+
+    console.log('fasdfbsakdf', filteredData);
+  }, [data, searchQuery]);
+
+  const filterData = () => {
+    console.log('NewProduct', searchQuery);
+    if (searchQuery.trim() === '') {
+      // If the search query is empty, display all data
+      setFilteredData(data);
+    } else {
+      // Use the Array.filter method to filter data based on the search query
+      const filtered = data.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setFilteredData(filtered);
+    }
   };
 
   return (
@@ -62,12 +89,18 @@ const Product = ({navigation}) => {
       </View>
       <View style={styles.SecondContainer}>
         <View style={styles.Search}>
-          <TextInput style={styles.input} placeholder="Search..." />
+          <TextInput
+            style={styles.input}
+            placeholder="Search..."
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
+          />
           <Icon
             name="search"
             size={24}
-            color="#888"
+            color="#000"
             style={styles.searchIcon}
+            // onPress={text => setSearchQuery(text)}
           />
         </View>
         <Button
@@ -83,7 +116,7 @@ const Product = ({navigation}) => {
         {loading ? (
           <Text>Loading...</Text>
         ) : (
-          data.map((item, index) => (
+          filteredData.map((item, index) => (
             <View
               key={index}
               style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -121,10 +154,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
@@ -133,7 +166,7 @@ const styles = StyleSheet.create({
     // height: 40,
     // width: 40,
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   SecondContainer: {
     display: 'flex',
@@ -166,7 +199,7 @@ const styles = StyleSheet.create({
     borderLeftColor: '#3A39A0',
     paddingLeft: 6,
     marginLeft: 8,
-    color: '#3A39A0',
+    color: '#000',
   },
   Button: {
     marginTop: 12,
@@ -178,10 +211,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    height: 120,
-    width: 350,
+    borderRadius: 10,
+    width: 380,
     padding: 8,
-    margin: 14,
+    margin: 8,
   },
   ShadowProps: {
     borderRightWidth: 1,

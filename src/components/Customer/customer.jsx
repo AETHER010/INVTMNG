@@ -16,6 +16,9 @@ const Customer = ({navigation}) => {
   const [loading, setLoading] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
   useEffect(() => {
     fetchApiData();
   }, []);
@@ -26,6 +29,7 @@ const Customer = ({navigation}) => {
         'https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/customer',
       );
       setData(response.data.data);
+      setFilteredData(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -38,11 +42,29 @@ const Customer = ({navigation}) => {
   };
 
   const handleRefresh = () => {
+    setSearchQuery('');
     setRefreshing(true);
     fetchApiData();
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
+  };
+
+  useEffect(() => {
+    filterData();
+  }, [data, searchQuery]);
+
+  const filterData = () => {
+    if (searchQuery.trim() === '') {
+      // If the search query is empty, display all data
+      setFilteredData(data);
+    } else {
+      // Use the Array.filter method to filter data based on the search query
+      const filtered = data.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setFilteredData(filtered);
+    }
   };
 
   return (
@@ -67,7 +89,13 @@ const Customer = ({navigation}) => {
         </View>
         <View style={styles.SecondContainer}>
           <View style={styles.Search}>
-            <TextInput style={styles.input} placeholder="Search..." />
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              placeholderTextColor="#888"
+              value={searchQuery}
+              onChangeText={text => setSearchQuery(text)}
+            />
             <Icon
               name="search"
               size={24}
@@ -85,7 +113,7 @@ const Customer = ({navigation}) => {
         {loading ? (
           <Text>Loading...</Text>
         ) : (
-          data.map((item, index) => (
+          filteredData.map((item, index) => (
             <View
               key={index}
               style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -158,6 +186,7 @@ const styles = StyleSheet.create({
     margin: 2,
     padding: 7,
     width: 170,
+    color: '#888',
   },
   searchIcon: {
     borderLeftWidth: 2,

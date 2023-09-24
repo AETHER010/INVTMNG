@@ -18,6 +18,9 @@ const Bill = ({navigation}) => {
   const [loading, setLoading] = useState('');
   const [formattedate, setFormattedDate] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
   useEffect(() => {
     fetchApiData();
     const apidate = data.created_date;
@@ -32,6 +35,8 @@ const Bill = ({navigation}) => {
         `${Api_Url}/bill/apis/sales/bills/list/`,
       );
       setData(response.data.data);
+      setFilteredData(response.data.data);
+      console.log('formated adfafa', response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -44,11 +49,31 @@ const Bill = ({navigation}) => {
   };
 
   const handleRefresh = () => {
+    setSearchQuery('');
     setRefreshing(true);
-
+    fetchApiData();
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
+  };
+
+  useEffect(() => {
+    filterData();
+  }, [data, searchQuery]);
+
+  const filterData = () => {
+    console.log(searchQuery, 'asjdfkasdfk');
+    if (searchQuery.trim() === '') {
+      setFilteredData(data);
+    } else {
+      const filtered = data.filter(
+        item =>
+          item.name &&
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setFilteredData(filtered);
+      console.log(filteredData, 'asjdfkasdfk');
+    }
   };
 
   return (
@@ -70,7 +95,13 @@ const Bill = ({navigation}) => {
         </View>
         <View style={styles.SecondContainer}>
           <View style={styles.Search}>
-            <TextInput style={styles.input} placeholder="Search..." />
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              placeholderTextColor="#888"
+              value={searchQuery}
+              onChangeText={text => setSearchQuery(text)}
+            />
             <Icon
               name="search"
               size={24}
@@ -87,7 +118,7 @@ const Bill = ({navigation}) => {
         {loading ? (
           <Text>Loading...</Text>
         ) : (
-          data.map((item, index) => (
+          filteredData.map((item, index) => (
             <View
               key={index}
               style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -102,7 +133,7 @@ const Bill = ({navigation}) => {
                   </Text>
                 </View>
                 <Text style={{fontSize: 18, color: '#000'}}>
-                  {item.suppliers}
+                  {item.customer}
                 </Text>
                 <View style={styles.card2}>
                   <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
@@ -128,10 +159,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
@@ -140,7 +171,7 @@ const styles = StyleSheet.create({
     // height: 40,
     // width: 40,
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   SecondContainer: {
     display: 'flex',
@@ -166,6 +197,7 @@ const styles = StyleSheet.create({
     margin: 2,
     padding: 7,
     width: 170,
+    color: '#000',
   },
   searchIcon: {
     borderLeftWidth: 2,
@@ -184,10 +216,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    height: 110,
-    width: 350,
+    borderRadius: 10,
+    width: 380,
     padding: 8,
-    margin: 14,
+    margin: 8,
   },
   ShadowProps: {
     borderRightWidth: 1,

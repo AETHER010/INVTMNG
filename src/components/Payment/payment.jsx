@@ -97,17 +97,17 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 150,
+    height: 100,
   },
   text: {
-    fontSize: 30,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
   Icons: {
     color: '#fff',
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   division: {
     display: 'flex',

@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   },
   Input: {
     height: 40,
-    width: screenWidth > 500 ? 220 : 275,
+    width: screenWidth > 500 ? 220 : 260,
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

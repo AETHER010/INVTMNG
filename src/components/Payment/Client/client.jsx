@@ -37,7 +37,11 @@ const Client = () => {
     <View style={styles.clientContainer}>
       <View style={styles.SecondContainer}>
         <View style={styles.Search}>
-          <TextInput style={styles.input} placeholder="Search..." />
+          <TextInput
+            style={styles.input}
+            placeholder="Search..."
+            placeholderTextColor="#888"
+          />
           <Icon
             name="search"
             size={24}
@@ -127,10 +131,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    height: 110,
-    width: 350,
+    borderRadius: 10,
+    width: 380,
     padding: 8,
-    margin: 14,
+    margin: 8,
   },
   ShadowProps: {
     borderRightWidth: 1,

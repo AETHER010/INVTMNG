@@ -12,6 +12,9 @@ const Supplier = () => {
   const [supplierData, setSupplierData] = useState([]);
   const [loading, setLoading] = useState('');
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
   useEffect(() => {
     fetchApiDatSupplier();
   }, []);
@@ -22,6 +25,7 @@ const Supplier = () => {
         `${Api_Url}/payment/apis/seller-payments/`,
       );
       setSupplierData(response.data.data);
+      setFilteredData(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -29,11 +33,34 @@ const Supplier = () => {
     }
   };
 
+  useEffect(() => {
+    filterData();
+  }, [supplierData, searchQuery]);
+
+  const filterData = () => {
+    if (searchQuery.trim() === '') {
+      // If the search query is empty, display all data
+      setFilteredData(supplierData);
+    } else {
+      // Use the Array.filter method to filter data based on the search query
+      const filtered = supplierData.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   return (
     <View>
       <View style={styles.SecondContainer}>
         <View style={styles.Search}>
-          <TextInput style={styles.input} placeholder="Search..." />
+          <TextInput
+            style={styles.input}
+            placeholder="Search..."
+            placeholderTextColor="#888"
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
+          />
           <Icon
             name="search"
             size={24}
@@ -125,10 +152,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    height: 110,
-    width: 350,
+    borderRadius: 10,
+    width: 380,
     padding: 8,
-    margin: 14,
+    margin: 8,
   },
   ShadowProps: {
     borderRightWidth: 1,

@@ -18,6 +18,9 @@ const User = ({navigation}) => {
   const [loading, setLoading] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
   useEffect(() => {
     fetchApiData();
   }, []);
@@ -28,10 +31,12 @@ const User = ({navigation}) => {
         `${Api_Url}/accounts/apis/list/user/?page=1&page_size=100`,
       );
       setData(response.data.data);
+      setFilteredData(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -64,12 +69,31 @@ const User = ({navigation}) => {
   };
 
   const handleRefresh = () => {
+    setSearchQuery('');
     setRefreshing(true);
     fetchApiData();
+
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
   };
+
+  // useEffect(() => {
+  //   filterData();
+  // }, [data, searchQuery]);
+
+  // const filterData = () => {
+  //   if (searchQuery.trim() === '') {
+  //     // If the search query is empty, display all data
+  //     setFilteredData(data);
+  //   } else {
+  //     // Use the Array.filter method to filter data based on the search query
+  //     const filtered = data.filter(item =>
+  //       item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  //     );
+  //     setFilteredData(filtered);
+  //   }
+  // };
 
   return (
     <ScrollView
@@ -96,14 +120,11 @@ const User = ({navigation}) => {
             <TextInput
               style={styles.input}
               placeholder="Search..."
-              color="#000"
+              placeholderTextColor="#000"
+              value={searchQuery}
+              onChangeText={text => setSearchQuery(text)}
             />
-            <Icon
-              name="search"
-              size={24}
-              color="#888"
-              style={styles.searchIcon}
-            />
+            <Icon name="search" size={24} style={styles.searchIcon} />
           </View>
           <Button
             buttonStyle={styles.Button}
@@ -111,29 +132,6 @@ const User = ({navigation}) => {
             onPress={() => navigation.navigate('NewUser')}
           />
         </View>
-        {/* <View
-          style={{
-            alignItems: 'flex-end',
-          }}>
-          <View style={styles.Search}>
-            <TextInput
-              style={styles.input}
-              placeholder="Search..."
-              color="#000"
-            />
-            <Icon
-              name="search"
-              size={24}
-              color="#888"
-              style={styles.searchIcon}
-            />
-          </View>
-          <Button
-            buttonStyle={styles.Button}
-            title="+ Create"
-            onPress={() => navigation.navigate('NewUser')}
-          />
-        </View> */}
 
         <View>
           {loading ? (

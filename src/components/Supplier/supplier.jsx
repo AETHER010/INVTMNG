@@ -13,12 +13,15 @@ import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Card} from 'react-native-elements';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
+import {Api_Url} from '../../utilities/api';
 
 const Supplier = ({navigation}) => {
-  const Api_ULR = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState();
   const [refreshing, setRefreshing] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
     fetchApiData();
@@ -27,9 +30,10 @@ const Supplier = ({navigation}) => {
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_ULR}/accounts/apis/suppliers?search=`,
+        `${Api_Url}/accounts/apis/suppliers?search=`,
       );
       setData(response.data.data);
+      setFilteredData(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -44,7 +48,7 @@ const Supplier = ({navigation}) => {
   const handlEnable = async pk => {
     try {
       const response = await axios.post(
-        `${Api_ULR}/accounts/apis/suppliers/enable/${pk}`,
+        `${Api_Url}/accounts/apis/suppliers/enable/${pk}`,
       );
       Alert.alert('User enabled successfully');
     } catch (error) {
@@ -57,7 +61,7 @@ const Supplier = ({navigation}) => {
   const handleDisable = async pk => {
     try {
       const response = await axios.post(
-        `${Api_ULR}/accounts/apis/suppliers/disable/${pk}`,
+        `${Api_Url}/accounts/apis/suppliers/disable/${pk}`,
       );
       Alert.alert('User disabled successfully');
     } catch (error) {
@@ -68,11 +72,29 @@ const Supplier = ({navigation}) => {
   };
 
   const handleRefresh = () => {
+    setSearchQuery('');
     setRefreshing(true);
     fetchApiData();
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
+  };
+
+  useEffect(() => {
+    filterData();
+  }, [data, searchQuery]);
+
+  const filterData = () => {
+    if (searchQuery.trim() === '') {
+      // If the search query is empty, display all data
+      setFilteredData(data);
+    } else {
+      // Use the Array.filter method to filter data based on the search query
+      const filtered = data.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setFilteredData(filtered);
+    }
   };
 
   return (
@@ -100,7 +122,9 @@ const Supplier = ({navigation}) => {
             <TextInput
               style={styles.input}
               placeholder="Search..."
-              color="#000"
+              placeholderTextColor="#000"
+              value={searchQuery}
+              onChangeText={text => setSearchQuery(text)}
             />
             <Icon
               name="search"
@@ -119,7 +143,7 @@ const Supplier = ({navigation}) => {
         {loading ? (
           <Text>Loading...</Text>
         ) : (
-          data.map((item, index) => (
+          filteredData.map((item, index) => (
             <View
               key={index}
               style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -212,6 +236,7 @@ const styles = StyleSheet.create({
     margin: 2,
     padding: 7,
     width: 170,
+    color: '#000',
   },
   searchIcon: {
     borderLeftWidth: 2,
