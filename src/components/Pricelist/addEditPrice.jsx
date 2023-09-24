@@ -5,6 +5,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Dimensions,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -140,6 +141,8 @@ const AddPriceList = ({navigation, route}) => {
   );
 };
 
+const screenWidth = Dimensions.get('window').width;
+
 const styles = StyleSheet.create({
   SupplierContainer: {
     display: 'flex',
@@ -176,7 +179,7 @@ const styles = StyleSheet.create({
   },
   Input: {
     height: 40,
-    width: 220,
+    width: screenWidth > 500 ? 220 : 275,
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

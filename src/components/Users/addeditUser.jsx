@@ -5,18 +5,23 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Dimensions,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {Api_Url} from '../../utilities/api';
+import SelectDropdown from 'react-native-select-dropdown';
 
 const NewUser = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const [role, setRole] = useState('');
+
+  const dropdownData = ['Select Role...', 'user', 'admin'];
 
   const HandleformSubmit = async () => {
     const formData = {
@@ -42,6 +47,10 @@ const NewUser = ({navigation}) => {
       Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
+
+  const renderDropdownIcon = () => (
+    <Icon2 name="arrow-drop-down" size={20} color="#000" />
+  );
 
   return (
     <View>
@@ -91,7 +100,23 @@ const NewUser = ({navigation}) => {
             secureTextEntry
           />
           <Text style={styles.label}>Role:</Text>
-          <TextInput style={styles.Input} value={role} onChangeText={setRole} />
+          {/* <TextInput style={styles.Input} value={role} onChangeText={setRole} /> */}
+          <SelectDropdown
+            data={dropdownData}
+            onSelect={selectedItem => setRole(selectedItem)}
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item;
+            }}
+            defaultValueByIndex={0}
+            defaultButtonText="Select Role..."
+            buttonStyle={styles.Input}
+            rowStyle={styles.dropdownText}
+            dropdownStyle={styles.dropdown2}
+            renderDropdownIcon={renderDropdownIcon}
+          />
         </View>
         <View style={{flexDirection: 'row'}}>
           <Button
@@ -104,23 +129,23 @@ const NewUser = ({navigation}) => {
     </View>
   );
 };
-
+const screenWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   SupplierContainer: {
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
   Icons: {
     color: '#fff',
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   formContainer: {
     display: 'flex',
@@ -136,13 +161,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: 'bold',
+
     marginTop: 10,
     color: '#000',
   },
   Input: {
     height: 40,
-    width: 250,
+    width: screenWidth > 500 ? 220 : 260,
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,
@@ -166,6 +191,14 @@ const styles = StyleSheet.create({
     padding: 8,
     fontSize: 18,
     marginLeft: 8,
+  },
+  dropdownText: {
+    color: '#000',
+    fontSize: 16,
+    paddingVertical: 4,
+  },
+  dropdown2: {
+    borderRadius: 10,
   },
 });
 

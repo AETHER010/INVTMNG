@@ -17,10 +17,12 @@ import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 const PriceList = ({navigation, route}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState();
+  const [scid, setScid] = useState(null);
 
   useEffect(() => {
+    setScid(route.params.id);
     const id = route.params.id;
-    fetchApiData(id);
+    fetchApiData(scid);
   }, []);
 
   const fetchApiData = async id => {
@@ -73,7 +75,7 @@ const PriceList = ({navigation, route}) => {
               name="arrow-back"
               onPress={() => navigation.navigate('SubCustomer')}
             />
-            <Text style={styles.text}>PriceList</Text>
+            <Text style={styles.text}>Price List</Text>
             <Icon style={styles.Icons} name="person-circle-outline"></Icon>
           </View>
         </View>
@@ -164,10 +166,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
@@ -176,7 +178,7 @@ const styles = StyleSheet.create({
     // height: 40,
     // width: 40,
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   SecondContainer: {
     display: 'flex',

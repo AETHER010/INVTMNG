@@ -69,52 +69,53 @@ const Supplier = ({navigation}) => {
 
   const handleRefresh = () => {
     setRefreshing(true);
-
+    fetchApiData();
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
   };
 
   return (
-    <View>
-      <View style={styles.SupplierContainer}>
-        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-          <Icon
-            style={styles.Icons}
-            name="arrow-back"
-            onPress={() => navigation.navigate('Home2')}
-          />
-          <Text style={styles.text}>Supplier</Text>
-          <Icon
-            style={styles.Icons}
-            name="person-circle-outline"
-            onPress={() => navigation.navigate('UserProfile')}></Icon>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
+      <View>
+        <View style={styles.SupplierContainer}>
+          <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+            <Icon
+              style={styles.Icons}
+              name="arrow-back"
+              onPress={() => navigation.navigate('Home2')}
+            />
+            <Text style={styles.text}>Supplier</Text>
+            <Icon
+              style={styles.Icons}
+              name="person-circle-outline"
+              onPress={() => navigation.navigate('UserProfile')}></Icon>
+          </View>
         </View>
-      </View>
-      <View style={styles.SecondContainer}>
-        <View style={styles.Search}>
-          <TextInput
-            style={styles.input}
-            placeholder="Search..."
-            color="#000"
-          />
-          <Icon
-            name="search"
-            size={24}
-            color="#888"
-            style={styles.searchIcon}
+        <View style={styles.SecondContainer}>
+          <View style={styles.Search}>
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              color="#000"
+            />
+            <Icon
+              name="search"
+              size={24}
+              color="#888"
+              style={styles.searchIcon}
+            />
+          </View>
+          <Button
+            buttonStyle={styles.Button}
+            title="+ Create"
+            onPress={() => navigation.navigate('NewSupplier')}
           />
         </View>
-        <Button
-          buttonStyle={styles.Button}
-          title="+ Create"
-          onPress={() => navigation.navigate('NewSupplier')}
-        />
-      </View>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }>
+
         {loading ? (
           <Text>Loading...</Text>
         ) : (
@@ -124,7 +125,10 @@ const Supplier = ({navigation}) => {
               style={{justifyContent: 'center', alignItems: 'center'}}>
               <View style={[styles.Card, styles.ShadowProps]}>
                 <View style={styles.card2}>
-                  <Text style={{fontSize: 18, color: '#000'}}>{item.name}</Text>
+                  <Text
+                    style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
+                    {item.name}
+                  </Text>
                   {item.is_blocked ? (
                     <Icon2
                       name="lock-open-variant-outline"
@@ -143,15 +147,13 @@ const Supplier = ({navigation}) => {
                     />
                   )}
                 </View>
-                <Text style={{fontSize: 18, color: '#000', marginTop: 6}}>
-                  Phone Number {item.contact_number}
-                </Text>
                 <View style={styles.card2}>
-                  <Text
-                    style={{fontSize: 16, paddingTop: 6, color: '#000'}}></Text>
+                  <Text style={{fontSize: 18, color: '#000', marginTop: 6}}>
+                    Phone Number: {item.contact_number}
+                  </Text>
                   <Icon2
                     name="square-edit-outline"
-                    size={20}
+                    size={18}
                     color="#fff"
                     style={styles.sideIcon}
                     onPress={() => handleUpdate(item.pk)}
@@ -161,8 +163,8 @@ const Supplier = ({navigation}) => {
             </View>
           ))
         )}
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -171,10 +173,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
@@ -183,7 +185,7 @@ const styles = StyleSheet.create({
     // height: 40,
     // width: 40,
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   SecondContainer: {
     display: 'flex',
@@ -228,10 +230,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    height: 120,
-    width: 350,
+    width: 380,
     padding: 8,
-    margin: 14,
+    margin: 8,
+    borderRadius: 10,
   },
   ShadowProps: {
     borderRightWidth: 1,
@@ -259,11 +261,9 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   sideIcon: {
-    // color: "red",
-    justifyContent: 'center',
-    alignItems: 'center',
+    // color: "red",s
     backgroundColor: '#3A39A0',
-    padding: 3,
+    padding: 5,
     borderRadius: 9,
   },
 });

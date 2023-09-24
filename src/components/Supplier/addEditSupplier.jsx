@@ -5,6 +5,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Dimensions,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -48,6 +49,8 @@ const NewSupplier = ({navigation, route}) => {
       contact_number: contact_number,
     };
 
+    console.log('Form data', formData);
+
     try {
       const response = await axios.post(
         `${Api_Url}/accounts/apis/suppliers/`,
@@ -76,7 +79,7 @@ const NewSupplier = ({navigation, route}) => {
         formData,
       );
       console.log('API response:', response.data);
-      Alert.alert('Success', 'Data submitted successfully!');
+      Alert.alert('Success', 'Data Updated successfully!');
       navigation.navigate('Supplier');
     } catch (error) {
       console.error('API error:', error);
@@ -154,28 +157,30 @@ const NewSupplier = ({navigation, route}) => {
   );
 };
 
+const screenWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   SupplierContainer: {
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
   Icons: {
     color: '#fff',
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   formContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 16,
+    padding: 10,
   },
   text2: {
     fontSize: 20,
@@ -183,13 +188,13 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   label: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 16,
     color: '#000000',
+    paddingVertical: 8,
   },
   Input: {
     height: 40,
-    width: 250,
+    width: screenWidth > 500 ? 220 : 275,
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

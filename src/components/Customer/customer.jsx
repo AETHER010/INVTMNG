@@ -39,48 +39,49 @@ const Customer = ({navigation}) => {
 
   const handleRefresh = () => {
     setRefreshing(true);
-
+    fetchApiData();
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
   };
 
   return (
-    <View>
-      <View style={styles.CustomerContainer}>
-        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-          <Icon
-            style={styles.Icons}
-            name="arrow-back"
-            onPress={() => navigation.navigate('Home2')}
-          />
-          <Text style={styles.text}>Customer</Text>
-          <Icon
-            style={styles.Icons}
-            name="person-circle-outline"
-            onPress={() => navigation.navigate('UserProfile')}></Icon>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
+      <View>
+        <View style={styles.CustomerContainer}>
+          <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+            <Icon
+              style={styles.Icons}
+              name="arrow-back"
+              onPress={() => navigation.navigate('Home2')}
+            />
+            <Text style={styles.text}>Customer</Text>
+            <Icon
+              style={styles.Icons}
+              name="person-circle-outline"
+              onPress={() => navigation.navigate('UserProfile')}></Icon>
+          </View>
         </View>
-      </View>
-      <View style={styles.SecondContainer}>
-        <View style={styles.Search}>
-          <TextInput style={styles.input} placeholder="Search..." />
-          <Icon
-            name="search"
-            size={24}
-            color="#888"
-            style={styles.searchIcon}
+        <View style={styles.SecondContainer}>
+          <View style={styles.Search}>
+            <TextInput style={styles.input} placeholder="Search..." />
+            <Icon
+              name="search"
+              size={24}
+              color="#888"
+              style={styles.searchIcon}
+            />
+          </View>
+          <Button
+            buttonStyle={styles.Button}
+            title="+ Create"
+            onPress={() => navigation.navigate('NewCustomer')}
           />
         </View>
-        <Button
-          buttonStyle={styles.Button}
-          title="+ Create"
-          onPress={() => navigation.navigate('NewCustomer')}
-        />
-      </View>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }>
+
         {loading ? (
           <Text>Loading...</Text>
         ) : (
@@ -90,14 +91,14 @@ const Customer = ({navigation}) => {
               style={{justifyContent: 'center', alignItems: 'center'}}>
               <View style={[styles.Card, styles.ShadowProps]}>
                 <View>
-                  <Text style={{fontSize: 18, color: '#000'}}>{item.name}</Text>
+                  <Text
+                    style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
+                    {item.name}
+                  </Text>
                 </View>
-                <Text style={{fontSize: 14, color: '#000'}}>
-                  {item.contact_number}
-                </Text>
                 <View style={styles.card2}>
-                  <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-                    Kathmandu, Nepal
+                  <Text style={{fontSize: 18, color: '#000', marginTop: 2}}>
+                    Phone Number: {item.contact_number}
                   </Text>
                   <Button
                     buttonStyle={styles.Button2}
@@ -109,8 +110,8 @@ const Customer = ({navigation}) => {
             </View>
           ))
         )}
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -119,10 +120,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
     // height: 40,
     // width: 40,
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   SecondContainer: {
     display: 'flex',
@@ -175,10 +176,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    height: 110,
-    width: 350,
+    width: 380,
     padding: 8,
     margin: 14,
+    borderRadius: 10,
   },
   ShadowProps: {
     borderRightWidth: 1,

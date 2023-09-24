@@ -4,7 +4,8 @@ import {Icon} from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import {useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {login} from '../Users/userAuth';
+
+import {Api_Url} from '../../utilities/api';
 
 const LoginForm = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -14,6 +15,7 @@ const LoginForm = ({navigation}) => {
   // Axios.get(https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/login/);
 
   const handleLogin = async () => {
+    console.log('sjabkjsdf');
     setError('');
     try {
       const response = await axios.post(`${Api_Url}/accounts/apis/login/`, {
@@ -35,12 +37,6 @@ const LoginForm = ({navigation}) => {
         'Please enter correct credentials',
       );
     }
-    // try {
-    //   await login(username, password);
-    //   navigation.navigate('Home2');
-    // } catch (error) {
-    //   setError('Invalid email or password');
-    // }
   };
 
   return (

@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -17,6 +18,7 @@ const SubCustomer = ({navigation, route}) => {
   // const Api_Url = 'http://192.168.1.70:8000';
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState();
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     console.log('route', route.params);
@@ -75,8 +77,19 @@ const SubCustomer = ({navigation, route}) => {
     navigation.navigate('NewSubCustomer', {scid});
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchApiData(route.params.id);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
       <View>
         <View style={styles.CustomerContainer}>
           <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -115,15 +128,18 @@ const SubCustomer = ({navigation, route}) => {
               style={{justifyContent: 'center', alignItems: 'center'}}>
               <View style={[styles.Card, styles.ShadowProps]}>
                 <View style={styles.card3}>
-                  <Text style={{fontSize: 18, color: '#000'}}>{item.name}</Text>
+                  <Text
+                    style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
+                    {item.name}
+                  </Text>
                   <Button
                     buttonStyle={styles.priceButton}
                     title="Price List"
                     onPress={() => handleNavigation(item.pk)}
                   />
                 </View>
-                <Text style={{fontSize: 16, color: '#000'}}>
-                  {item.contact_number}
+                <Text style={{fontSize: 16, color: '#000', marginTop: 5}}>
+                  Phone Number: {item.contact_number}
                 </Text>
                 <View style={styles.card2}>
                   {item.is_blocked === true ? (
@@ -165,10 +181,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
@@ -177,7 +193,7 @@ const styles = StyleSheet.create({
     // height: 40,
     // width: 40,
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   SecondContainer: {
     display: 'flex',
@@ -221,10 +237,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    height: 110,
-    width: 350,
+    width: 380,
     padding: 8,
-    margin: 14,
+    margin: 8,
+    borderRadius: 10,
   },
   ShadowProps: {
     borderRightWidth: 1,
@@ -250,7 +266,6 @@ const styles = StyleSheet.create({
   card2: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: 5,
   },
   card3: {
     flexDirection: 'row',
@@ -258,17 +273,18 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   priceButton: {
-    backgroundColor: '#24D14A',
+    backgroundColor: '#3A39A0',
     height: 30,
     padding: 3,
     width: 80,
+    borderRadius: 8,
   },
   sideIcon: {
     // color: "red",
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#3A39A0',
-    padding: 3,
+    padding: 5,
     borderRadius: 9,
     margin: 3,
   },

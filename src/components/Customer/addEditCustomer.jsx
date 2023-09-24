@@ -113,7 +113,11 @@ const NewSupplier = ({navigation, route}) => {
         </View>
       </View>
       <View style={styles.formContainer}>
-        <Text style={styles.text2}>Create Customer</Text>
+        {route && route.params ? (
+          <Text style={styles.text2}>Update Customer</Text>
+        ) : (
+          <Text style={styles.text2}>Create Customer</Text>
+        )}
         <View
           style={{
             flexDirection: 'row',
@@ -140,7 +144,7 @@ const NewSupplier = ({navigation, route}) => {
         </View>
         <View style={{flexDirection: 'row'}}>
           {route && route.params ? (
-            <View>
+            <View style={{flexDirection: 'row'}}>
               <Button
                 buttonStyle={styles.Button}
                 title="Update"
@@ -171,24 +175,24 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
   Icons: {
     color: '#fff',
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   formContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 16,
-    padding: 5,
+    padding: 10,
   },
   text2: {
     fontSize: 20,
@@ -196,9 +200,9 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   label: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 16,
     color: '#000000',
+    paddingVertical: 8,
   },
   Input: {
     height: 40,
@@ -222,7 +226,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   Button2: {
-    margin: 4,
     height: 40,
     width: 120,
     fontSize: 14,

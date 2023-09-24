@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   RefreshControl,
+  TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
@@ -64,42 +65,76 @@ const User = ({navigation}) => {
 
   const handleRefresh = () => {
     setRefreshing(true);
-
+    fetchApiData();
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
   };
 
   return (
-    <View>
-      <View style={styles.UserContainer}>
-        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-          <Icon
-            style={styles.Icons}
-            name="arrow-back"
-            onPress={() => navigation.navigate('Home2')}
-          />
-          <Text style={styles.text}>User</Text>
-          <Icon
-            style={styles.Icons}
-            name="person-circle-outline"
-            onPress={() => navigation.navigate('UserProfile')}></Icon>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
+      <View>
+        <View style={styles.UserContainer}>
+          <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+            <Icon
+              style={styles.Icons}
+              name="arrow-back"
+              onPress={() => navigation.navigate('Home2')}
+            />
+            <Text style={styles.text}>Users</Text>
+            <Icon
+              style={styles.Icons}
+              name="person-circle-outline"
+              onPress={() => navigation.navigate('UserProfile')}></Icon>
+          </View>
         </View>
-      </View>
-      <View
-        style={{
-          alignItems: 'flex-end',
-        }}>
-        <Button
-          buttonStyle={styles.Button}
-          title="+ Create"
-          onPress={() => navigation.navigate('NewUser')}
-        />
-      </View>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }>
+        <View style={styles.SecondContainer}>
+          <View style={styles.Search}>
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              color="#000"
+            />
+            <Icon
+              name="search"
+              size={24}
+              color="#888"
+              style={styles.searchIcon}
+            />
+          </View>
+          <Button
+            buttonStyle={styles.Button}
+            title="+ Create"
+            onPress={() => navigation.navigate('NewUser')}
+          />
+        </View>
+        {/* <View
+          style={{
+            alignItems: 'flex-end',
+          }}>
+          <View style={styles.Search}>
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              color="#000"
+            />
+            <Icon
+              name="search"
+              size={24}
+              color="#888"
+              style={styles.searchIcon}
+            />
+          </View>
+          <Button
+            buttonStyle={styles.Button}
+            title="+ Create"
+            onPress={() => navigation.navigate('NewUser')}
+          />
+        </View> */}
+
         <View>
           {loading ? (
             <Text>Loading...</Text>
@@ -109,9 +144,9 @@ const User = ({navigation}) => {
                 key={index}
                 style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View style={[styles.Card, styles.ShadowProps]}>
-                  <Text style={{fontSize: 18, color: '#000'}}>
+                  {/* <Text style={{fontSize: 18, color: '#000'}}>
                     UserId:{item.pk}
-                  </Text>
+                  </Text> */}
 
                   <View style={styles.card2}>
                     <Text style={{fontSize: 20, color: '#000'}}>
@@ -142,8 +177,8 @@ const User = ({navigation}) => {
             ))
           )}
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -152,10 +187,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
@@ -164,7 +199,7 @@ const styles = StyleSheet.create({
     // height: 40,
     // width: 40,
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   Button: {
     margin: 12,
@@ -176,10 +211,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    height: 100,
-    width: 350,
+    width: 370,
     padding: 8,
-    margin: 14,
+    margin: 8,
+    borderRadius: 10,
   },
   ShadowProps: {
     borderRightWidth: 1,
@@ -204,6 +239,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 5,
+  },
+  SecondContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    // height: 100,
+  },
+  Search: {
+    marginTop: 10,
+    flexDirection: 'row',
+    // justifyContent: "space-evenly",
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderRightWidth: 1,
+    borderLeftWidth: 1,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    height: 40,
+    width: 220,
+    borderRadius: 9,
+    borderBlockColor: '#3A39A0',
+  },
+  input: {
+    margin: 2,
+    padding: 7,
+    width: 170,
+  },
+  searchIcon: {
+    borderLeftWidth: 2,
+    borderLeftColor: '#3A39A0',
+    paddingLeft: 6,
+    marginLeft: 8,
+    color: '#3A39A0',
   },
 });
 
