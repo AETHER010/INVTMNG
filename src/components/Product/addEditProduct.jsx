@@ -20,9 +20,6 @@ const NewProduct = ({navigation, route}) => {
   const [stock, setStock] = useState('');
   const [data, setData] = useState([]);
   const [supplierName, setSupplierName] = useState('');
-  const [selectedSupplierIndex, setSelectedSupplierIndex] = useState(0);
-  const [selectedSupplierName, setSelectedSupplierName] =
-    useState('Select Product...');
 
   useEffect(() => {
     console.log(route);
@@ -32,7 +29,7 @@ const NewProduct = ({navigation, route}) => {
     }
     GetSupplierList();
     // getProductData();
-  }, [route.params]);
+  }, [route.params, supplierName]);
 
   const GetSupplierList = async () => {
     try {
@@ -41,11 +38,6 @@ const NewProduct = ({navigation, route}) => {
       );
       console.log('API error:', response.data.data);
       setData(response.data.data);
-
-      if (route.params && route.params.index) {
-        setSelectedSupplierIndex(route.params.index);
-        setSelectedSupplierName(response.data.data[route.params.index].name);
-      }
     } catch (error) {
       console.error('API error:', error);
       // Alert.alert('Error', 'An error occurred while getting data.');
@@ -59,7 +51,7 @@ const NewProduct = ({navigation, route}) => {
         `${Api_Url}/products/apis/products/${route.params.pk}`,
       );
 
-      console.log('getting products', response.data.stock);
+      console.log('getting products', response.data);
       // setSelectedSupplierName(response.data.name);
       setName(response.data.name);
       setSellingPrice(response.data.standard_price.toString());
@@ -155,18 +147,23 @@ const NewProduct = ({navigation, route}) => {
             marginTop: 18,
           }}>
           <Text style={styles.label}>Supplier:</Text>
-          <ModalDropdown
-            style={styles.Input}
-            defaultValue={selectedSupplierName}
-            options={data.map(item => item.name)}
-            onSelect={index => handleProductSelection(index)}
-            defaultIndex={selectedSupplierIndex}
-            animated={true}
-            isFullWidth={true}
-            textStyle={styles.dropdownText}
-            showsVerticalScrollIndicator={true}
-            dropdownTextStyle={styles.dropdownText}
-          />
+          {route && route.params ? (
+            <Text style={styles.Input4}>{supplierName}</Text>
+          ) : (
+            <ModalDropdown
+              style={styles.Input}
+              defaultValue="Select Supplier"
+              options={data.map(item => item.name)}
+              onSelect={index => handleProductSelection(index)}
+              defaultIndex={0}
+              animated={true}
+              isFullWidth={true}
+              textStyle={styles.dropdownText}
+              showsVerticalScrollIndicator={true}
+              dropdownTextStyle={styles.dropdownText}
+              defaultTextStyle={{color: '#000'}}
+            />
+          )}
           <Text style={styles.label}>Name:</Text>
           <TextInput style={styles.Input} value={name} onChangeText={setName} />
 
@@ -247,7 +244,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: '#000000',
   },
-
+  Input4: {
+    height: 40,
+    width: 250,
+    borderWidth: 2,
+    borderColor: '#CED4DA',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    marginBottom: 16,
+    color: '#000000',
+    paddingVertical: 9,
+  },
   Button: {
     height: 40,
     width: 80,

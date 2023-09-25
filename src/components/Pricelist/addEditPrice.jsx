@@ -13,6 +13,7 @@ import {useEffect, useState} from 'react';
 import axios from 'axios';
 import ModalDropdown from 'react-native-modal-dropdown';
 import {Api_Url} from '../../utilities/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddPriceList = ({navigation, route}) => {
   const [name, setName] = useState('');
@@ -22,13 +23,18 @@ const AddPriceList = ({navigation, route}) => {
   const [data, setData] = useState([]);
   const [updateData, setUpdateData] = useState([]);
   const [standardPrice, setStandardPrice] = useState('');
-  const [selectedSupplierIndex, setSelectedSupplierIndex] = useState(0);
+  const [selectedSupplierName, setSelectedSupplierName] = useState('');
+
+  const [edPrice, setEdPrice] = useState(route.params?.id || null);
+
+  const [nameError, setNameError] = useState('');
+  const [cRateError, setCrateError] = useState('');
 
   useEffect(() => {
     console.log('Add Price List', route.params);
     GetProductList(route.params.sUbcpid);
     if (route && route.params.id) {
-      GetPriceList(route.params.id);
+      GetPriceList(edPrice);
     }
   }, []);
 
@@ -54,6 +60,7 @@ const AddPriceList = ({navigation, route}) => {
       setProduct(response.data.product_name);
       setCrate(response.data.price);
       setStandardPrice(response.data.standard_price);
+      setSelectedSupplierName(response.data.product_name);
       console.log('getting products', response.data);
     } catch (error) {
       console.error('API error:', error);
@@ -61,23 +68,75 @@ const AddPriceList = ({navigation, route}) => {
     }
   };
 
+  const validateForm = () => {
+    let isValid = true;
+    const errors = {};
+
+    // Reset error messages
+    setNameError('');
+    setCrateError('');
+
+    // Validate Name
+    if (!name) {
+      setNameError('Name is required');
+      isValid = false;
+    }
+
+    // Validate Customer Rate
+    if (!cRate) {
+      setCrateError('Customer Rate is required');
+      isValid = false;
+    } else if (isNaN(parseFloat(cRate))) {
+      setCrateError('Customer Rate must be a number');
+      isValid = false;
+    }
+
+    // Validate Customer Rate
+    if (!cRate) {
+      errors.cRate = 'Customer Rate is required';
+      isValid = false;
+    } else if (isNaN(parseFloat(cRate))) {
+      errors.cRate = 'Customer Rate must be a number';
+      isValid = false;
+    }
+
+    // Display an alert if there are errors
+    if (!isValid) {
+      let errorMessage = 'Validation error(s):\n\n';
+      for (const key in errors) {
+        errorMessage += `${errors[key]}\n`;
+      }
+      Alert.alert('Validation Error', errorMessage);
+    }
+
+    return isValid;
+  };
+
   const HandleformSubmit = async () => {
-    const formData = {
-      products: productId,
-      price: cRate,
-    };
-    console.log(formData);
-    try {
-      const response = await axios.post(
-        `${Api_Url}/accounts/apis/subcustomer/product/create/${sUbcpid}/`,
-        formData,
-      );
-      console.log('API response:', response.data);
-      Alert.alert('Success', 'Data submitted successfully!');
-      navigation.navigate('PriceList');
-    } catch (error) {
-      console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+    if (validateForm()) {
+      // Proceed with form submission
+      const formData = {
+        products: productId,
+        price: cRate,
+      };
+
+      // const formData = {
+      //   products: productId,
+      //   price: cRate,
+      // };
+      console.log(formData);
+      try {
+        const response = await axios.post(
+          `${Api_Url}/accounts/apis/subcustomer/product/create/${edPrice}/`,
+          formData,
+        );
+        console.log('API response:', response.data);
+        Alert.alert('Success', 'Data submitted successfully!');
+        navigation.navigate('PriceList');
+      } catch (error) {
+        console.error('API error:', error);
+        Alert.alert('Error', 'An error occurred while submitting data.');
+      }
     }
   };
 
@@ -109,6 +168,34 @@ const AddPriceList = ({navigation, route}) => {
     setStandardPrice(data[index].standard_price);
     setProductId(data[index].pk);
     console.log('getting price', data[index].standard_price);
+  };
+
+  useEffect(() => {
+    if (edPrice === null) {
+      retrieveScidFromStorage();
+    } else {
+      saveScidToStorage(edPrice);
+      GetProductList(edPrice);
+    }
+  }, [edPrice]);
+
+  const retrieveScidFromStorage = async () => {
+    try {
+      const storedScid = await AsyncStorage.getItem('edPrice');
+      if (storedScid !== null) {
+        setEdPrice(storedScid);
+      }
+    } catch (error) {
+      console.error('Error retrieving scid:', error);
+    }
+  };
+
+  const saveScidToStorage = async value => {
+    try {
+      await AsyncStorage.setItem('scid', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving scid:', error);
+    }
   };
 
   return (
@@ -147,18 +234,22 @@ const AddPriceList = ({navigation, route}) => {
             marginTop: 18,
           }}>
           <Text style={styles.label}>Product Name:</Text>
-          <ModalDropdown
-            style={styles.Input}
-            defaultValue={route.params.id ? product : 'Select Product'}
-            options={data.map(item => item.name)}
-            onSelect={index => handleProductSelection(index)}
-            defaultIndex={0}
-            animated={true}
-            isFullWidth={true}
-            textStyle={styles.dropdownText}
-            showsVerticalScrollIndicator={true}
-            dropdownTextStyle={styles.dropdownText}
-          />
+          {route && route.params.id ? (
+            <Text style={styles.textProduct}>{selectedSupplierName} </Text>
+          ) : (
+            <ModalDropdown
+              style={styles.Input}
+              defaultValue={route.params.id ? product : 'Select Product'}
+              options={data.map(item => item.name)}
+              onSelect={index => handleProductSelection(index)}
+              defaultIndex={0}
+              animated={true}
+              isFullWidth={true}
+              textStyle={styles.dropdownText}
+              showsVerticalScrollIndicator={true}
+              dropdownTextStyle={styles.dropdownText}
+            />
+          )}
           <Text style={styles.label}>Standard Price:</Text>
           <Text style={styles.Input2}>{standardPrice}</Text>
 
@@ -166,7 +257,11 @@ const AddPriceList = ({navigation, route}) => {
           <TextInput
             style={styles.Input}
             value={cRate.toString()}
-            onChangeText={setCrate}
+            onChangeText={text => {
+              setCrate(text);
+              // Clear error message when user edits the input
+              setCrateError('');
+            }}
           />
         </View>
         <View style={{flexDirection: 'row'}}>
@@ -232,6 +327,18 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 8,
     marginBottom: 16,
+    color: '#000',
+  },
+  textProduct: {
+    height: 40,
+    width: screenWidth > 500 ? 220 : 240,
+    borderWidth: 2,
+    borderColor: '#CED4DA',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 9,
+    marginBottom: 16,
+    fontSize: 16,
     color: '#000',
   },
   Input2: {

@@ -36,8 +36,8 @@ const Product = ({navigation}) => {
     }
   };
 
-  const handleUpdate = async (index, pk) => {
-    navigation.navigate('NewProduct', {index, pk});
+  const handleUpdate = async (name, pk) => {
+    navigation.navigate('NewProduct', {name, pk});
   };
 
   const handleRefresh = () => {
@@ -137,7 +137,7 @@ const Product = ({navigation}) => {
                   </Text>
                   <Button
                     buttonStyle={styles.Button2}
-                    onPress={() => handleUpdate(index, item.pk)}
+                    onPress={() => handleUpdate(item.name, item.pk)}
                     title="View Detaiils"
                   />
                 </View>
