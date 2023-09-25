@@ -15,19 +15,21 @@ import ModalDropdown from 'react-native-modal-dropdown';
 import {Api_Url} from '../../utilities/api';
 
 const AddPriceList = ({navigation, route}) => {
-  const subCId = route.params.ScId;
-
   const [name, setName] = useState('');
   const [product, setProduct] = useState('');
   const [productId, setProductId] = useState('');
   const [cRate, setCrate] = useState('');
   const [data, setData] = useState([]);
+  const [updateData, setUpdateData] = useState([]);
   const [standardPrice, setStandardPrice] = useState('');
   const [selectedSupplierIndex, setSelectedSupplierIndex] = useState(0);
 
   useEffect(() => {
     console.log('Add Price List', route.params);
-    GetProductList(route.params.ScId);
+    GetProductList(route.params.sUbcpid);
+    if (route && route.params.id) {
+      GetPriceList(route.params.id);
+    }
   }, []);
 
   const GetProductList = async id => {
@@ -39,7 +41,23 @@ const AddPriceList = ({navigation, route}) => {
       console.log('getting products', response.data);
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      // Alert.alert('Error', 'An error occurred while submitting data.');
+    }
+  };
+
+  const GetPriceList = async id => {
+    try {
+      const response = await axios.get(
+        `${Api_Url}/accounts/apis/subcustomer/product/update/${id}`,
+      );
+      setUpdateData(response.data);
+      setProduct(response.data.product_name);
+      setCrate(response.data.price);
+      setStandardPrice(response.data.standard_price);
+      console.log('getting products', response.data);
+    } catch (error) {
+      console.error('API error:', error);
+      // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
@@ -51,7 +69,26 @@ const AddPriceList = ({navigation, route}) => {
     console.log(formData);
     try {
       const response = await axios.post(
-        `${Api_Url}/accounts/apis/subcustomer/product/create/${subCId}/`,
+        `${Api_Url}/accounts/apis/subcustomer/product/create/${sUbcpid}/`,
+        formData,
+      );
+      console.log('API response:', response.data);
+      Alert.alert('Success', 'Data submitted successfully!');
+      navigation.navigate('PriceList');
+    } catch (error) {
+      console.error('API error:', error);
+      Alert.alert('Error', 'An error occurred while submitting data.');
+    }
+  };
+
+  const HandleUpdate = async () => {
+    const formData = {
+      price: cRate,
+    };
+    console.log(formData);
+    try {
+      const response = await axios.put(
+        `${Api_Url}/accounts/apis/subcustomer/product/update/${route.params.id}/`,
         formData,
       );
       console.log('API response:', response.data);
@@ -68,7 +105,7 @@ const AddPriceList = ({navigation, route}) => {
   }, [product, standardPrice]);
 
   const handleProductSelection = async index => {
-    setProduct(data[index].name);
+    // setProduct(data[index].name);
     setStandardPrice(data[index].standard_price);
     setProductId(data[index].pk);
     console.log('getting price', data[index].standard_price);
@@ -95,7 +132,11 @@ const AddPriceList = ({navigation, route}) => {
         </View>
       </View>
       <View style={styles.formContainer}>
-        <Text style={styles.text2}>Create Price List</Text>
+        {route.params && route.params.id ? (
+          <Text style={styles.text2}>Update Price List</Text>
+        ) : (
+          <Text style={styles.text2}>Create Price List</Text>
+        )}
 
         <View
           style={{
@@ -108,10 +149,10 @@ const AddPriceList = ({navigation, route}) => {
           <Text style={styles.label}>Product Name:</Text>
           <ModalDropdown
             style={styles.Input}
-            defaultValue={route.params ? product : 'Select Product...'}
+            defaultValue={route.params.id ? product : 'Select Product'}
             options={data.map(item => item.name)}
             onSelect={index => handleProductSelection(index)}
-            defaultIndex={selectedSupplierIndex}
+            defaultIndex={0}
             animated={true}
             isFullWidth={true}
             textStyle={styles.dropdownText}
@@ -124,17 +165,24 @@ const AddPriceList = ({navigation, route}) => {
           <Text style={styles.label}>Customer Rate:</Text>
           <TextInput
             style={styles.Input}
-            value={cRate}
+            value={cRate.toString()}
             onChangeText={setCrate}
           />
         </View>
         <View style={{flexDirection: 'row'}}>
-          <Button
-            buttonStyle={styles.Button}
-            onPress={HandleformSubmit}
-            title="Create"
-          />
-          <Button buttonStyle={styles.Button} title="Update" />
+          {route.params && route.params.id ? (
+            <Button
+              buttonStyle={styles.Button}
+              title="Update"
+              onPress={HandleUpdate}
+            />
+          ) : (
+            <Button
+              buttonStyle={styles.Button}
+              onPress={HandleformSubmit}
+              title="Create"
+            />
+          )}
         </View>
       </View>
     </View>
@@ -173,13 +221,12 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   label: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
     color: '#000000',
   },
   Input: {
     height: 40,
-    width: screenWidth > 500 ? 220 : 275,
+    width: screenWidth > 500 ? 220 : 240,
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

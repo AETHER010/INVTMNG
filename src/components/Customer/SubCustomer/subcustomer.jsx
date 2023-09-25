@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Api_Url} from '../../../utilities/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SubCustomer = ({navigation, route}) => {
   // const Api_Url = 'http://192.168.1.70:8000';
@@ -20,9 +21,14 @@ const SubCustomer = ({navigation, route}) => {
   const [loading, setLoading] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
+  const [subCid, setSubCid] = useState(route.params?.id || null);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
   useEffect(() => {
     console.log('route', route.params);
-    fetchApiData(route.params.id);
+    fetchApiData(subCid);
   }, []);
 
   const fetchApiData = async id => {
@@ -78,11 +84,64 @@ const SubCustomer = ({navigation, route}) => {
   };
 
   const handleRefresh = () => {
+    setSearchQuery('');
     setRefreshing(true);
-    fetchApiData(route.params.id);
+    fetchApiData(subCid);
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
+  };
+
+  useEffect(() => {
+    filterData();
+
+    console.log('fasdfbsakdf', filteredData);
+  }, [data, searchQuery]);
+
+  const filterData = () => {
+    console.log('NewProduct', searchQuery);
+    if (searchQuery.trim() === '') {
+      // If the search query is empty, display all data
+      setFilteredData(data);
+    } else {
+      // Use the Array.filter method to filter data based on the search query
+      const filtered = data.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setFilteredData(filtered);
+    }
+  };
+
+  useEffect(() => {
+    // Check if scid is null, and if so, try to retrieve it from AsyncStorage
+    if (subCid === null) {
+      retrieveScidFromStorage();
+    } else {
+      // Save the retrieved scid to AsyncStorage
+      saveScidToStorage(subCid);
+      fetchApiData(subCid);
+    }
+  }, [subCid]);
+
+  // Function to retrieve scid from AsyncStorage
+  const retrieveScidFromStorage = async () => {
+    try {
+      const storedScid = await AsyncStorage.getItem('SubCid');
+      if (storedScid !== null) {
+        setSubCid(storedScid);
+      }
+    } catch (error) {
+      console.error('Error retrieving scid:', error);
+    }
+  };
+
+  // Function to save scid to AsyncStorage
+  const saveScidToStorage = async value => {
+    try {
+      await AsyncStorage.setItem('subCid', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving subCid:', error);
+    }
   };
 
   return (
@@ -96,7 +155,7 @@ const SubCustomer = ({navigation, route}) => {
             <Icon
               style={styles.Icons}
               name="arrow-back"
-              onPress={() => navigation.navigate('NewCustomer')}
+              onPress={() => navigation.navigate('Customer')}
             />
             <Text style={styles.text}>Sub Customer</Text>
             <Icon style={styles.Icons} name="person-circle-outline"></Icon>
@@ -104,7 +163,13 @@ const SubCustomer = ({navigation, route}) => {
         </View>
         <View style={styles.SecondContainer}>
           <View style={styles.Search}>
-            <TextInput style={styles.input} placeholder="Search..." />
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              placeholderTextColor="#000"
+              value={searchQuery}
+              onChangeText={text => setSearchQuery(text)}
+            />
             <Icon
               name="search"
               size={24}
@@ -122,7 +187,7 @@ const SubCustomer = ({navigation, route}) => {
         {loading ? (
           <Text>Loading...</Text>
         ) : (
-          data.map((item, index) => (
+          filteredData.map((item, index) => (
             <View
               key={index}
               style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -219,6 +284,7 @@ const styles = StyleSheet.create({
     margin: 2,
     padding: 7,
     width: 170,
+    color: '#000',
   },
   searchIcon: {
     borderLeftWidth: 2,

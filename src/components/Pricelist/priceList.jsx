@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -13,19 +14,21 @@ import {Card} from 'react-native-elements';
 import axios from 'axios';
 import {Api_Url} from '../../utilities/api';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PriceList = ({navigation, route}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState();
-  const [scid, setScid] = useState(null);
+  const [sUbcpid, setSubcpcid] = useState(route.params?.id || null);
+
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    setScid(route.params.id);
-    const id = route.params.id;
-    fetchApiData(scid);
+    fetchApiData(sUbcpid);
   }, []);
 
   const fetchApiData = async id => {
+    console.log('Fetching', id);
     try {
       const response = await axios.get(
         `${Api_Url}/accounts/apis/subcustomer/product/list/${id}/`,
@@ -33,7 +36,7 @@ const PriceList = ({navigation, route}) => {
       setData(response.data.data);
       console.log(response.data, 'fsddfsd');
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -56,17 +59,55 @@ const PriceList = ({navigation, route}) => {
   };
 
   const handleNavigation = () => {
-    const ScId = route.params.id;
-    navigation.navigate('AddPriceList', {ScId});
+    navigation.navigate('AddPriceList', {sUbcpid});
   };
 
   const handleUpdate = id => {
-    const ScId = route.params.id;
-    navigation.navigate('AddPriceList', {id, ScId});
+    navigation.navigate('AddPriceList', {id, sUbcpid});
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchApiData(sUbcpid);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    if (sUbcpid === null) {
+      retrieveScidFromStorage();
+    } else {
+      saveScidToStorage(sUbcpid);
+      fetchApiData(sUbcpid);
+    }
+  }, [sUbcpid]);
+
+  const retrieveScidFromStorage = async () => {
+    try {
+      const storedScid = await AsyncStorage.getItem('sUbcpid');
+      if (storedScid !== null) {
+        setSubcpcid(storedScid);
+      }
+    } catch (error) {
+      console.error('Error retrieving scid:', error);
+    }
+  };
+
+  const saveScidToStorage = async value => {
+    try {
+      await AsyncStorage.setItem('scid', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving scid:', error);
+    }
   };
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
       <View style={styles.Container}>
         <View style={styles.BillsContainer}>
           <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -76,7 +117,10 @@ const PriceList = ({navigation, route}) => {
               onPress={() => navigation.navigate('SubCustomer')}
             />
             <Text style={styles.text}>Price List</Text>
-            <Icon style={styles.Icons} name="person-circle-outline"></Icon>
+            <Icon
+              style={styles.Icons}
+              name="person-circle-outline"
+              onPress={() => navigation.navigate('UserProfile')}></Icon>
           </View>
         </View>
         <View style={styles.SecondContainer}>
@@ -95,64 +139,58 @@ const PriceList = ({navigation, route}) => {
             title="+ Create"
           />
         </View>
-        {Array.isArray(data) && data.length === 0 ? (
-          <Text
-            style={{
-              color: '#000',
-              textAlign: 'center',
-              marginTop: 8,
-              fontSize: 22,
-            }}>
-            No data available!!!
-          </Text>
-        ) : (
-          <View>
-            {loading ? (
-              <Text>Loading...</Text>
-            ) : (
-              data.map((item, index) => (
-                <View
-                  key={index}
-                  style={{justifyContent: 'center', alignItems: 'center'}}>
-                  <View style={[styles.Card, styles.ShadowProps]}>
-                    <View style={styles.card2}>
-                      <Text style={{fontSize: 14, color: '#000'}}>
-                        {item.name}
-                      </Text>
-                      <Text style={{fontSize: 14, color: '#000'}}>
-                        Standard Rate: {item.standard_price}
-                      </Text>
-                    </View>
-                    <View style={styles.card2}>
-                      <Text style={{fontSize: 16, color: '#000'}}>
-                        {item.price}
-                      </Text>
-                      <View style={{flexDirection: 'row', padding: 4}}>
-                        <Icon2
-                          name="square-edit-outline"
-                          size={18}
-                          color="#fff"
-                          backgroundColor="#3A39A0"
-                          style={styles.sideIcon}
-                          onPress={() => handleUpdate(item.pk)}
-                        />
 
-                        <Icon2
-                          name="delete"
-                          size={18}
-                          color="#fff"
-                          style={styles.sideIcon}
-                          onPress={() => handleDelete(item.pk)}
-                          backgroundColor="#ff0000"
-                        />
-                      </View>
+        <View>
+          {loading ? (
+            <Text>Loading...</Text>
+          ) : (
+            data.map((item, index) => (
+              <View
+                key={index}
+                style={{justifyContent: 'center', alignItems: 'center'}}>
+                <View style={[styles.Card, styles.ShadowProps]}>
+                  <View style={styles.card2}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: '#000',
+                        fontWeight: 'bold',
+                      }}>
+                      {item.product_name}
+                    </Text>
+                    <Text style={{fontSize: 14, color: '#000'}}>
+                      Standard Rate: {item.standard_price}
+                    </Text>
+                  </View>
+                  <View style={styles.card2}>
+                    <Text style={{fontSize: 16, color: '#000'}}>
+                      {item.price}
+                    </Text>
+                    <View style={{flexDirection: 'row', padding: 4}}>
+                      <Icon2
+                        name="square-edit-outline"
+                        size={18}
+                        color="#fff"
+                        backgroundColor="#3A39A0"
+                        style={styles.sideIcon}
+                        onPress={() => handleUpdate(item.pk)}
+                      />
+
+                      <Icon2
+                        name="delete"
+                        size={18}
+                        color="#fff"
+                        style={styles.sideIcon}
+                        onPress={() => handleDelete(item.pk)}
+                        backgroundColor="#ff0000"
+                      />
                     </View>
                   </View>
                 </View>
-              ))
-            )}
-          </View>
-        )}
+              </View>
+            ))
+          )}
+        </View>
       </View>
     </ScrollView>
   );

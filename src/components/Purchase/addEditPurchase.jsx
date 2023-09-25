@@ -42,6 +42,7 @@ const NewPurchase = ({navigation, route}) => {
   const [newQuantity, setNewQuantity] = useState('');
 
   const [commission, setCommission] = useState('');
+  const [subTotal, setSubtotal] = useState('');
 
   useEffect(() => {
     fetchApiData();
@@ -126,9 +127,10 @@ const NewPurchase = ({navigation, route}) => {
         `${Api_Url}/bill/apis/purchase/unconfirm/bill/${id}/`,
       );
       // console.log('API response for unconfirm products:', response.data.data);
-      setGrandTotal(response.data.data.total_price);
+      setGrandTotal(response.data.data.grand_total);
       setCommission(response.data.data.charge_percentage);
       setChargeBillId(response.data.data.id);
+      setSubtotal(response.data.data.sub_total);
       // console.log('asdadsasd', response.data.data.charge_percentage);
       const apiData = response.data.data;
       const items = apiData.unconfirmpurchase_items || [];
@@ -517,7 +519,9 @@ const NewPurchase = ({navigation, route}) => {
       </ScrollView>
       <View style={styles.footerContainer}>
         <View style={{padding: 5}}>
-          <Text style={{color: 'black', marginBottom: 5}}>Sub Total: </Text>
+          <Text style={{color: 'black', marginBottom: 5}}>
+            Sub Total: {subTotal}{' '}
+          </Text>
           <View style={{color: 'black', flexDirection: 'row'}}>
             <Text style={{color: 'black', marginTop: 3}}>Commission:</Text>
             <TextInput

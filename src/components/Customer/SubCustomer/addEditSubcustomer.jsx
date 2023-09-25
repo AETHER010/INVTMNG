@@ -10,6 +10,7 @@ import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NewSubCustomer = ({navigation, route}) => {
   const Api_url = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
@@ -18,10 +19,12 @@ const NewSubCustomer = ({navigation, route}) => {
   const [customerId, setCustomerId] = useState('');
   const [data, setData] = useState([]);
 
+  const [scid, setScid] = useState(route.params.scid || null);
+
   useEffect(() => {
     console.log(route);
     if (route.params && route.params.scid) {
-      fetchApiData(route.params.scid);
+      fetchApiData(scid);
     }
   }, [route]);
 
@@ -31,13 +34,41 @@ const NewSubCustomer = ({navigation, route}) => {
         `${Api_url}/accounts/apis/subcustomer/${id}`,
       );
       console.log('API response:', response.data.data[0]);
-      setData(response.data.data[0]);
+      setData(response.data.data[0] || []);
 
       setName(response.data.data[0].name);
       setContact_number(response.data.data[0].contact_number);
     } catch (error) {
-      console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while fetching data.');
+      console.error('API error:', error.message);
+      // Alert.alert('Error', 'An error occurred while fetching data.');
+    }
+  };
+
+  useEffect(() => {
+    if (scid === null) {
+      retrieveScidFromStorage();
+    } else {
+      saveScidToStorage(scid);
+      fetchApiData(scid);
+    }
+  }, [scid]);
+
+  const retrieveScidFromStorage = async () => {
+    try {
+      const storedScid = await AsyncStorage.getItem('scid');
+      if (storedScid !== null) {
+        setScid(storedScid);
+      }
+    } catch (error) {
+      console.error('Error retrieving scid:', error);
+    }
+  };
+
+  const saveScidToStorage = async value => {
+    try {
+      await AsyncStorage.setItem('scid', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving scid:', error);
     }
   };
 
@@ -101,9 +132,9 @@ const NewSubCustomer = ({navigation, route}) => {
           <Icon
             style={styles.Icons}
             name="arrow-back"
-            onPress={() => navigation.navigate('Customer')}
+            onPress={() => navigation.navigate('SubCustomer')}
           />
-          <Text style={styles.text}>NewSubCustomer</Text>
+          <Text style={styles.text}>New Sub Customer</Text>
           <Icon style={styles.Icons} name="person-circle-outline"></Icon>
         </View>
       </View>

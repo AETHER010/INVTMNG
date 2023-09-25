@@ -78,22 +78,22 @@ const User = ({navigation}) => {
     }, 1000);
   };
 
-  // useEffect(() => {
-  //   filterData();
-  // }, [data, searchQuery]);
+  useEffect(() => {
+    filterData();
+  }, [data, searchQuery]);
 
-  // const filterData = () => {
-  //   if (searchQuery.trim() === '') {
-  //     // If the search query is empty, display all data
-  //     setFilteredData(data);
-  //   } else {
-  //     // Use the Array.filter method to filter data based on the search query
-  //     const filtered = data.filter(item =>
-  //       item.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  //     );
-  //     setFilteredData(filtered);
-  //   }
-  // };
+  const filterData = () => {
+    if (searchQuery.trim() === '') {
+      setFilteredData(data);
+    } else {
+      const filtered = data.filter(
+        item =>
+          item.name &&
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setFilteredData(filtered);
+    }
+  };
 
   return (
     <ScrollView

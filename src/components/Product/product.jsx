@@ -92,6 +92,7 @@ const Product = ({navigation}) => {
           <TextInput
             style={styles.input}
             placeholder="Search..."
+            placeholderTextColor="#000"
             value={searchQuery}
             onChangeText={text => setSearchQuery(text)}
           />

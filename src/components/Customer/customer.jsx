@@ -26,7 +26,7 @@ const Customer = ({navigation}) => {
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        'https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/customer',
+        'https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/customer?page=1&page_size=500',
       );
       setData(response.data.data);
       setFilteredData(response.data.data);

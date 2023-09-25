@@ -16,6 +16,7 @@ import {Api_Url} from '../../../utilities/api';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon2 from 'react-native-vector-icons/AntDesign';
+import ModalDropdown from 'react-native-modal-dropdown';
 
 export default class ClientLedger extends Component {
   constructor(props) {
@@ -29,11 +30,14 @@ export default class ClientLedger extends Component {
       toDate: new Date(),
       showFromDatePicker: false,
       showToDatePicker: false,
+      client: [],
+      clientId: null,
     };
   }
 
   componentDidMount() {
     this.getApiData();
+    this.fetchApiClient();
   }
 
   getApiData = async () => {
@@ -43,7 +47,7 @@ export default class ClientLedger extends Component {
       );
       const responseData = response.data.data;
 
-      console.log(responseData, 'dsfhjgsjdhf');
+      // console.log(responseData, 'dsfhjgsjdhf');
       this.setState({data: responseData, loading: false});
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -56,6 +60,20 @@ export default class ClientLedger extends Component {
       this.setState({fromDate: date, showFromDatePicker: false});
     } else if (type === 'to') {
       this.setState({toDate: date, showToDatePicker: false});
+    }
+  };
+
+  fetchApiClient = async () => {
+    try {
+      const response = await axios.get(
+        `${Api_Url}/bill/apis/purchase/suppliers/list/`,
+      );
+      const responseData = response.data;
+      console.log('API error:', responseData);
+      this.setState({client: responseData, loading: false});
+    } catch (error) {
+      console.error('API error:', error);
+      Alert.alert('Error', 'An error occurred while fetching data.');
     }
   };
 
@@ -91,7 +109,18 @@ export default class ClientLedger extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.SecondContainer}>
-          <Text style={styles.textDisplay}>Supplier</Text>
+          <ModalDropdown
+            style={styles.textDisplay}
+            defaultValue="Clients"
+            options={this.state.client.map(item => item.name)}
+            onSelect={index => this.handleProductSelection(index)}
+            defaultIndex={0}
+            animated={true}
+            isFullWidth={true}
+            textStyle={styles.dropdownText}
+            showsVerticalScrollIndicator={true}
+            dropdownTextStyle={styles.dropdownText}
+          />
           <TouchableOpacity
             style={styles.datePickerButton}
             onPress={() => this.setState({showFromDatePicker: true})}>
@@ -230,5 +259,27 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 25,
     marginTop: 17,
+  },
+  textDisplay: {
+    color: '#000',
+    marginTop: 9,
+    height: 40,
+    width: 120,
+    borderWidth: 1,
+    borderColor: '#3A39A0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+  },
+  swapIcon: {
+    color: '#000',
+    fontSize: 25,
+    marginTop: 17,
+  },
+  dropdownText: {
+    color: '#000',
+    fontSize: 18,
+    paddingVertical: 4,
+    paddingHorizontal: 17,
   },
 });

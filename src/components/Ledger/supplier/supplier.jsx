@@ -23,7 +23,7 @@ export default class SupplierLedger extends Component {
     super(props);
     this.state = {
       tableHead: ['Date', 'Name', 'Particular', 'Credit', 'Debit', 'Balance'],
-      widthArr: [80, 80, 120, 70, 70, 80],
+      widthArr: [80, 120, 120, 70, 70, 80],
       data: [],
       loading: true,
       fromDate: new Date(),

@@ -42,6 +42,7 @@ const NewBills = ({navigation, route}) => {
   const [newQuantity, setNewQuantity] = useState('');
 
   const [commission, setCommission] = useState('');
+  const [subTotal, setSubTotal] = useState('');
 
   useEffect(() => {
     fetchApiData();
@@ -129,7 +130,8 @@ const NewBills = ({navigation, route}) => {
       setGrandTotal(response.data.data.total_price);
       setCommission(response.data.data.charge_percentage);
       setChargeBillId(response.data.data.id);
-      // console.log('asdadsasd', response.data.data.charge_percentage);
+      setSubTotal(response.data.data.sub_total);
+
       const apiData = response.data.data;
       const items = apiData.unconfirmsalesbill_item || [];
       setBillId(apiData.id);
@@ -517,7 +519,9 @@ const NewBills = ({navigation, route}) => {
       </ScrollView>
       <View style={styles.footerContainer}>
         <View style={{padding: 5}}>
-          <Text style={{color: 'black', marginBottom: 5}}>Sub Total: </Text>
+          <Text style={{color: 'black', marginBottom: 5}}>
+            Sub Total:{subTotal}{' '}
+          </Text>
           <View style={{color: 'black', flexDirection: 'row'}}>
             <Text style={{color: 'black', marginTop: 3}}>Commission:</Text>
             <TextInput

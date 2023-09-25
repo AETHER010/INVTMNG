@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {Api_Url} from '../../utilities/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NewSupplier = ({navigation, route}) => {
   // const Api_url = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
@@ -39,8 +40,8 @@ const NewSupplier = ({navigation, route}) => {
       setName(response.data.name || '');
       setContact_number(response.data.contact_number || '');
     } catch (error) {
-      console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while fetching data.');
+      console.error('API error sdfsdf:', error);
+      // Alert.alert('Error', 'An error occurred while fetching data.');
     }
   };
 

@@ -77,6 +77,7 @@ const HomeDashboard = ({navigation}) => {
               onPress={() => navigation.navigate('Customer')}
               style={styles.cardImage}
               source={require('../../Images/customer.png')}
+              resizeMode="contain"
             />
             <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               Customer
@@ -87,6 +88,7 @@ const HomeDashboard = ({navigation}) => {
               onPress={() => navigation.navigate('Supplier')}
               style={styles.cardImage}
               source={require('../../Images/supplier.png')}
+              resizeMode="contain"
             />
             <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               Supplier
@@ -97,6 +99,7 @@ const HomeDashboard = ({navigation}) => {
               onPress={() => navigation.navigate('User')}
               style={styles.cardImage}
               source={require('../../Images/user.png')}
+              resizeMode="contain"
             />
             <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               User
@@ -117,7 +120,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
     fontSize: 34,
