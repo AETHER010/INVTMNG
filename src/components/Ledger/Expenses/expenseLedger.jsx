@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native';
 import {Table, TableWrapper, Row} from 'react-native-table-component';
 import {Button} from 'react-native-elements';
@@ -33,6 +34,7 @@ export default class ExpenseLedger extends Component {
       client: [],
       clientId: null,
       selectors: ['Debit', 'Credit'],
+      filteredData: [],
     };
   }
 
@@ -49,6 +51,7 @@ export default class ExpenseLedger extends Component {
 
       // console.log(responseData, 'dsfhjgsjdhf');
       this.setState({data: responseData, loading: false});
+      this.setState({filteredData: responseData, loading: false});
     } catch (error) {
       console.error('Error fetching data:', error);
       this.setState({loading: false});
@@ -63,14 +66,26 @@ export default class ExpenseLedger extends Component {
     }
   };
 
+  filterData = async () => {
+    const {fromDate, toDate, supplierID} = this.state;
+    console.log('filterData', supplierID);
+    // Filter the data based on the selected supplier and date range
+    const getUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?fromDate=${fromDate}&toDate=${toDate}`;
+
+    const response = await axios.get(getUrl);
+    const data = response.data.data;
+    console.log(data, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
+    // Update the state with the filtered data
+    this.setState({filteredData: data});
+  };
+
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
-      this.state.data && this.state.data.length > 0
-        ? this.state.data.map(
+      this.state.filteredData && this.state.filteredData.length > 0
+        ? this.state.filteredData.map(
             ({
               created_date,
-
               _type,
               amount,
               Credit,

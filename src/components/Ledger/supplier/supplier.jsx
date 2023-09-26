@@ -18,6 +18,7 @@ import {Api_Url} from '../../../utilities/api';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon2 from 'react-native-vector-icons/AntDesign';
+import Linking from 'react-native';
 
 export default class SupplierLedger extends Component {
   constructor(props) {
@@ -34,14 +35,13 @@ export default class SupplierLedger extends Component {
       supplier: [],
       supplierID: null,
       selectedSupplier: '',
+      filteredData: [],
     };
   }
 
   componentDidMount() {
     this.fetchApiSupplier();
-
     this.getApiData();
-    this.filterData();
   }
 
   getApiData = async () => {
@@ -52,6 +52,7 @@ export default class SupplierLedger extends Component {
       const responseData = response.data.data;
 
       this.setState({data: responseData, loading: false});
+      this.setState({filteredData: responseData, loading: false});
     } catch (error) {
       console.error('Error fetching data:', error);
       this.setState({loading: false});
@@ -83,62 +84,70 @@ export default class SupplierLedger extends Component {
   handleProductSelection = async index => {
     const selectedData = this.state.supplier[index];
     const selectedProductId = selectedData.pk;
+
     this.setState({supplierID: selectedProductId});
-    const selectedSupplier = this.state.supplier[index];
-    this.setState({selectedSupplier}, () => {
-      this.filterData();
+    const selectedSupplier2 = this.state.supplier[index].name;
+    this.setState({selectedSupplier: selectedSupplier2}, () => {
+      console.log('Updated selected supplier:', this.state.selectedSupplier);
     });
+
+    this.filterData();
   };
 
-  filterData = () => {
-    const {fromDate, toDate, selectedSupplier} = this.state;
-
+  filterData = async () => {
+    const {fromDate, toDate, supplierID} = this.state;
+    console.log('filterData', supplierID);
     // Filter the data based on the selected supplier and date range
-    const filteredData = this.state.data.filter(item => {
-      const createdDate = moment(item.created_date);
-      return (
-        (selectedSupplier === '' || item.name === selectedSupplier) && // Filter by selected supplier
-        createdDate.isSameOrAfter(fromDate) &&
-        createdDate.isSameOrBefore(toDate) // Filter by date range
-      );
-    });
+    const getUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?supplierID=${supplierID}&fromDate=${fromDate}&toDate=${toDate}`;
 
+    const response = await axios.get(getUrl);
+    const data = response.data.data;
+    console.log(data, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
     // Update the state with the filtered data
-    this.setState({filteredData});
-    console.log('dsajfksd', filteredData);
+    this.setState({filteredData: data});
   };
 
   handleDownload = async () => {
     const {fromDate, toDate, supplierID} = this.state;
 
-    // Construct the API URL for downloading the file
-    const downloadUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?supplierID=${supplierID}&fromDate=${fromDate}&toDate=${toDate}`;
-
     try {
-      const response = await axios.get(downloadUrl, {
-        responseType: 'blob',
-      });
+      // Make a GET request to the API endpoint
+      const response = await axios.get(
+        `${Api_Url}/report/apis/ledger/suppliers/list/?supplierID=${supplierID}&fromDate=${fromDate}&toDate=${toDate}`,
+      );
+      console.log(response.data);
 
-      const contentDisposition = response.headers['content-disposition'];
-      const fileName = contentDisposition
-        .split(';')
-        .find(part => part.includes('filename='))
-        .split('=')[1]
-        .trim();
+      const jsonData = response.data.data;
 
-      const fileUrl = window.URL.createObjectURL(new Blob([response.data]));
+      const jsonString = JSON.stringify(jsonData, null, 2);
 
-      Linking.openURL(fileUrl);
+      const blob = new Blob([jsonString], {type: 'application/json'});
+      console.log('application/json', blob);
+
+      const url = window.URL.createObjectURL(blob);
+      console.log('application/json for url', url);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'data.txt'; // Specify the desired file name
+      a.style.display = 'none';
+
+      // Append the link to the body and trigger a click event to start the download
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up by removing the created elements
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (error) {
-      console.error('Error downloading file:', error);
+      console.error('Error downloading data:', error);
     }
   };
 
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
-      this.state.data && this.state.data.length > 0
-        ? this.state.data.map(
+      this.state.filteredData && this.state.filteredData.length > 0
+        ? this.state.filteredData.map(
             ({
               created_date,
               suppliers,
@@ -186,9 +195,11 @@ export default class SupplierLedger extends Component {
             style={styles.datePickerButton}
             onPress={() => this.setState({showFromDatePicker: true})}>
             {fromDate ? (
-              <Text>{moment(fromDate).format('MMM DD, YYYY')}</Text>
+              <Text style={{color: '#000'}}>
+                {moment(fromDate).format('MMM DD, YYYY')}
+              </Text>
             ) : (
-              <Text>Select From Date</Text>
+              <Text style={{color: '#000'}}>From Date</Text>
             )}
           </TouchableOpacity>
           {showFromDatePicker && (
@@ -196,7 +207,9 @@ export default class SupplierLedger extends Component {
               value={fromDate}
               mode="date"
               display="default"
-              onChange={(event, date) => this.handleDateChange(date, 'from')}
+              onChange={(event, date) => {
+                this.handleDateChange(date, 'from'), this.filterData();
+              }}
             />
           )}
           <Icon2 style={styles.swapIcon} name="swap"></Icon2>
@@ -204,9 +217,11 @@ export default class SupplierLedger extends Component {
             style={styles.datePickerButton}
             onPress={() => this.setState({showToDatePicker: true})}>
             {toDate ? (
-              <Text>{moment(toDate).format('MMM DD, YYYY')}</Text>
+              <Text style={{color: '#000'}}>
+                {moment(toDate).format('MMM DD, YYYY')}
+              </Text>
             ) : (
-              <Text>Select To Date</Text>
+              <Text style={{color: '#000'}}>To Date</Text>
             )}
           </TouchableOpacity>
           {showToDatePicker && (
@@ -214,7 +229,9 @@ export default class SupplierLedger extends Component {
               value={toDate}
               mode="date"
               display="default"
-              onChange={(event, date) => this.handleDateChange(date, 'to')}
+              onChange={(event, date) => {
+                this.handleDateChange(date, 'to'), this.filterData();
+              }}
             />
           )}
           <Icon
@@ -243,10 +260,10 @@ export default class SupplierLedger extends Component {
                     key={index}
                     data={rowData}
                     widthArr={this.state.widthArr}
-                    style={[
-                      styles.row,
-                      index % 2 && {backgroundColor: '#F7F6E7'},
-                    ]}
+                    style={{
+                      ...styles.row,
+                      ...(index % 2 ? {backgroundColor: '#F7F6E7'} : {}), // Use an object for style
+                    }}
                     textStyle={styles.text}
                   />
                 ))}

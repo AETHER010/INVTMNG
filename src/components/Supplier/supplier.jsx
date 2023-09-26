@@ -51,12 +51,11 @@ const Supplier = ({navigation}) => {
       const response = await axios.post(
         `${Api_Url}/accounts/apis/suppliers/enable/${pk}/`,
       );
+      console.log(response.message);
       Alert.alert('User enabled successfully');
       fetchApiData();
     } catch (error) {
-      console.log('error', error.response.data);
-    } finally {
-      setLoading(false);
+      console.log('error', error);
     }
   };
 
@@ -69,7 +68,7 @@ const Supplier = ({navigation}) => {
       Alert.alert('User disabled successfully');
       fetchApiData();
     } catch (error) {
-      console.log('error', error.response.data);
+      console.log('error', error);
     } finally {
       setLoading(false);
     }

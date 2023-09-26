@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native';
 import {Table, TableWrapper, Row} from 'react-native-table-component';
 import {Button} from 'react-native-elements';
@@ -31,7 +32,9 @@ export default class ClientLedger extends Component {
       showFromDatePicker: false,
       showToDatePicker: false,
       client: [],
-      clientId: null,
+      clientID: null,
+      selectedClient: '',
+      filteredData: [],
     };
   }
 
@@ -49,6 +52,7 @@ export default class ClientLedger extends Component {
 
       // console.log(responseData, 'dsfhjgsjdhf');
       this.setState({data: responseData, loading: false});
+      this.setState({filteredData: responseData, loading: false});
     } catch (error) {
       console.error('Error fetching data:', error);
       this.setState({loading: false});
@@ -80,14 +84,34 @@ export default class ClientLedger extends Component {
   handleProductSelection = async index => {
     const selectedData = this.state.supplier[index];
     const selectedProductId = selectedData.pk;
-    this.setState(selectedProductId);
+    this.setState({clientID: selectedProductId});
+
+    const selectedClient2 = this.state.client[index].name;
+    this.setState({selectedClient: selectedClient2}, () => {
+      console.log('Updated selected client:', this.state.selectedClient);
+    });
+
+    this.filterData();
+  };
+
+  filterData = async () => {
+    const {fromDate, toDate, clientID} = this.state;
+    console.log('filterData', clientID);
+    // Filter the data based on the selected supplier and date range
+    const getUrl = `${Api_Url}/report/apis/ledger/customer/list/?supplierID=${clientID}&fromDate=${fromDate}&toDate=${toDate}`;
+
+    const response = await axios.get(getUrl);
+    const data = response.data.data;
+    console.log(data, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
+    // Update the state with the filtered data
+    this.setState({filteredData: data});
   };
 
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
-      this.state.data && this.state.data.length > 0
-        ? this.state.data.map(
+      this.state.filteredData && this.state.filteredData.length > 0
+        ? this.state.filteredData.map(
             ({
               created_date,
               customer,
@@ -135,9 +159,11 @@ export default class ClientLedger extends Component {
             style={styles.datePickerButton}
             onPress={() => this.setState({showFromDatePicker: true})}>
             {fromDate ? (
-              <Text>{moment(fromDate).format('MMM DD, YYYY')}</Text>
+              <Text style={{color: '#000'}}>
+                {moment(fromDate).format('MMM DD, YYYY')}
+              </Text>
             ) : (
-              <Text>Select From Date</Text>
+              <Text style={{color: '#000'}}>Select From Date</Text>
             )}
           </TouchableOpacity>
           {showFromDatePicker && (
@@ -153,9 +179,11 @@ export default class ClientLedger extends Component {
             style={styles.datePickerButton}
             onPress={() => this.setState({showToDatePicker: true})}>
             {toDate ? (
-              <Text>{moment(toDate).format('MMM DD, YYYY')}</Text>
+              <Text style={{color: '#000'}}>
+                {moment(toDate).format('MMM DD, YYYY')}
+              </Text>
             ) : (
-              <Text>Select To Date</Text>
+              <Text style={{color: '#000'}}>Select To Date</Text>
             )}
           </TouchableOpacity>
           {showToDatePicker && (
