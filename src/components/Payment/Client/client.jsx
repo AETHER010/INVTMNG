@@ -7,7 +7,7 @@ import axios from 'axios';
 import {Api_Url} from '../../../utilities/api';
 import {useNavigation} from '@react-navigation/native';
 
-const Client = () => {
+const PaymentClient = () => {
   const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState('');
@@ -170,4 +170,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Client;
+export default PaymentClient;

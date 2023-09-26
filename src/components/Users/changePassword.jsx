@@ -11,22 +11,28 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {Api_Url} from '../../utilities/api';
+import {AlertProvider, useAlert} from 'react-native-alert-notification';
 
 const ChangePassword = ({navigation, route}) => {
-  const user = route.params.userId;
   const [oPassword, setOPassword] = useState('');
   const [npassword, setNPassword] = useState('');
   const [cPassword, setCPassword] = useState('');
+  const [user, setUser] = useState('');
+
+  const {showAlert} = useAlert();
+
+  useEffect(() => {
+    console.log('change password', route.params.user.username);
+    setUser(route.params.user.username);
+  }, [route.params]);
 
   const HandleformSubmit = async () => {
     const formData = {
       new_password: npassword,
       confirm_password: cPassword,
     };
-
-    console.log(route.params.userId);
-    console.log(formData);
-    console.log('user', user);
+    console.log('formdata', user);
+    console.log('formdata', formData);
 
     try {
       const response = await axios.post(
@@ -35,6 +41,7 @@ const ChangePassword = ({navigation, route}) => {
       );
       console.log('API response:', response.data);
       Alert.alert('Success', 'Data submitted successfully!');
+      navigation.navigate('UserProfile');
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while submitting data.');

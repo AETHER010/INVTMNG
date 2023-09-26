@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import moment from 'moment';
 
-const Bill = ({navigation}) => {
+const Bills = ({navigation}) => {
   const Api_Url = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState('');
@@ -255,4 +255,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Bill;
+export default Bills;

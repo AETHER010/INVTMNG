@@ -7,12 +7,13 @@ import {
   TextInput,
   Dimensions,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {Table, TableWrapper, Row} from 'react-native-table-component';
 import {Button} from 'react-native-elements';
 import ModalDropdown from 'react-native-modal-dropdown';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import axios from 'axios'; // Import Axios for API requests
+import axios from 'axios';
 import {Api_Url} from '../../../utilities/api';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -23,7 +24,7 @@ export default class SupplierLedger extends Component {
     super(props);
     this.state = {
       tableHead: ['Date', 'Name', 'Particular', 'Credit', 'Debit', 'Balance'],
-      widthArr: [80, 120, 120, 70, 70, 80],
+      widthArr: [80, 120, 120, 50, 70, 80],
       data: [],
       loading: true,
       fromDate: new Date(),
@@ -32,6 +33,7 @@ export default class SupplierLedger extends Component {
       showToDatePicker: false,
       supplier: [],
       supplierID: null,
+      selectedSupplier: '',
     };
   }
 
@@ -39,6 +41,7 @@ export default class SupplierLedger extends Component {
     this.fetchApiSupplier();
 
     this.getApiData();
+    this.filterData();
   }
 
   getApiData = async () => {
@@ -48,7 +51,6 @@ export default class SupplierLedger extends Component {
       );
       const responseData = response.data.data;
 
-      console.log(responseData, 'dsfhjgsjdhf');
       this.setState({data: responseData, loading: false});
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -81,12 +83,33 @@ export default class SupplierLedger extends Component {
   handleProductSelection = async index => {
     const selectedData = this.state.supplier[index];
     const selectedProductId = selectedData.pk;
-    this.setSate(selectedProductId);
+    this.setState({supplierID: selectedProductId});
+    const selectedSupplier = this.state.supplier[index];
+    this.setState({selectedSupplier}, () => {
+      this.filterData();
+    });
+  };
+
+  filterData = () => {
+    const {fromDate, toDate, selectedSupplier} = this.state;
+
+    // Filter the data based on the selected supplier and date range
+    const filteredData = this.state.data.filter(item => {
+      const createdDate = moment(item.created_date);
+      return (
+        (selectedSupplier === '' || item.name === selectedSupplier) && // Filter by selected supplier
+        createdDate.isSameOrAfter(fromDate) &&
+        createdDate.isSameOrBefore(toDate) // Filter by date range
+      );
+    });
+
+    // Update the state with the filtered data
+    this.setState({filteredData});
+    console.log('dsajfksd', filteredData);
   };
 
   handleDownload = async () => {
-    const {fromDate, toDate} = this.state;
-    const supplierID = 'your_supplier_id';
+    const {fromDate, toDate, supplierID} = this.state;
 
     // Construct the API URL for downloading the file
     const downloadUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?supplierID=${supplierID}&fromDate=${fromDate}&toDate=${toDate}`;
@@ -130,10 +153,14 @@ export default class SupplierLedger extends Component {
               suppliers,
               particular,
               _type === 'Credit' ? (
-                <Text style={{color: 'green'}}>{amount}</Text>
+                <Text style={{color: 'green', textAlign: 'center'}}>
+                  {amount}
+                </Text>
               ) : null,
               _type === 'Debit' ? (
-                <Text style={{color: 'red'}}>{amount}</Text>
+                <Text style={{color: 'red', textAlign: 'center'}}>
+                  {amount}
+                </Text>
               ) : null,
               balance ? balance : null,
             ],
@@ -153,7 +180,7 @@ export default class SupplierLedger extends Component {
             isFullWidth={true}
             textStyle={styles.dropdownText}
             showsVerticalScrollIndicator={true}
-            dropdownTextStyle={styles.dropdownText}
+            dropdownTextStyle={styles.dropdownText2}
           />
           <TouchableOpacity
             style={styles.datePickerButton}
@@ -261,11 +288,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   datePickerButton: {
-    backgroundColor: '#3A39A0',
+    backgroundColor: '#fff',
     paddingHorizontal: 8,
     paddingVertical: 10,
+    borderWidth: 1,
     borderRadius: 9,
     marginVertical: 10,
+    borderColor: '#3A39A0',
   },
   Button: {
     marginTop: 14,
@@ -297,6 +326,12 @@ const styles = StyleSheet.create({
   dropdownText: {
     color: '#000',
     fontSize: 18,
+    paddingVertical: 4,
+    paddingHorizontal: 17,
+  },
+  dropdownText2: {
+    color: '#000',
+    fontSize: 12,
     paddingVertical: 4,
     paddingHorizontal: 17,
   },

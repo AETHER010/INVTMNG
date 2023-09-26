@@ -46,26 +46,30 @@ const Supplier = ({navigation}) => {
   };
 
   const handlEnable = async pk => {
+    console.log('jfgvasjkf', pk);
     try {
       const response = await axios.post(
-        `${Api_Url}/accounts/apis/suppliers/enable/${pk}`,
+        `${Api_Url}/accounts/apis/suppliers/enable/${pk}/`,
       );
       Alert.alert('User enabled successfully');
+      fetchApiData();
     } catch (error) {
-      console.log('error', error);
+      console.log('error', error.response.data);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDisable = async pk => {
+    console.log('jfgvasjkf', pk);
     try {
       const response = await axios.post(
-        `${Api_Url}/accounts/apis/suppliers/disable/${pk}`,
+        `${Api_Url}/accounts/apis/suppliers/disable/${pk}/`,
       );
       Alert.alert('User disabled successfully');
+      fetchApiData();
     } catch (error) {
-      console.log('error', error);
+      console.log('error', error.response.data);
     } finally {
       setLoading(false);
     }
@@ -159,7 +163,7 @@ const Supplier = ({navigation}) => {
                       size={18}
                       color="#ff0000"
                       style={styles.sideIcon}
-                      onPress={handlEnable}
+                      onPress={() => handlEnable(item.pk)}
                     />
                   ) : (
                     <Icon2
@@ -167,7 +171,7 @@ const Supplier = ({navigation}) => {
                       size={18}
                       color="#ff0000"
                       style={styles.sideIcon}
-                      onPress={handleDisable}
+                      onPress={() => handleDisable(item.pk)}
                     />
                   )}
                 </View>
@@ -178,8 +182,8 @@ const Supplier = ({navigation}) => {
                   <Icon2
                     name="square-edit-outline"
                     size={18}
-                    color="#fff"
-                    style={styles.sideIcon}
+                    color="#000"
+                    style={styles.sideIcon2}
                     onPress={() => handleUpdate(item.pk)}
                   />
                 </View>
@@ -287,9 +291,19 @@ const styles = StyleSheet.create({
   },
   sideIcon: {
     // color: "red",s
-    backgroundColor: '#3A39A0',
+    backgroundColor: '#fff',
     padding: 5,
     borderRadius: 9,
+    borderColor: '#FF0000',
+    borderWidth: 0.5,
+  },
+  sideIcon2: {
+    // color: "red",s
+    backgroundColor: '#fff',
+    padding: 5,
+    borderRadius: 9,
+    borderWidth: 0.5,
+    borderColor: '#3A39A0',
   },
 });
 

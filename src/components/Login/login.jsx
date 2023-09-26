@@ -29,6 +29,8 @@ const LoginForm = ({navigation}) => {
         console.log('token is: ' + token);
         await AsyncStorage.setItem('access_token', token);
         console.log('Token saved in async storage perfectly');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
         navigation.navigate('Home2');
       }
     } catch (error) {

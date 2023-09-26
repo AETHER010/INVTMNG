@@ -14,7 +14,7 @@ import axios from 'axios';
 import {Api_Url} from '../../utilities/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const NewSupplier = ({navigation, route}) => {
+const NewCustomer = ({navigation, route}) => {
   // const Api_url = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
   const [name, setName] = useState('');
   const [contact_number, setContact_number] = useState('');
@@ -239,4 +239,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewSupplier;
+export default NewCustomer;

@@ -78,8 +78,8 @@ const UserProfile = ({navigation}) => {
   };
 
   const handleNavigation = () => {
-    console.log(userId, 'jfyfkvk');
-    navigation.navigate('ChangePassword', {userId});
+    console.log(user, 'jfyfkvk');
+    navigation.navigate('ChangePassword', {user});
   };
 
   const handleLogOut = async () => {

@@ -38,15 +38,21 @@ const Ledger = ({navigation}) => {
           />
         </View>
         <View style={styles.division}>
-          <Text style={styles.text1} onPress={handleSupplierLedger}>
+          <Text
+            style={[styles.text1, action === 'supplier' && styles.selectedText]}
+            onPress={handleSupplierLedger}>
             Supplier
           </Text>
           <View style={styles.text2}></View>
-          <Text style={styles.text1} onPress={handleClientLedger}>
+          <Text
+            style={[styles.text1, action === 'client' && styles.selectedText]}
+            onPress={handleClientLedger}>
             Clients
           </Text>
           <View style={styles.text2}></View>
-          <Text style={styles.text1} onPress={handleExpenseLedger}>
+          <Text
+            style={[styles.text1, action === 'expense' && styles.selectedText]}
+            onPress={handleExpenseLedger}>
             Expences
           </Text>
         </View>
@@ -66,7 +72,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 100,
+    height: 120,
   },
   text: {
     fontSize: 28,
@@ -83,6 +89,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     marginTop: 4,
+    paddingVertical: 5,
   },
   text1: {
     fontSize: 24,
@@ -134,6 +141,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',
     borderRadius: 10,
+  },
+  selectedText: {
+    color: '#000',
   },
 });
 

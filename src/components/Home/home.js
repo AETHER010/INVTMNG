@@ -2,6 +2,7 @@ import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {Card} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
 const HomeDashboard = ({navigation}) => {
   return (
     <ScrollView>

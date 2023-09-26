@@ -66,7 +66,7 @@ export default class ClientLedger extends Component {
   fetchApiClient = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/bill/apis/purchase/suppliers/list/`,
+        `${Api_Url}/bill/apis/sales/subcustomer/list/`,
       );
       const responseData = response.data;
       console.log('API error:', responseData);
@@ -75,6 +75,12 @@ export default class ClientLedger extends Component {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while fetching data.');
     }
+  };
+
+  handleProductSelection = async index => {
+    const selectedData = this.state.supplier[index];
+    const selectedProductId = selectedData.pk;
+    this.setState(selectedProductId);
   };
 
   render() {
@@ -96,10 +102,14 @@ export default class ClientLedger extends Component {
               customer,
               particular,
               _type === 'Credit' ? (
-                <Text style={{color: 'green'}}>{amount}</Text>
+                <Text style={{color: 'green', textAlign: 'center'}}>
+                  {amount}
+                </Text>
               ) : null,
               _type === 'Debit' ? (
-                <Text style={{color: 'red'}}>{amount}</Text>
+                <Text style={{color: 'red', textAlign: 'center'}}>
+                  {amount}
+                </Text>
               ) : null,
               balance ? balance : null,
             ],
@@ -119,7 +129,7 @@ export default class ClientLedger extends Component {
             isFullWidth={true}
             textStyle={styles.dropdownText}
             showsVerticalScrollIndicator={true}
-            dropdownTextStyle={styles.dropdownText}
+            dropdownTextStyle={styles.dropdownText2}
           />
           <TouchableOpacity
             style={styles.datePickerButton}
@@ -226,11 +236,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   datePickerButton: {
-    backgroundColor: '#3A39A0',
+    backgroundColor: '#fff',
     paddingHorizontal: 8,
     paddingVertical: 10,
+    borderWidth: 1,
     borderRadius: 9,
     marginVertical: 10,
+    borderColor: '#3A39A0',
   },
   Button: {
     marginTop: 14,
@@ -279,6 +291,12 @@ const styles = StyleSheet.create({
   dropdownText: {
     color: '#000',
     fontSize: 18,
+    paddingVertical: 4,
+    paddingHorizontal: 17,
+  },
+  dropdownText2: {
+    color: '#000',
+    fontSize: 12,
     paddingVertical: 4,
     paddingHorizontal: 17,
   },

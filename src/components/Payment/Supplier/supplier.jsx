@@ -7,7 +7,7 @@ import axios from 'axios';
 import {Api_Url} from './../../../utilities/api';
 import {useNavigation} from '@react-navigation/native';
 
-const Supplier = () => {
+const PaymentSupplier = () => {
   const navigation = useNavigation();
   const [supplierData, setSupplierData] = useState([]);
   const [loading, setLoading] = useState('');
@@ -191,4 +191,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Supplier;
+export default PaymentSupplier;

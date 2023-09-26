@@ -1,18 +1,38 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, ScrollView, Text} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import {Table, TableWrapper, Row} from 'react-native-table-component';
+import {Button} from 'react-native-elements';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios'; // Import Axios for API requests
 import {Api_Url} from '../../../utilities/api';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon2 from 'react-native-vector-icons/AntDesign';
+import ModalDropdown from 'react-native-modal-dropdown';
 
 export default class ExpenseLedger extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tableHead: ['Date', 'Name', 'Particular', 'Credit', 'Debit', 'Balance'],
-      widthArr: [50, 80, 120, 70, 70, 80],
+      tableHead: ['Date', 'Credit', 'Debit', 'Balance', 'Remarks'],
+      widthArr: [80, 70, 80, 70, 110],
       data: [],
       loading: true,
+      fromDate: new Date(),
+      toDate: new Date(),
+      showFromDatePicker: false,
+      showToDatePicker: false,
+      client: [],
+      clientId: null,
+      selectors: ['Debit', 'Credit'],
     };
   }
 
@@ -23,11 +43,11 @@ export default class ExpenseLedger extends Component {
   getApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/report/apis/ledger/expenses/list/`,
+        `${Api_Url}/report/apis/ledger/expenses/list/?page=1&page_size=100`,
       );
       const responseData = response.data.data;
 
-      console.log(responseData, 'dsfhjgsjdhf'); // Assuming the API response is an object with a data property
+      // console.log(responseData, 'dsfhjgsjdhf');
       this.setState({data: responseData, loading: false});
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -35,53 +55,99 @@ export default class ExpenseLedger extends Component {
     }
   };
 
+  handleDateChange = (date, type) => {
+    if (type === 'from') {
+      this.setState({fromDate: date, showFromDatePicker: false});
+    } else if (type === 'to') {
+      this.setState({toDate: date, showToDatePicker: false});
+    }
+  };
+
   render() {
-    const state = this.state;
+    const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
       this.state.data && this.state.data.length > 0
         ? this.state.data.map(
             ({
               created_date,
-              suppliers,
-              particular,
+
               _type,
               amount,
               Credit,
               Debit,
               balance,
+              remarks,
             }) => [
-              moment(created_date).format('MMM DD, YYYY'),
-              suppliers,
-              particular,
+              moment(created_date).format('MMM DD, YYYY'), // Fixed date format
               _type === 'Credit' ? (
-                <Text style={{color: 'green'}}>{amount}</Text>
+                <Text style={{color: 'green', textAlign: 'center'}}>
+                  {amount}
+                </Text>
               ) : null,
-              // Credit !== null ? Credit : null,
-              // Debit !== null ? Debit : null,
               _type === 'Debit' ? (
-                <Text style={{color: 'red'}}>{amount}</Text>
+                <Text style={{color: 'red', textAlign: 'center'}}>
+                  {amount}
+                </Text>
               ) : null,
               balance ? balance : null,
+              remarks,
             ],
           )
         : [];
 
     return (
       <View style={styles.container}>
-        <Text
-          style={{
-            color: '#888',
-            padding: 2,
-            fontSize: 20,
-          }}>
-          Expenses:
-        </Text>
-        <ScrollView horizontal={true}>
+        <View style={styles.SecondContainer}>
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={() => this.setState({showFromDatePicker: true})}>
+            {fromDate ? (
+              <Text>{moment(fromDate).format('MMM DD, YYYY')}</Text>
+            ) : (
+              <Text>Select From Date</Text>
+            )}
+          </TouchableOpacity>
+          {showFromDatePicker && (
+            <DateTimePicker
+              value={fromDate}
+              mode="date"
+              display="default"
+              onChange={(event, date) => this.handleDateChange(date, 'from')}
+            />
+          )}
+          <Icon2 style={styles.swapIcon} name="swap"></Icon2>
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={() => this.setState({showToDatePicker: true})}>
+            {toDate ? (
+              <Text>{moment(toDate).format('MMM DD, YYYY')}</Text>
+            ) : (
+              <Text>Select To Date</Text>
+            )}
+          </TouchableOpacity>
+          {showToDatePicker && (
+            <DateTimePicker
+              value={toDate}
+              mode="date"
+              display="default"
+              onChange={(event, date) => this.handleDateChange(date, 'to')}
+            />
+          )}
+          <Icon
+            style={styles.Button}
+            name="download"
+            // onPress={handleSupplierLedger}
+          />
+        </View>
+
+        <ScrollView
+          horizontal={true}
+          style={{maxHeight: Dimensions.get('window').height - 200}}>
           <View>
             <Table>
               <Row
-                data={state.tableHead}
-                widthArr={state.widthArr}
+                data={this.state.tableHead}
+                widthArr={this.state.widthArr}
                 style={styles.header}
                 textStyle={styles.text}
               />
@@ -92,7 +158,7 @@ export default class ExpenseLedger extends Component {
                   <Row
                     key={index}
                     data={rowData}
-                    widthArr={state.widthArr}
+                    widthArr={this.state.widthArr}
                     style={[
                       styles.row,
                       index % 2 && {backgroundColor: '#F7F6E7'},
@@ -128,5 +194,71 @@ const styles = StyleSheet.create({
   row: {
     height: 50,
     backgroundColor: '#E7E6E1',
+  },
+
+  SecondContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    backgroundColor: '#fff',
+  },
+  datePickerButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderRadius: 9,
+    marginVertical: 10,
+    borderColor: '#3A39A0',
+  },
+  Button: {
+    marginTop: 14,
+    height: 30,
+    width: 30,
+    fontSize: 24,
+    backgroundColor: '#3A39A0',
+    color: '#FFFFFF',
+    borderRadius: 14,
+    textAlign: 'center',
+    paddingTop: 4,
+  },
+  textDisplay: {
+    color: '#000',
+    marginTop: 9,
+    height: 40,
+    width: 120,
+    borderWidth: 1,
+    borderColor: '#3A39A0',
+    textAlign: 'center',
+    paddingTop: 7,
+    borderRadius: 10,
+  },
+
+  swapIcon: {
+    color: '#000',
+    fontSize: 25,
+    marginTop: 17,
+  },
+  textDisplay: {
+    color: '#000',
+    marginTop: 9,
+    height: 40,
+    width: 120,
+    borderWidth: 1,
+    borderColor: '#3A39A0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+  },
+  swapIcon: {
+    color: '#000',
+    fontSize: 25,
+    marginTop: 17,
+  },
+  dropdownText: {
+    color: '#000',
+    fontSize: 18,
+    paddingVertical: 4,
+    paddingHorizontal: 17,
   },
 });
