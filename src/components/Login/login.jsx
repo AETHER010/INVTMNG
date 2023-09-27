@@ -6,7 +6,6 @@ import {useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {Api_Url} from '../../utilities/api';
-import {refreshToken} from '../../components/Users/userAuth';
 
 const LoginForm = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -16,7 +15,7 @@ const LoginForm = ({navigation}) => {
   // Axios.get(https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/login/);
 
   const handleLogin = async () => {
-    console.log('sjabkjsdf');
+    console.log('sjabkjsdf', username, password);
     setError('');
     try {
       const response = await axios.post(`${Api_Url}/accounts/apis/login/`, {

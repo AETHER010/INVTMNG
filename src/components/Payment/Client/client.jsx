@@ -26,6 +26,7 @@ const PaymentClient = () => {
         `${Api_Url}/payment/apis/customer-payments/`,
       );
       setData(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -55,35 +56,41 @@ const PaymentClient = () => {
           onPress={() => navigation.navigate('NewPaymentClient')}
         />
       </View>
-      {data.map((item, index) => (
-        <View
-          key={index}
-          style={{justifyContent: 'center', alignItems: 'center'}}>
-          <View style={[styles.Card, styles.ShadowProps]}>
-            <View style={styles.card2}>
-              <Text style={{fontSize: 18, color: '#000'}}>{item.customer}</Text>
+      {data.length === 0 ? (
+        <Text style={styles.noDataText}>No Data Available</Text>
+      ) : (
+        data.map((item, index) => (
+          <View
+            key={index}
+            style={{justifyContent: 'center', alignItems: 'center'}}>
+            <View style={[styles.Card, styles.ShadowProps]}>
+              <View style={styles.card2}>
+                <Text style={{fontSize: 18, color: '#000'}}>
+                  {item.customer}
+                </Text>
 
-              {/* <Text style={{fontSize: 18, color: '#000'}}>
+                {/* <Text style={{fontSize: 18, color: '#000'}}>
                       {formattedate}
                     </Text> */}
-            </View>
-            <View
-              style={{
-                justifyContent: 'space-between',
-                flexDirection: 'row',
-              }}>
-              <Text style={{fontSize: 18, color: '#000'}}>Amount:</Text>
-              <Text style={{fontSize: 18, color: '#008000'}}>
-                {item.amount}
+              </View>
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                }}>
+                <Text style={{fontSize: 18, color: '#000'}}>Amount:</Text>
+                <Text style={{fontSize: 18, color: '#008000'}}>
+                  {item.amount}
+                </Text>
+              </View>
+
+              <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
+                Remarks : {item.remarks}
               </Text>
             </View>
-
-            <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-              Remarks : {item.remarks}
-            </Text>
           </View>
-        </View>
-      ))}
+        ))
+      )}
     </View>
   );
 };

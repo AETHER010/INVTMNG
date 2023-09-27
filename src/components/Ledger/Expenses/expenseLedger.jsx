@@ -18,6 +18,8 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon2 from 'react-native-vector-icons/AntDesign';
 import ModalDropdown from 'react-native-modal-dropdown';
+import RNFS from 'react-native-fs';
+import {PermissionsAndroid} from 'react-native';
 
 export default class ExpenseLedger extends Component {
   constructor(props) {
@@ -61,22 +63,89 @@ export default class ExpenseLedger extends Component {
   handleDateChange = (date, type) => {
     if (type === 'from') {
       this.setState({fromDate: date, showFromDatePicker: false});
+      this.filterData();
     } else if (type === 'to') {
       this.setState({toDate: date, showToDatePicker: false});
+      this.filterData();
     }
   };
 
   filterData = async () => {
-    const {fromDate, toDate, supplierID} = this.state;
-    console.log('filterData', supplierID);
+    const {fromDate, toDate} = this.state;
+
+    const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
+    const formattedToDate = moment(toDate).format('YYYY-MM-DD');
     // Filter the data based on the selected supplier and date range
-    const getUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?fromDate=${fromDate}&toDate=${toDate}`;
+    const getUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
 
     const response = await axios.get(getUrl);
     const data = response.data.data;
     console.log(data, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
     // Update the state with the filtered data
     this.setState({filteredData: data});
+  };
+
+  handleDownload = async () => {
+    const {fromDate, toDate, supplierID} = this.state;
+
+    // Request storage permission
+    const hasPermission = await this.requestStoragePermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
+    const formattedToDate = moment(toDate).format('YYYY-MM-DD');
+
+    const apiUrl = `${Api_Url}/report/pages/expenses/export-excel/?from_date=${formattedFromDate}&to_date=${formattedToDate}`;
+
+    try {
+      const response = await axios.get(apiUrl, {
+        responseType: 'blob', // Ensure the response is treated as binary data
+      });
+
+      if (response.status === 200) {
+        // Save the PDF data to a file
+        const pdfData = response;
+        const filePath = `${RNFS.DownloadDirectoryPath}/downloaded.pdf`; // Change the file name and path as needed
+
+        await RNFS.writeFile(filePath, pdfData, 'blob');
+
+        Alert.alert('Download Complete', 'PDF file saved to device.');
+      } else {
+        Alert.alert('Download Error', 'Failed to download PDF file.');
+      }
+    } catch (error) {
+      console.error('Error downloading data:', error);
+      Alert.alert(
+        'Download Error',
+        'An error occurred while downloading the PDF.',
+      );
+    }
+  };
+
+  requestStoragePermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'App needs access to your storage to download data.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      } else {
+        console.log('Storage permission denied');
+        return false;
+      }
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
   };
 
   render() {
@@ -117,9 +186,11 @@ export default class ExpenseLedger extends Component {
             style={styles.datePickerButton}
             onPress={() => this.setState({showFromDatePicker: true})}>
             {fromDate ? (
-              <Text>{moment(fromDate).format('MMM DD, YYYY')}</Text>
+              <Text style={{color: '#000'}}>
+                {moment(fromDate).format('MMM DD, YYYY')}
+              </Text>
             ) : (
-              <Text>Select From Date</Text>
+              <Text style={{color: '#000'}}>Select From Date</Text>
             )}
           </TouchableOpacity>
           {showFromDatePicker && (
@@ -135,9 +206,11 @@ export default class ExpenseLedger extends Component {
             style={styles.datePickerButton}
             onPress={() => this.setState({showToDatePicker: true})}>
             {toDate ? (
-              <Text>{moment(toDate).format('MMM DD, YYYY')}</Text>
+              <Text style={{color: '#000'}}>
+                {moment(toDate).format('MMM DD, YYYY')}
+              </Text>
             ) : (
-              <Text>Select To Date</Text>
+              <Text style={{color: '#000'}}>Select To Date</Text>
             )}
           </TouchableOpacity>
           {showToDatePicker && (
@@ -151,7 +224,7 @@ export default class ExpenseLedger extends Component {
           <Icon
             style={styles.Button}
             name="download"
-            // onPress={handleSupplierLedger}
+            onPress={this.handleDownload}
           />
         </View>
 

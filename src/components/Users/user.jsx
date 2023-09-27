@@ -40,32 +40,92 @@ const User = ({navigation}) => {
     }
   };
 
+  // const handleUnblock = async username => {
+  //   try {
+  //     await axios.post(
+  //       `https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/unblock/user/${username}`,
+  //     );
+  //     Alert.alert('Successfully unblock');
+  //   } catch (error) {
+  //     console.error('Error updating data:', error);
+  //   } finally {
+  //     console.log('...');
+  //   }
+  //   fetchApiData();
+  // };
+
+  // const handleBlock = async username => {
+  //   try {
+  //     await axios.post(`${Api_Url}/accounts/apis/block/user/${username}`);
+  //     Alert.alert('Successfully Block');
+  //   } catch (error) {
+  //     console.error('Error updating data:', error);
+  //   } finally {
+  //     console.log('Successfully block');
+  //   }
+  //   fetchApiData();
+  // };
+
   const handleUnblock = async username => {
-    try {
-      await axios.post(
-        `https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/unblock/user/${username}`,
-      );
-      Alert.alert('Successfully unblock');
-    } catch (error) {
-      console.error('Error updating data:', error);
-    } finally {
-      console.log('...');
-    }
-    fetchApiData();
+    // Show an alert to confirm the action
+    Alert.alert(
+      'Confirm Unblock',
+      `Are you sure you want to unblock ${username}?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Unblock',
+          onPress: async () => {
+            try {
+              await axios.post(
+                `${Api_Url}/accounts/apis/unblock/user/${username}`,
+              );
+              Alert.alert('Successfully unblocked');
+            } catch (error) {
+              console.error('Error updating data:', error);
+            } finally {
+              console.log('...');
+            }
+            fetchApiData();
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const handleBlock = async username => {
-    try {
-      await axios.post(
-        `https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/block/user/${username}`,
-      );
-      Alert.alert('Successfully Block');
-    } catch (error) {
-      console.error('Error updating data:', error);
-    } finally {
-      console.log('Successfully block');
-    }
-    fetchApiData();
+    // Show an alert to confirm the action
+    Alert.alert(
+      'Confirm Block',
+      `Are you sure you want to block ${username}?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Block',
+          onPress: async () => {
+            try {
+              await axios.post(
+                `${Api_Url}/accounts/apis/block/user/${username}`,
+              );
+              Alert.alert('Successfully blocked');
+            } catch (error) {
+              console.error('Error updating data:', error);
+            } finally {
+              console.log('Successfully blocked');
+            }
+            fetchApiData();
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const handleRefresh = () => {
@@ -147,7 +207,7 @@ const User = ({navigation}) => {
                   </Text> */}
 
                   <View style={styles.card2}>
-                    <Text style={{fontSize: 20, color: '#000'}}>
+                    <Text style={styles.usernameText} numberOfLines={1}>
                       Username: {item.username}
                     </Text>
                     {item.is_blocked ? (
@@ -270,6 +330,13 @@ const styles = StyleSheet.create({
     paddingLeft: 6,
     marginLeft: 8,
     color: '#3A39A0',
+  },
+  usernameText: {
+    flex: 1, // Allow the text to grow and shrink as needed
+    fontSize: 20,
+    color: '#000',
+    marginRight: 8, // Add some space between the text and the button
+    overflow: 'hidden', // Hide any overflowing text
   },
 });
 

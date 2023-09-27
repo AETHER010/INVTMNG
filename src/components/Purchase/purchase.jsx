@@ -69,8 +69,8 @@ const Purchase = ({navigation}) => {
     } else {
       const filtered = data.filter(
         item =>
-          item.name &&
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          item.suppliers &&
+          item.suppliers.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredData(filtered);
       console.log(filteredData, 'asjdfkasdfk');

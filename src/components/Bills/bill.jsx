@@ -68,11 +68,11 @@ const Bills = ({navigation}) => {
     } else {
       const filtered = data.filter(
         item =>
-          item.name &&
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          item.customer &&
+          item.customer.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredData(filtered);
-      console.log(filteredData, 'asjdfkasdfk');
+      console.log(filtered, 'asjdfkasdfk');
     }
   };
 

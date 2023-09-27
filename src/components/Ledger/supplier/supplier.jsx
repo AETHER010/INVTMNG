@@ -18,7 +18,10 @@ import {Api_Url} from '../../../utilities/api';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon2 from 'react-native-vector-icons/AntDesign';
-import Linking from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import RNFS from 'react-native-fs';
+import {PermissionsAndroid} from 'react-native';
 
 export default class SupplierLedger extends Component {
   constructor(props) {
@@ -50,7 +53,7 @@ export default class SupplierLedger extends Component {
         `${Api_Url}/report/apis/ledger/suppliers/list/?page=1&page_size=100`,
       );
       const responseData = response.data.data;
-
+      // console.log('Error fetching data:', response.data.data);
       this.setState({data: responseData, loading: false});
       this.setState({filteredData: responseData, loading: false});
     } catch (error) {
@@ -76,78 +79,115 @@ export default class SupplierLedger extends Component {
   handleDateChange = (date, type) => {
     if (type === 'from') {
       this.setState({fromDate: date, showFromDatePicker: false});
+      this.filterData();
     } else if (type === 'to') {
       this.setState({toDate: date, showToDatePicker: false});
+      this.filterData();
     }
   };
 
   handleProductSelection = async index => {
     const selectedData = this.state.supplier[index];
     const selectedProductId = selectedData.pk;
+    console.log('Updated selected id:', selectedData.pk);
 
-    this.setState({supplierID: selectedProductId});
-    const selectedSupplier2 = this.state.supplier[index].name;
-    this.setState({selectedSupplier: selectedSupplier2}, () => {
+    // Use the callback function to ensure that state is updated after the selection
+    this.setState({selectedSupplier: selectedData.name}, () => {
       console.log('Updated selected supplier:', this.state.selectedSupplier);
     });
 
-    this.filterData();
+    this.setState({supplierID: selectedProductId}, () => {
+      console.log('Updated supplierID:', this.state.supplierID);
+      this.filterData(); // Call filterData after updating the state
+    });
   };
 
   filterData = async () => {
     const {fromDate, toDate, supplierID} = this.state;
     console.log('filterData', supplierID);
-    // Filter the data based on the selected supplier and date range
-    const getUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?supplierID=${supplierID}&fromDate=${fromDate}&toDate=${toDate}`;
+    console.log('filterData', fromDate);
+    console.log('filterData', toDate);
 
+    const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
+    const formattedToDate = moment(toDate).format('YYYY-MM-DD');
+
+    const getUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?suppliers=${supplierID}&from_date=${formattedFromDate}&to_date=${formattedToDate}`;
+    console.log(getUrl, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
     const response = await axios.get(getUrl);
     const data = response.data.data;
     console.log(data, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
     // Update the state with the filtered data
-    this.setState({filteredData: data});
+    this.setState({data: data});
   };
 
   handleDownload = async () => {
     const {fromDate, toDate, supplierID} = this.state;
 
+    // Request storage permission
+    const hasPermission = await this.requestStoragePermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
+    const formattedToDate = moment(toDate).format('YYYY-MM-DD');
+
+    const apiUrl = `${Api_Url}/report/pages/suppliers/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&suppliers=${supplierID}`;
+
     try {
-      // Make a GET request to the API endpoint
-      const response = await axios.get(
-        `${Api_Url}/report/apis/ledger/suppliers/list/?supplierID=${supplierID}&fromDate=${fromDate}&toDate=${toDate}`,
-      );
-      console.log(response.data);
+      const response = await axios.get(apiUrl, {
+        responseType: 'blob', // Ensure the response is treated as binary data
+      });
 
-      const jsonData = response.data.data;
+      if (response.status === 200) {
+        // Save the PDF data to a file
+        const pdfData = response;
+        const filePath = `${RNFS.DownloadDirectoryPath}/downloaded.pdf`; // Change the file name and path as needed
 
-      const jsonString = JSON.stringify(jsonData, null, 2);
+        await RNFS.writeFile(filePath, pdfData, 'blob');
 
-      const blob = new Blob([jsonString], {type: 'application/json'});
-      console.log('application/json', blob);
-
-      const url = window.URL.createObjectURL(blob);
-      console.log('application/json for url', url);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'data.txt'; // Specify the desired file name
-      a.style.display = 'none';
-
-      // Append the link to the body and trigger a click event to start the download
-      document.body.appendChild(a);
-      a.click();
-
-      // Clean up by removing the created elements
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+        Alert.alert('Download Complete', 'PDF file saved to device.');
+      } else {
+        Alert.alert('Download Error', 'Failed to download PDF file.');
+      }
     } catch (error) {
       console.error('Error downloading data:', error);
+      Alert.alert(
+        'Download Error',
+        'An error occurred while downloading the PDF.',
+      );
+    }
+  };
+
+  requestStoragePermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'App needs access to your storage to download data.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      } else {
+        console.log('Storage permission denied');
+        return false;
+      }
+    } catch (err) {
+      console.warn(err);
+      return false;
     }
   };
 
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
-      this.state.filteredData && this.state.filteredData.length > 0
-        ? this.state.filteredData.map(
+      this.state.data && this.state.data.length > 0
+        ? this.state.data.map(
             ({
               created_date,
               suppliers,

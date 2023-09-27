@@ -45,33 +45,62 @@ const Supplier = ({navigation}) => {
     navigation.navigate('NewSupplier', {pk});
   };
 
-  const handlEnable = async pk => {
-    console.log('jfgvasjkf', pk);
-    try {
-      const response = await axios.post(
-        `${Api_Url}/accounts/apis/suppliers/enable/${pk}/`,
-      );
-      console.log(response.message);
-      Alert.alert('User enabled successfully');
-      fetchApiData();
-    } catch (error) {
-      console.log('error', error);
-    }
+  const handleEnable = pk => {
+    Alert.alert(
+      'Enable Supplier',
+      'Are you sure you want to enable this supplier?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              const response = await axios.post(
+                `${Api_Url}/accounts/apis/suppliers/enable/${pk}/`,
+              );
+              console.log(response.message);
+              Alert.alert('User enabled successfully');
+              fetchApiData();
+            } catch (error) {
+              console.log('error', error);
+            }
+            fetchApiData();
+          },
+        },
+      ],
+    );
   };
 
-  const handleDisable = async pk => {
-    console.log('jfgvasjkf', pk);
-    try {
-      const response = await axios.post(
-        `${Api_Url}/accounts/apis/suppliers/disable/${pk}/`,
-      );
-      Alert.alert('User disabled successfully');
-      fetchApiData();
-    } catch (error) {
-      console.log('error', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleDisable = pk => {
+    Alert.alert(
+      'Disable Supplier',
+      'Are you sure you want to disable this supplier?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              const response = await axios.post(
+                `${Api_Url}/accounts/apis/suppliers/disable/${pk}/`,
+              );
+              Alert.alert('User disabled successfully');
+              fetchApiData();
+            } catch (error) {
+              console.log('error', error);
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const handleRefresh = () => {
@@ -160,9 +189,9 @@ const Supplier = ({navigation}) => {
                     <Icon2
                       name="lock-open-variant-outline"
                       size={18}
-                      color="#ff0000"
+                      color="#008000"
                       style={styles.sideIcon}
-                      onPress={() => handlEnable(item.pk)}
+                      onPress={() => handleEnable(item.pk)}
                     />
                   ) : (
                     <Icon2

@@ -43,8 +43,10 @@ const PaymentSupplier = () => {
       setFilteredData(supplierData);
     } else {
       // Use the Array.filter method to filter data based on the search query
-      const filtered = supplierData.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      const filtered = supplierData.filter(
+        item =>
+          item.name &&
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredData(filtered);
     }
@@ -134,6 +136,7 @@ const styles = StyleSheet.create({
     margin: 2,
     padding: 7,
     width: 170,
+    color: '#000',
   },
   searchIcon: {
     borderLeftWidth: 2,

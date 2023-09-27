@@ -19,6 +19,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon2 from 'react-native-vector-icons/AntDesign';
 import ModalDropdown from 'react-native-modal-dropdown';
 
+import RNFS from 'react-native-fs';
+import {PermissionsAndroid} from 'react-native';
+
 export default class ClientLedger extends Component {
   constructor(props) {
     super(props);
@@ -62,8 +65,10 @@ export default class ClientLedger extends Component {
   handleDateChange = (date, type) => {
     if (type === 'from') {
       this.setState({fromDate: date, showFromDatePicker: false});
+      this.filterData();
     } else if (type === 'to') {
       this.setState({toDate: date, showToDatePicker: false});
+      this.filterData();
     }
   };
 
@@ -82,9 +87,12 @@ export default class ClientLedger extends Component {
   };
 
   handleProductSelection = async index => {
-    const selectedData = this.state.supplier[index];
+    const selectedData = this.state.client[index];
     const selectedProductId = selectedData.pk;
-    this.setState({clientID: selectedProductId});
+    this.setState({clientID: selectedProductId}, () => {
+      console.log('Updated supplierID:', this.state.clientID);
+      this.filterData();
+    });
 
     const selectedClient2 = this.state.client[index].name;
     this.setState({selectedClient: selectedClient2}, () => {
@@ -94,24 +102,89 @@ export default class ClientLedger extends Component {
     this.filterData();
   };
 
+  handleDownload = async () => {
+    const {fromDate, toDate, clientID} = this.state;
+
+    // Request storage permission
+    const hasPermission = await this.requestStoragePermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
+    const formattedToDate = moment(toDate).format('YYYY-MM-DD');
+
+    const apiUrl = `${Api_Url}/report/pages/customer/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&customer=${clientID}`;
+
+    try {
+      const response = await axios.get(apiUrl, {
+        responseType: 'blob', // Ensure the response is treated as binary data
+      });
+
+      if (response.status === 200) {
+        // Save the PDF data to a file
+        const pdfData = response;
+        const filePath = `${RNFS.DownloadDirectoryPath}/downloaded.pdf`; // Change the file name and path as needed
+
+        await RNFS.writeFile(filePath, pdfData, 'blob');
+
+        Alert.alert('Download Complete', 'PDF file saved to device.');
+      } else {
+        Alert.alert('Download Error', 'Failed to download PDF file.');
+      }
+    } catch (error) {
+      console.error('Error downloading data:', error);
+      Alert.alert(
+        'Download Error',
+        'An error occurred while downloading the PDF.',
+      );
+    }
+  };
+
+  requestStoragePermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'App needs access to your storage to download data.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      } else {
+        console.log('Storage permission denied');
+        return false;
+      }
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  };
+
   filterData = async () => {
     const {fromDate, toDate, clientID} = this.state;
     console.log('filterData', clientID);
     // Filter the data based on the selected supplier and date range
-    const getUrl = `${Api_Url}/report/apis/ledger/customer/list/?supplierID=${clientID}&fromDate=${fromDate}&toDate=${toDate}`;
+    const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
+    const formattedToDate = moment(toDate).format('YYYY-MM-DD');
+    const getUrl = `${Api_Url}/report/apis/ledger/customer/list/?customer=${clientID}&from_date=${formattedFromDate}&to_Date=${formattedToDate}`;
 
     const response = await axios.get(getUrl);
     const data = response.data.data;
     console.log(data, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
     // Update the state with the filtered data
-    this.setState({filteredData: data});
+    this.setState({data: data});
   };
 
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
-      this.state.filteredData && this.state.filteredData.length > 0
-        ? this.state.filteredData.map(
+      this.state.data && this.state.data.length > 0
+        ? this.state.data.map(
             ({
               created_date,
               customer,
@@ -197,7 +270,7 @@ export default class ClientLedger extends Component {
           <Icon
             style={styles.Button}
             name="download"
-            // onPress={handleSupplierLedger}
+            onPress={this.handleDownload}
           />
         </View>
 
