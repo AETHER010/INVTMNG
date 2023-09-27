@@ -118,15 +118,16 @@ export default class ClientLedger extends Component {
 
     try {
       const response = await axios.get(apiUrl, {
-        responseType: 'blob', // Ensure the response is treated as binary data
+        responseType: 'arraybuffer', // Ensure the response is treated as binary data
       });
 
       if (response.status === 200) {
         // Save the PDF data to a file
-        const pdfData = response;
-        const filePath = `${RNFS.DownloadDirectoryPath}/downloaded.pdf`; // Change the file name and path as needed
+        const pdfData = response.data;
+        const pdfData2 = JSON.stringify(pdfData);
+        const filePath = `${RNFS.DownloadDirectoryPath}+ /downloaded.pdf`; // Change the file name and path as needed
 
-        await RNFS.writeFile(filePath, pdfData, 'blob');
+        await RNFS.writeFile(filePath, pdfData2, 'base64');
 
         Alert.alert('Download Complete', 'PDF file saved to device.');
       } else {

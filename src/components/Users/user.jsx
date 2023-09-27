@@ -70,7 +70,7 @@ const User = ({navigation}) => {
     // Show an alert to confirm the action
     Alert.alert(
       'Confirm Unblock',
-      `Are you sure you want to unblock ${username}?`,
+      `Are you sure you want to block ${username}?`,
       [
         {
           text: 'Cancel',
@@ -101,7 +101,7 @@ const User = ({navigation}) => {
     // Show an alert to confirm the action
     Alert.alert(
       'Confirm Block',
-      `Are you sure you want to block ${username}?`,
+      `Are you sure you want to unblock ${username}?`,
       [
         {
           text: 'Cancel',
