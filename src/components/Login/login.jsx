@@ -24,10 +24,11 @@ const LoginForm = ({navigation}) => {
       });
 
       const token = response.data.access_token;
-
+      const role = response.data.role;
       if (token) {
         console.log('token is: ' + token);
         await AsyncStorage.setItem('access_token', token);
+        await AsyncStorage.setItem('userRole', role);
         console.log('Token saved in async storage perfectly');
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
