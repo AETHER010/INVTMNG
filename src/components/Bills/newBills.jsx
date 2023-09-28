@@ -227,7 +227,7 @@ const NewBills = ({navigation, route}) => {
 
     try {
       await axios.post(
-        `${Api_Url}/bill/apis/sales/charge/${chargeBillId}`,
+        `${Api_Url}/bill/apis/sales/charge/${chargeBillId}/`,
         formData,
       );
       Alert.alert('Success', 'Charge Added Successfully');
@@ -261,44 +261,49 @@ const NewBills = ({navigation, route}) => {
       <View style={styles.formContainer}>
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
+            // flexDirection: 'row',
+            // flexWrap: 'wrap',
+            // justifyContent: 'space-between',
             padding: 5,
             marginTop: 18,
           }}>
-          <Text style={styles.label}>Customer:</Text>
-          <ModalDropdown
-            style={styles.Input}
-            defaultValue="Select Customer..."
-            options={supplier.map(item => item.name)}
-            onSelect={index => handleProductSelection(index)}
-            defaultIndex={0}
-            animated={true}
-            isFullWidth={true}
-            textStyle={styles.dropdownText}
-            showsVerticalScrollIndicator={true}
-            dropdownTextStyle={styles.dropdownText}
-          />
-          <Text style={styles.label}>Product:</Text>
-          <ModalDropdown
-            style={styles.Input}
-            options={product.map(item => item.name)}
-            onSelect={index => handlePriceSelection(index)}
-            defaultValue="Select product..."
-            defaultIndex={0}
-            animated={true}
-            isFullWidth={true}
-            textStyle={styles.dropdownText}
-            dropdownTextStyle={styles.dropdownText}
-          />
-
-          <Text style={styles.label}>Quantity:</Text>
-          <TextInput
-            style={styles.Input}
-            value={quantity}
-            onChangeText={setQuantity}
-          />
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Customer:</Text>
+            <ModalDropdown
+              style={styles.Input}
+              defaultValue="Select Customer..."
+              options={supplier.map(item => item.name)}
+              onSelect={index => handleProductSelection(index)}
+              defaultIndex={0}
+              animated={true}
+              isFullWidth={true}
+              textStyle={styles.dropdownText}
+              showsVerticalScrollIndicator={true}
+              dropdownTextStyle={styles.dropdownText}
+            />
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Product:</Text>
+            <ModalDropdown
+              style={styles.Input}
+              options={product.map(item => item.name)}
+              onSelect={index => handlePriceSelection(index)}
+              defaultValue="Select product..."
+              defaultIndex={0}
+              animated={true}
+              isFullWidth={true}
+              textStyle={styles.dropdownText}
+              dropdownTextStyle={styles.dropdownText}
+            />
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Quantity:</Text>
+            <TextInput
+              style={styles.Input}
+              value={quantity}
+              onChangeText={setQuantity}
+            />
+          </View>
           <View
             style={{
               flexDirection: 'row',
@@ -529,7 +534,7 @@ const NewBills = ({navigation, route}) => {
             <TextInput
               style={styles.CommisionText}
               onChangeText={setCommission}>
-              {commission}{' '}
+              {commission}
             </TextInput>
             <Text style={{color: 'black', marginTop: 3}}>% </Text>
           </View>
@@ -597,12 +602,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    fontWeight: 'bold',
+
     color: '#000',
   },
   Input: {
     height: 40,
-    width: 250,
+    width: '70%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

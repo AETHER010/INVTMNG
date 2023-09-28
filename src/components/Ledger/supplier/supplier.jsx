@@ -8,6 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {Table, TableWrapper, Row} from 'react-native-table-component';
 import {Button} from 'react-native-elements';
@@ -31,7 +32,7 @@ export default class SupplierLedger extends Component {
       widthArr: [80, 120, 120, 50, 70, 80],
       data: [],
       loading: true,
-      fromDate: new Date(),
+      fromDate: new Date(2010, 0, 1),
       toDate: new Date(),
       showFromDatePicker: false,
       showToDatePicker: false,
@@ -39,6 +40,8 @@ export default class SupplierLedger extends Component {
       supplierID: null,
       selectedSupplier: '',
       filteredData: [],
+      refreshing: false,
+      defaultSupplier: 'Suppliers...',
     };
   }
 
@@ -191,6 +194,16 @@ export default class SupplierLedger extends Component {
     }
   };
 
+  handleRefresh = () => {
+    this.setState({refreshing: true});
+
+    this.getApiData();
+    this.setState({defaultSupplier: 'Suppliers...'});
+    setTimeout(() => {
+      this.setState({refreshing: false});
+    }, 1000);
+  };
+
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
@@ -225,11 +238,18 @@ export default class SupplierLedger extends Component {
         : [];
 
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={this.handleRefresh}
+          />
+        }>
         <View style={styles.SecondContainer}>
           <ModalDropdown
             style={styles.textDisplay}
-            defaultValue="Suppliers"
+            defaultValue={this.state.defaultSupplier}
             options={this.state.supplier.map(item => item.name)}
             onSelect={index => this.handleProductSelection(index)}
             defaultIndex={0}
@@ -376,11 +396,9 @@ const styles = StyleSheet.create({
     color: '#000',
     marginTop: 9,
     height: 40,
-    width: 120,
+    width: 130,
     borderWidth: 1,
     borderColor: '#3A39A0',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 10,
   },
   swapIcon: {
@@ -390,14 +408,15 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     color: '#000',
-    fontSize: 18,
-    paddingVertical: 4,
-    paddingHorizontal: 17,
+    fontSize: 16,
+    width: 120,
+    paddingVertical: 7,
+    textAlign: 'center',
   },
   dropdownText2: {
     color: '#000',
     fontSize: 12,
     paddingVertical: 4,
-    paddingHorizontal: 17,
+    paddingHorizontal: 3,
   },
 });

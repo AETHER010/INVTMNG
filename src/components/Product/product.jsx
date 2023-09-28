@@ -38,6 +38,7 @@ const Product = ({navigation}) => {
       );
       setData(response.data.data);
       setFilteredData(response.data.data);
+      console.log(response.data, 'hjdgsfavjashdfva');
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -136,7 +137,7 @@ const Product = ({navigation}) => {
                     Product Id: {item.pk}
                   </Text>
                   <Text style={{fontSize: 12, color: '#000'}}>
-                    Stock: {item.pk}
+                    Stock: {item.stock}
                   </Text>
                 </View>
                 <Text style={{fontSize: 18, color: '#000'}}>{item.name}</Text>

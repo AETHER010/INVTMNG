@@ -307,13 +307,12 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   label: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
     color: '#000',
   },
   Input: {
     height: 40,
-    width: 200,
+    width: '60%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

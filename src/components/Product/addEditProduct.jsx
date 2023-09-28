@@ -36,7 +36,7 @@ const NewProduct = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/accounts/apis/suppliers?search=`,
       );
-      console.log('API error:', response.data.data);
+      // console.log('API error:', response.data.data);
       setData(response.data.data);
     } catch (error) {
       console.error('API error:', error);
@@ -93,13 +93,13 @@ const NewProduct = ({navigation, route}) => {
   const HandleUpdate = async () => {
     const formData = {
       name: name,
-
       standard_price: sellingPrice,
     };
     console.log(formData, 'formdata');
+
     try {
       const response = await axios.put(
-        `${Api_Url}/products/apis/products/${route.params.pk}`,
+        `${Api_Url}/products/apis/products/${route.params.pk}/`,
         formData,
       );
       console.log('API response:', response.data);
@@ -185,11 +185,15 @@ const NewProduct = ({navigation, route}) => {
               justifyContent: 'space-between',
             }}>
             <Text style={styles.label}>Stock:</Text>
-            <TextInput
-              style={styles.Input}
-              value={stock}
-              onChangeText={setStock}
-            />
+            {route && route.params ? (
+              <Text style={styles.Input9}>{stock}</Text>
+            ) : (
+              <TextInput
+                style={styles.Input}
+                value={stock}
+                onChangeText={setStock}
+              />
+            )}
           </View>
         </View>
         <View style={{flexDirection: 'row'}}>
@@ -242,8 +246,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   label: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
     color: '#000000',
   },
   Input: {
@@ -266,6 +269,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: '#000000',
     paddingVertical: 9,
+  },
+  Input9: {
+    height: 40,
+    width: '68%',
+    paddingHorizontal: 8,
+    paddingVertical: 9,
+    color: '#000000',
   },
   Button: {
     height: 40,
