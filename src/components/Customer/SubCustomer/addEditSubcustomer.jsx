@@ -22,6 +22,7 @@ const NewSubCustomer = ({navigation, route}) => {
   const [scid, setScid] = useState('');
 
   useEffect(() => {
+    retrieveScidFromStorage();
     console.log('New Sub Customer', route);
     if (route && route.params) {
       fetchApiData(route.params.upid);
@@ -32,11 +33,9 @@ const NewSubCustomer = ({navigation, route}) => {
     try {
       const storedScid = await AsyncStorage.getItem('subCid');
       const parsedScid = JSON.parse(storedScid);
+      setScid(parsedScid);
 
-      if (parsedScid !== null) {
-        setScid(parsedScid);
-      }
-      console.log('New Sub Customer', scid);
+      console.log('New Sub CustomedFdADSr', scid);
     } catch (error) {
       console.error('Error retrieving scid:', error);
     }
@@ -60,7 +59,6 @@ const NewSubCustomer = ({navigation, route}) => {
   };
 
   const HandleformSubmit = async () => {
-    retrieveScidFromStorage();
     const formData = {
       name: name,
       contact_number: contact_number,
