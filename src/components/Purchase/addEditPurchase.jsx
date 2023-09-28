@@ -208,6 +208,7 @@ const NewPurchase = ({navigation, route}) => {
       Alert.alert('Success', 'Product Updated Successfully');
       setAction('false');
       setViewProduct('false');
+      gettingSupplierProducts(supplierId);
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
@@ -468,7 +469,7 @@ const NewPurchase = ({navigation, route}) => {
                     </Text>
                     <TextInput
                       style={[styles.updateInput, {color: '#000'}]}
-                      value={newPrice.toString()}
+                      value={newPrice ? newPrice.toString() : ''}
                       onChangeText={setNewPrice}
                       editable={true}
                     />
@@ -480,7 +481,7 @@ const NewPurchase = ({navigation, route}) => {
 
                     <TextInput
                       style={[styles.updateInput, {color: '#000'}]}
-                      value={newQuantity.toString()}
+                      value={newQuantity ? newQuantity.toString() : ''}
                       onChangeText={setNewQuantity}
                       editable={true}
                     />

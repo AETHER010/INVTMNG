@@ -14,6 +14,8 @@ import {Card} from 'react-native-elements';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {Api_Url} from '../../utilities/api';
+import React from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Supplier = ({navigation}) => {
   const [data, setData] = useState([]);
@@ -23,9 +25,11 @@ const Supplier = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
-  useEffect(() => {
-    fetchApiData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchApiData();
+    }, []),
+  );
 
   const fetchApiData = async () => {
     try {

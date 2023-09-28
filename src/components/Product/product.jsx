@@ -11,6 +11,8 @@ import {
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Api_Url} from '../../utilities/api';
+import React from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Product = ({navigation}) => {
   const [data, setData] = useState([]);
@@ -20,13 +22,20 @@ const Product = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
-  useEffect(() => {
-    fetchApiData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchApiData();
+    }, []),
+  );
+  // useEffect(() => {
+  //   fetchApiData();
+  // }, []);
 
   const fetchApiData = async () => {
     try {
-      const response = await axios.get(`${Api_Url}/products/apis/products`);
+      const response = await axios.get(
+        `${Api_Url}/products/apis/products?page=1&page_size=500`,
+      );
       setData(response.data.data);
       setFilteredData(response.data.data);
     } catch (error) {

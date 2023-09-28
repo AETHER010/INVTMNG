@@ -1,10 +1,12 @@
 import {View, Text, StyleSheet, TextInput} from 'react-native';
-import React from 'react';
+
 import {useState, useEffect} from 'react';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {Api_Url} from './../../../utilities/api';
+import React from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 
 const PaymentSupplier = () => {
@@ -15,9 +17,15 @@ const PaymentSupplier = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
-  useEffect(() => {
-    fetchApiDatSupplier();
-  }, []);
+  // useEffect(() => {
+  //   fetchApiDatSupplier();
+  // }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchApiDatSupplier();
+    }, []),
+  );
 
   const fetchApiDatSupplier = async () => {
     try {

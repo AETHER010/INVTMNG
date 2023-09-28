@@ -1,32 +1,40 @@
 import {View, Text, StyleSheet, TextInput} from 'react-native';
-import React from 'react';
+
 import {useState, useEffect} from 'react';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {Api_Url} from '../../../utilities/api';
 import {useNavigation} from '@react-navigation/native';
+import React from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 
 const PaymentClient = () => {
   const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState('');
 
-  useEffect(() => {
-    fetchApiDataCustomer();
-    // const apidate = data.created_date;
-    // const formattedDate = moment(apidate).format('YYYY-MM-DD');
-    // setFormattedDate(formattedDate);
-    // console.log('formated', formattedDate);
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchApiDataCustomer();
+    }, []),
+  );
+
+  // useEffect(() => {
+  //   fetchApiDataCustomer();
+  //   // const apidate = data.created_date;
+  //   // const formattedDate = moment(apidate).format('YYYY-MM-DD');
+  //   // setFormattedDate(formattedDate);
+  //   // console.log('formated', formattedDate);
+  // }, []);
 
   const fetchApiDataCustomer = async () => {
     try {
       const response = await axios.get(
         `${Api_Url}/payment/apis/customer-payments/`,
       );
-      setData(response.data);
-      console.log(response.data);
+      setData(response.data.data);
+      console.log(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {

@@ -15,6 +15,8 @@ import axios from 'axios';
 import {Api_Url} from '../../utilities/api';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 
 const PriceList = ({navigation, route}) => {
   const [data, setData] = useState([]);
@@ -23,9 +25,14 @@ const PriceList = ({navigation, route}) => {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchApiData(sUbcpid);
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchApiData(sUbcpid);
+    }, []),
+  );
+  // useEffect(() => {
+  //   fetchApiData(sUbcpid);
+  // }, []);
 
   const fetchApiData = async id => {
     console.log('Fetching', id);

@@ -9,7 +9,7 @@ import {
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon2 from 'react-native-vector-icons/Ionicons';
-
+import React from 'react';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import ModalDropdown from 'react-native-modal-dropdown';
@@ -122,6 +122,7 @@ const NewBills = ({navigation, route}) => {
   };
 
   const gettingSupplierProducts = async id => {
+    console.log('Product issues bills', id);
     try {
       const response = await axios.get(
         `${Api_Url}/bill/apis/sales/unconfirm-bill/${id}/`,
@@ -148,7 +149,7 @@ const NewBills = ({navigation, route}) => {
     try {
       await axios.post(`${Api_Url}/bill/apis/sales/issue-bill/${billId}/`);
       Alert.alert('Success', 'Bill Issued Successfully');
-      navigation.navigate('Purchase');
+      navigation.navigate('Bills');
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
@@ -206,6 +207,7 @@ const NewBills = ({navigation, route}) => {
         formData,
       );
       Alert.alert('Success', 'Product Updated Successfully');
+      gettingSupplierProducts(supplierId);
       setAction('false');
       setViewProduct('false');
     } catch (error) {
@@ -221,11 +223,11 @@ const NewBills = ({navigation, route}) => {
       charge: commission,
     };
 
-    console.log(supplierId);
+    console.log(commission);
 
     try {
       await axios.post(
-        `${Api_Url}/bill/apis/sales/charge/${chargeBillId}/`,
+        `${Api_Url}/bill/apis/sales/charge/${chargeBillId}`,
         formData,
       );
       Alert.alert('Success', 'Charge Added Successfully');
@@ -468,8 +470,8 @@ const NewBills = ({navigation, route}) => {
                     </Text>
                     <TextInput
                       style={[styles.updateInput, {color: '#000'}]}
-                      value={newPrice.toString()}
-                      onChangeText={setNewPrice}
+                      value={newPrice ? newPrice.toString() : ''}
+                      onChangeText={text => setNewPrice(text)}
                       editable={true}
                     />
                   </View>
@@ -480,8 +482,8 @@ const NewBills = ({navigation, route}) => {
 
                     <TextInput
                       style={[styles.updateInput, {color: '#000'}]}
-                      value={newQuantity.toString()}
-                      onChangeText={setNewQuantity}
+                      value={newQuantity ? newQuantity.toString() : ''}
+                      onChangeText={text => setNewQuantity(text)}
                       editable={true}
                     />
                   </View>

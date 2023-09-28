@@ -27,7 +27,6 @@ const AddPriceList = ({navigation, route}) => {
 
   const [edPrice, setEdPrice] = useState(route.params?.id || null);
 
-  const [nameError, setNameError] = useState('');
   const [cRateError, setCrateError] = useState('');
 
   useEffect(() => {
@@ -44,7 +43,7 @@ const AddPriceList = ({navigation, route}) => {
         `${Api_Url}/accounts/apis/subcustomer/myproduct/list/${id}`,
       );
       setData(response.data);
-      console.log('getting products', response.data);
+      // console.log('getting products', response.data);
     } catch (error) {
       console.error('API error:', error);
       // Alert.alert('Error', 'An error occurred while submitting data.');
@@ -73,14 +72,8 @@ const AddPriceList = ({navigation, route}) => {
     const errors = {};
 
     // Reset error messages
-    setNameError('');
-    setCrateError('');
 
-    // Validate Name
-    if (!name) {
-      setNameError('Name is required');
-      isValid = false;
-    }
+    setCrateError('');
 
     // Validate Customer Rate
     if (!cRate) {
@@ -230,7 +223,6 @@ const AddPriceList = ({navigation, route}) => {
             flexDirection: 'row',
             flexWrap: 'wrap',
             justifyContent: 'space-between',
-            padding: 5,
             marginTop: 18,
           }}>
           <Text style={styles.label}>Product Name:</Text>
@@ -321,7 +313,7 @@ const styles = StyleSheet.create({
   },
   Input: {
     height: 40,
-    width: screenWidth > 500 ? 220 : 240,
+    width: screenWidth > 500 ? 220 : 250,
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

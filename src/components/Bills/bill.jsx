@@ -11,6 +11,8 @@ import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import moment from 'moment';
+import React from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Bills = ({navigation}) => {
   const Api_Url = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
@@ -21,13 +23,15 @@ const Bills = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
-  useEffect(() => {
-    fetchApiData();
-    const apidate = data.created_date;
-    const formattedDate = moment(apidate).format('YYYY-MM-DD');
-    setFormattedDate(formattedDate);
-    console.log('formated', formattedDate);
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchApiData();
+      const apidate = data.created_date;
+      const formattedDate = moment(apidate).format('YYYY-MM-DD');
+      setFormattedDate(formattedDate);
+      console.log('formated', formattedDate);
+    }, []),
+  );
 
   const fetchApiData = async () => {
     try {

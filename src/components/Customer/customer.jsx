@@ -10,6 +10,9 @@ import {
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
+import {useFocusEffect} from '@react-navigation/native';
+import {Api_Url} from '../../utilities/api';
+import React from 'react';
 
 const Customer = ({navigation}) => {
   const [data, setData] = useState([]);
@@ -19,14 +22,20 @@ const Customer = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
-  useEffect(() => {
-    fetchApiData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchApiData();
+    }, []),
+  );
+
+  // useEffect(() => {
+  //   fetchApiData();
+  // }, []);
 
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        'https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/customer?page=1&page_size=500',
+        `${Api_Url}/accounts/apis/customer?page=1&page_size=500`,
       );
       setData(response.data.data);
       setFilteredData(response.data.data);

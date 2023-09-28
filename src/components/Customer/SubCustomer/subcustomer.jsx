@@ -14,6 +14,8 @@ import axios from 'axios';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Api_Url} from '../../../utilities/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 
 const SubCustomer = ({navigation, route}) => {
   // const Api_Url = 'http://192.168.1.70:8000';
@@ -26,10 +28,12 @@ const SubCustomer = ({navigation, route}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
-  useEffect(() => {
-    console.log('route', route.params);
-    fetchApiData(subCid);
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('route', route.params);
+      fetchApiData(subCid);
+    }, []),
+  );
 
   const fetchApiData = async id => {
     try {
