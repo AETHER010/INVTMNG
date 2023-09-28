@@ -288,11 +288,11 @@ const styles = StyleSheet.create({
   UserContainer: {
     display: 'flex',
     backgroundColor: '#3A39A0',
-    height: 109,
+    height: 80,
     justifyContent: 'flex-end',
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     // height: 40,
     // width: 40,
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   Card: {
     height: 100,

@@ -31,20 +31,24 @@ const NewUser = ({navigation}) => {
       role: role,
     };
 
-    console.log(formData);
+    if (password !== password2) {
+      Alert.alert('Password mismatch');
 
-    try {
-      console.log('fdshgj');
-      const response = await axios.post(
-        `${Api_Url}/accounts/apis/create/user/`,
-        formData,
-      );
-      console.log('API response:', response.data);
-      Alert.alert('Success', 'Data submitted successfully!');
-      navigation.navigate('User');
-    } catch (error) {
-      console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      console.log(formData);
+
+      try {
+        console.log('fdshgj');
+        const response = await axios.post(
+          `${Api_Url}/accounts/apis/create/user/`,
+          formData,
+        );
+        console.log('API response:', response.data);
+        Alert.alert('Success', 'Data submitted successfully!');
+        navigation.navigate('User');
+      } catch (error) {
+        console.error('API error:', error);
+        Alert.alert('Error', 'An error occurred while submitting data.');
+      }
     }
   };
 
@@ -73,50 +77,58 @@ const NewUser = ({navigation}) => {
         <Text style={styles.text2}>Create User</Text>
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
+            // flexDirection: 'row',
+            // flexWrap: 'wrap',
+            // justifyContent: 'space-between',
             padding: 5,
             marginTop: 18,
           }}>
-          <Text style={styles.label}>Username:</Text>
-          <TextInput
-            style={styles.Input}
-            value={username}
-            onChangeText={setUsername}
-          />
-          <Text style={styles.label}>Password:</Text>
-          <TextInput
-            style={styles.Input}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-          <Text style={styles.label}>Confirm Password:</Text>
-          <TextInput
-            style={styles.Input}
-            value={password2}
-            onChangeText={setPassword2}
-            secureTextEntry
-          />
-          <Text style={styles.label}>Role:</Text>
-          {/* <TextInput style={styles.Input} value={role} onChangeText={setRole} /> */}
-          <SelectDropdown
-            data={dropdownData}
-            onSelect={selectedItem => setRole(selectedItem)}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item;
-            }}
-            defaultValueByIndex={0}
-            defaultButtonText="Select Role..."
-            buttonStyle={styles.Input}
-            rowStyle={styles.dropdownText}
-            dropdownStyle={styles.dropdown2}
-            renderDropdownIcon={renderDropdownIcon}
-          />
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Username:</Text>
+            <TextInput
+              style={styles.Input}
+              value={username}
+              onChangeText={setUsername}
+            />
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Password:</Text>
+            <TextInput
+              style={styles.Input}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Confirm Password:</Text>
+            <TextInput
+              style={styles.Input}
+              value={password2}
+              onChangeText={setPassword2}
+              secureTextEntry
+            />
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Role:</Text>
+            {/* <TextInput style={styles.Input} value={role} onChangeText={setRole} /> */}
+            <SelectDropdown
+              data={dropdownData}
+              onSelect={selectedItem => setRole(selectedItem)}
+              buttonTextAfterSelection={(selectedItem, index) => {
+                return selectedItem;
+              }}
+              rowTextForSelection={(item, index) => {
+                return item;
+              }}
+              defaultValueByIndex={0}
+              defaultButtonText="Select Role..."
+              buttonStyle={styles.Input}
+              rowStyle={styles.dropdownText}
+              dropdownStyle={styles.dropdown2}
+              renderDropdownIcon={renderDropdownIcon}
+            />
+          </View>
         </View>
         <View style={{flexDirection: 'row'}}>
           <Button
@@ -166,7 +178,7 @@ const styles = StyleSheet.create({
   },
   Input: {
     height: 40,
-    width: screenWidth > 500 ? 230 : 250,
+    width: '65%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

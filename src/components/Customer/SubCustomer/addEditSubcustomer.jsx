@@ -19,14 +19,27 @@ const NewSubCustomer = ({navigation, route}) => {
   const [customerId, setCustomerId] = useState('');
   const [data, setData] = useState([]);
 
-  const [scid, setScid] = useState(route.params.scid || null);
+  const [scid, setScid] = useState(null);
 
   useEffect(() => {
-    console.log(route);
-    if (route.params && route.params.scid) {
+    console.log('New Sub Customer', route);
+    if (route && route.params) {
+      retrieveScidFromStorage();
+
       fetchApiData(scid);
     }
-  }, [route]);
+  }, [scid]);
+
+  const retrieveScidFromStorage = async () => {
+    try {
+      const storedScid = await AsyncStorage.getItem('SubCid');
+      if (storedScid !== null) {
+        setScid(storedScid);
+      }
+    } catch (error) {
+      console.error('Error retrieving scid:', error);
+    }
+  };
 
   const fetchApiData = async id => {
     try {
@@ -44,36 +57,7 @@ const NewSubCustomer = ({navigation, route}) => {
     }
   };
 
-  useEffect(() => {
-    if (scid === null) {
-      retrieveScidFromStorage();
-    } else {
-      saveScidToStorage(scid);
-      fetchApiData(scid);
-    }
-  }, [scid]);
-
-  const retrieveScidFromStorage = async () => {
-    try {
-      const storedScid = await AsyncStorage.getItem('scid');
-      if (storedScid !== null) {
-        setScid(storedScid);
-      }
-    } catch (error) {
-      console.error('Error retrieving scid:', error);
-    }
-  };
-
-  const saveScidToStorage = async value => {
-    try {
-      await AsyncStorage.setItem('scid', JSON.stringify(value));
-    } catch (error) {
-      console.error('Error saving scid:', error);
-    }
-  };
-
   const HandleformSubmit = async () => {
-    const id = route.params.pk;
     const formData = {
       name: name,
       contact_number: contact_number,
@@ -83,7 +67,7 @@ const NewSubCustomer = ({navigation, route}) => {
 
     try {
       const response = await axios.post(
-        `${Api_url}/accounts/apis/subcustomer/${id}/`,
+        `${Api_url}/accounts/apis/subcustomer/${scid}/`,
         formData,
       );
       console.log('API response:', response.data);
@@ -117,10 +101,6 @@ const NewSubCustomer = ({navigation, route}) => {
     }
   };
 
-  const handlesubcustomer = async id => {
-    navigation.navigate('SubCustomer', {id});
-  };
-
   return (
     <View>
       <View style={styles.SupplierContainer}>
@@ -135,7 +115,10 @@ const NewSubCustomer = ({navigation, route}) => {
             onPress={() => navigation.navigate('SubCustomer')}
           />
           <Text style={styles.text}>New Sub Customer</Text>
-          <Icon style={styles.Icons} name="person-circle-outline"></Icon>
+          <Icon
+            style={styles.Icons}
+            name="person-circle-outline"
+            onPress={() => navigation.navigate('UserProfile')}></Icon>
         </View>
       </View>
       <View style={styles.formContainer}>
@@ -163,7 +146,7 @@ const NewSubCustomer = ({navigation, route}) => {
           />
         </View>
         <View style={{flexDirection: 'row'}}>
-          {route.params && route.params.scid ? (
+          {route && route.params ? (
             <View>
               <Button
                 buttonStyle={styles.Button}
@@ -189,17 +172,17 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#3A39A0',
     justifyContent: 'flex-end',
-    height: 109,
+    height: 80,
   },
   text: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
     marginTop: 10,
   },
   Icons: {
     color: '#fff',
     margin: 10,
-    fontSize: 45,
+    fontSize: 35,
   },
   formContainer: {
     display: 'flex',
@@ -214,8 +197,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   label: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
     color: '#000',
   },
   Input: {

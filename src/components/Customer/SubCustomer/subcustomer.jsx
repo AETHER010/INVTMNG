@@ -30,10 +30,37 @@ const SubCustomer = ({navigation, route}) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log('route', route.params);
-      fetchApiData(subCid);
-    }, []),
+      // Check if scid is null, and if so, try to retrieve it from AsyncStorage
+      if (subCid === null) {
+        retrieveScidFromStorage();
+      } else {
+        // Save the retrieved scid to AsyncStorage
+        saveScidToStorage(subCid);
+        fetchApiData(subCid);
+      }
+    }, [subCid]),
   );
+
+  // Function to retrieve scid from AsyncStorage
+  const retrieveScidFromStorage = async () => {
+    try {
+      const storedScid = await AsyncStorage.getItem('SubCid');
+      if (storedScid !== null) {
+        setSubCid(storedScid);
+      }
+    } catch (error) {
+      console.error('Error retrieving scid:', error);
+    }
+  };
+
+  // Function to save scid to AsyncStorage
+  const saveScidToStorage = async value => {
+    try {
+      await AsyncStorage.setItem('subCid', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving subCid:', error);
+    }
+  };
 
   const fetchApiData = async id => {
     try {
@@ -41,7 +68,7 @@ const SubCustomer = ({navigation, route}) => {
         `${Api_Url}/accounts/apis/subcustomer/${id}`,
       );
       setData(response.data.data);
-      console.log(response.data.data);
+      console.log(response.data.data, 'asdghfvajshdfv');
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -50,8 +77,7 @@ const SubCustomer = ({navigation, route}) => {
   };
 
   const handleNavigationSC = async () => {
-    const pk = route.params.id;
-    navigation.navigate('NewSubCustomer', {pk});
+    navigation.navigate('NewSubCustomer');
   };
 
   const handleEnable = async pk => {
@@ -113,38 +139,6 @@ const SubCustomer = ({navigation, route}) => {
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredData(filtered);
-    }
-  };
-
-  useEffect(() => {
-    // Check if scid is null, and if so, try to retrieve it from AsyncStorage
-    if (subCid === null) {
-      retrieveScidFromStorage();
-    } else {
-      // Save the retrieved scid to AsyncStorage
-      saveScidToStorage(subCid);
-      fetchApiData(subCid);
-    }
-  }, [subCid]);
-
-  // Function to retrieve scid from AsyncStorage
-  const retrieveScidFromStorage = async () => {
-    try {
-      const storedScid = await AsyncStorage.getItem('SubCid');
-      if (storedScid !== null) {
-        setSubCid(storedScid);
-      }
-    } catch (error) {
-      console.error('Error retrieving scid:', error);
-    }
-  };
-
-  // Function to save scid to AsyncStorage
-  const saveScidToStorage = async value => {
-    try {
-      await AsyncStorage.setItem('subCid', JSON.stringify(value));
-    } catch (error) {
-      console.error('Error saving subCid:', error);
     }
   };
 

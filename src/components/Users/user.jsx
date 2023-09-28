@@ -74,7 +74,7 @@ const User = ({navigation}) => {
     // Show an alert to confirm the action
     Alert.alert(
       'Confirm Unblock',
-      `Are you sure you want to block ${username}?`,
+      `Are you sure you want to unblock ${username}?`,
       [
         {
           text: 'Cancel',
@@ -87,7 +87,6 @@ const User = ({navigation}) => {
               await axios.post(
                 `${Api_Url}/accounts/apis/unblock/user/${username}`,
               );
-              Alert.alert('Successfully unblocked');
             } catch (error) {
               console.error('Error updating data:', error);
             } finally {
@@ -105,7 +104,7 @@ const User = ({navigation}) => {
     // Show an alert to confirm the action
     Alert.alert(
       'Confirm Block',
-      `Are you sure you want to unblock ${username}?`,
+      `Are you sure you want to block ${username}?`,
       [
         {
           text: 'Cancel',
@@ -118,7 +117,6 @@ const User = ({navigation}) => {
               await axios.post(
                 `${Api_Url}/accounts/apis/block/user/${username}`,
               );
-              Alert.alert('Successfully blocked');
             } catch (error) {
               console.error('Error updating data:', error);
             } finally {
@@ -201,7 +199,7 @@ const User = ({navigation}) => {
           {loading ? (
             <Text>Loading...</Text>
           ) : (
-            data.map((item, index) => (
+            filteredData.map((item, index) => (
               <View
                 key={index}
                 style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -216,17 +214,17 @@ const User = ({navigation}) => {
                     </Text>
                     {item.is_blocked ? (
                       <Button
-                        buttonStyle={[styles.Button2, {backgroundColor: 'red'}]}
-                        title="Block"
-                        onPress={() => handleUnblock(item.username)}
-                      />
-                    ) : (
-                      <Button
                         buttonStyle={[
                           styles.Button2,
                           {backgroundColor: '#3A39A0'},
                         ]}
-                        title="Unblock"
+                        title="Unlock"
+                        onPress={() => handleUnblock(item.username)}
+                      />
+                    ) : (
+                      <Button
+                        buttonStyle={[styles.Button2, {backgroundColor: 'red'}]}
+                        title="Block"
                         onPress={() => handleBlock(item.username)}
                       />
                     )}

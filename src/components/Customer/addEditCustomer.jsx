@@ -121,27 +121,30 @@ const NewCustomer = ({navigation, route}) => {
         )}
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
+            // flexDirection: 'row',
+            // flexWrap: 'wrap',
+            // justifyContent: 'space-between',
             padding: 5,
             marginTop: 18,
           }}>
-          <Text style={styles.label}>Customer:</Text>
-          <TextInput
-            style={styles.Input}
-            value={name}
-            onChangeText={text => setName(text)}
-            editable={true}
-          />
-
-          <Text style={styles.label}>Contact Number:</Text>
-          <TextInput
-            style={styles.Input}
-            value={contact_number}
-            onChangeText={text => setContact_number(text)}
-            editable={true}
-          />
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Customer:</Text>
+            <TextInput
+              style={styles.Input}
+              value={name}
+              onChangeText={text => setName(text)}
+              editable={true}
+            />
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Contact Number:</Text>
+            <TextInput
+              style={styles.Input}
+              value={contact_number}
+              onChangeText={text => setContact_number(text)}
+              editable={true}
+            />
+          </View>
         </View>
         <View style={{flexDirection: 'row'}}>
           {route && route.params ? (
@@ -207,7 +210,7 @@ const styles = StyleSheet.create({
   },
   Input: {
     height: 40,
-    width: screenWidth > 400 ? 220 : 250,
+    width: '68%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

@@ -34,7 +34,7 @@ const Supplier = ({navigation}) => {
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/accounts/apis/suppliers?search=`,
+        `${Api_Url}/accounts/apis/suppliers??page=1&page_size=100`,
       );
       setData(response.data.data);
       setFilteredData(response.data.data);
@@ -194,7 +194,7 @@ const Supplier = ({navigation}) => {
                       name="lock-open-variant-outline"
                       size={18}
                       color="#008000"
-                      style={styles.sideIcon}
+                      style={[styles.sideIcon, {borderColor: '#008000'}]}
                       onPress={() => handleEnable(item.pk)}
                     />
                   ) : (

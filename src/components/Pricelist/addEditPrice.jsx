@@ -220,41 +220,43 @@ const AddPriceList = ({navigation, route}) => {
 
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
             marginTop: 18,
           }}>
-          <Text style={styles.label}>Product Name:</Text>
-          {route && route.params.id ? (
-            <Text style={styles.textProduct}>{selectedSupplierName} </Text>
-          ) : (
-            <ModalDropdown
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Product Name:</Text>
+            {route && route.params.id ? (
+              <Text style={styles.textProduct}>{selectedSupplierName} </Text>
+            ) : (
+              <ModalDropdown
+                style={styles.Input}
+                defaultValue={route.params.id ? product : 'Select Product'}
+                options={data.map(item => item.name)}
+                onSelect={index => handleProductSelection(index)}
+                defaultIndex={0}
+                animated={true}
+                isFullWidth={true}
+                textStyle={styles.dropdownText}
+                showsVerticalScrollIndicator={true}
+                dropdownTextStyle={styles.dropdownText}
+              />
+            )}
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Standard Price:</Text>
+            <Text style={styles.Input2}>{standardPrice}</Text>
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Customer Rate:</Text>
+            <TextInput
               style={styles.Input}
-              defaultValue={route.params.id ? product : 'Select Product'}
-              options={data.map(item => item.name)}
-              onSelect={index => handleProductSelection(index)}
-              defaultIndex={0}
-              animated={true}
-              isFullWidth={true}
-              textStyle={styles.dropdownText}
-              showsVerticalScrollIndicator={true}
-              dropdownTextStyle={styles.dropdownText}
+              value={cRate.toString()}
+              onChangeText={text => {
+                setCrate(text);
+                // Clear error message when user edits the input
+                setCrateError('');
+              }}
             />
-          )}
-          <Text style={styles.label}>Standard Price:</Text>
-          <Text style={styles.Input2}>{standardPrice}</Text>
-
-          <Text style={styles.label}>Customer Rate:</Text>
-          <TextInput
-            style={styles.Input}
-            value={cRate.toString()}
-            onChangeText={text => {
-              setCrate(text);
-              // Clear error message when user edits the input
-              setCrateError('');
-            }}
-          />
+          </View>
         </View>
         <View style={{flexDirection: 'row'}}>
           {route.params && route.params.id ? (
@@ -313,7 +315,7 @@ const styles = StyleSheet.create({
   },
   Input: {
     height: 40,
-    width: screenWidth > 500 ? 220 : 250,
+    width: '69%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,
@@ -323,7 +325,7 @@ const styles = StyleSheet.create({
   },
   textProduct: {
     height: 40,
-    width: screenWidth > 500 ? 220 : 240,
+    width: '69%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

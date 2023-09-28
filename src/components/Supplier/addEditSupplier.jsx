@@ -115,27 +115,36 @@ const NewSupplier = ({navigation, route}) => {
         )}
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
+            // flexDirection: 'row',
+            // flexWrap: 'wrap',
+            // justifyContent: 'space-between',
             padding: 5,
             marginTop: 18,
           }}>
-          {/* <Text style={styles.label}>CustomerId:</Text>
-          <TextInput style={styles.Input} value={data.pk || ""} /> */}
-          <Text style={styles.label}>Name:</Text>
-          <TextInput
-            style={styles.Input}
-            value={name || ''}
-            onChangeText={setName}
-          />
-
-          <Text style={styles.label}>Phone Number:</Text>
-          <TextInput
-            style={styles.Input}
-            value={contact_number || ''}
-            onChangeText={setContact_number}
-          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <Text style={styles.label}>Name:</Text>
+            <TextInput
+              style={styles.Input}
+              value={name || ''}
+              onChangeText={setName}
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <Text style={styles.label}>Phone Number:</Text>
+            <TextInput
+              style={styles.Input}
+              value={contact_number || ''}
+              onChangeText={setContact_number}
+            />
+          </View>
         </View>
         <View style={{flexDirection: 'row'}}>
           {route && route.params ? (
@@ -194,7 +203,7 @@ const styles = StyleSheet.create({
   },
   Input: {
     height: 40,
-    width: screenWidth > 500 ? 220 : 260,
+    width: '70%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

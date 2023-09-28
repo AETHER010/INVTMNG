@@ -140,45 +140,57 @@ const NewProduct = ({navigation, route}) => {
 
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
             padding: 5,
             marginTop: 18,
           }}>
-          <Text style={styles.label}>Supplier:</Text>
-          {route && route.params ? (
-            <Text style={styles.Input4}>{supplierName}</Text>
-          ) : (
-            <ModalDropdown
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Supplier:</Text>
+            {route && route.params ? (
+              <Text style={styles.Input4}>{supplierName}</Text>
+            ) : (
+              <ModalDropdown
+                style={styles.Input}
+                defaultValue="Select Supplier"
+                options={data.map(item => item.name)}
+                onSelect={index => handleProductSelection(index)}
+                defaultIndex={0}
+                animated={true}
+                isFullWidth={true}
+                textStyle={styles.dropdownText}
+                showsVerticalScrollIndicator={true}
+                dropdownTextStyle={styles.dropdownText}
+                defaultTextStyle={{color: '#000'}}
+              />
+            )}
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Name:</Text>
+            <TextInput
               style={styles.Input}
-              defaultValue="Select Supplier"
-              options={data.map(item => item.name)}
-              onSelect={index => handleProductSelection(index)}
-              defaultIndex={0}
-              animated={true}
-              isFullWidth={true}
-              textStyle={styles.dropdownText}
-              showsVerticalScrollIndicator={true}
-              dropdownTextStyle={styles.dropdownText}
-              defaultTextStyle={{color: '#000'}}
+              value={name}
+              onChangeText={setName}
             />
-          )}
-          <Text style={styles.label}>Name:</Text>
-          <TextInput style={styles.Input} value={name} onChangeText={setName} />
-
-          <Text style={styles.label}>Selling Price:</Text>
-          <TextInput
-            style={styles.Input}
-            value={sellingPrice}
-            onChangeText={setSellingPrice}
-          />
-          <Text style={styles.label}>Stock:</Text>
-          <TextInput
-            style={styles.Input}
-            value={stock}
-            onChangeText={setStock}
-          />
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.label}>Selling Price:</Text>
+            <TextInput
+              style={styles.Input}
+              value={sellingPrice}
+              onChangeText={setSellingPrice}
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <Text style={styles.label}>Stock:</Text>
+            <TextInput
+              style={styles.Input}
+              value={stock}
+              onChangeText={setStock}
+            />
+          </View>
         </View>
         <View style={{flexDirection: 'row'}}>
           {route && route.params ? (
@@ -246,7 +258,7 @@ const styles = StyleSheet.create({
   },
   Input4: {
     height: 40,
-    width: 250,
+    width: '68%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,
