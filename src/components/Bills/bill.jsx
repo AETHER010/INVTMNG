@@ -13,9 +13,9 @@ import axios from 'axios';
 import moment from 'moment';
 import React from 'react';
 import {useFocusEffect} from '@react-navigation/native';
+import {Api_Url} from '../../utilities/api';
 
 const Bills = ({navigation}) => {
-  const Api_Url = 'https://ims.itnepalsoultions.com.pujanrajrai.com.np';
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState('');
   const [formattedate, setFormattedDate] = useState('');
@@ -36,7 +36,7 @@ const Bills = ({navigation}) => {
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/bill/apis/sales/bills/list/`,
+        `${Api_Url}/bill/apis/sales/bills/list?page=1&page_size=500`,
       );
       setData(response.data.data);
       setFilteredData(response.data.data);

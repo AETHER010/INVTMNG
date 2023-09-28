@@ -38,7 +38,7 @@ const Purchase = ({navigation}) => {
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/bill/apis/purchase/bills/list/`,
+        `${Api_Url}/bill/apis/purchase/bills/list/?page=1&page_size=500`,
       );
       setData(response.data.data);
       setFilteredData(response.data.data);
