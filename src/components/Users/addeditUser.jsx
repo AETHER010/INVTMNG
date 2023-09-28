@@ -31,24 +31,20 @@ const NewUser = ({navigation}) => {
       role: role,
     };
 
-    if (password !== password2) {
-      Alert.alert('Password mismatch');
+    console.log(formData);
 
-      console.log(formData);
-
-      try {
-        console.log('fdshgj');
-        const response = await axios.post(
-          `${Api_Url}/accounts/apis/create/user/`,
-          formData,
-        );
-        console.log('API response:', response.data);
-        Alert.alert('Success', 'Data submitted successfully!');
-        navigation.navigate('User');
-      } catch (error) {
-        console.error('API error:', error);
-        Alert.alert('Error', 'An error occurred while submitting data.');
-      }
+    try {
+      console.log('fdshgj');
+      const response = await axios.post(
+        `${Api_Url}/accounts/apis/create/user/`,
+        formData,
+      );
+      console.log('API response:', response.data);
+      Alert.alert('Success', 'Data submitted successfully!');
+      navigation.navigate('User');
+    } catch (error) {
+      console.error('API error:', error);
+      Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 

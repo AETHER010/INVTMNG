@@ -14,6 +14,7 @@ import {Button} from 'react-native-elements';
 import React from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {Api_Url} from '../../utilities/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const User = ({navigation}) => {
   const [data, setData] = useState([]);
@@ -23,11 +24,26 @@ const User = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
+  const [userRoles, setUserRoles] = useState('');
+
   useFocusEffect(
     React.useCallback(() => {
-      fetchApiData();
-    }, []),
+      getUserRole();
+    }, [userRoles]),
   );
+
+  const getUserRole = async () => {
+    const role = await AsyncStorage.getItem('userRole');
+    setUserRoles(role);
+    console.log('role of user', role);
+    if (role === 'superadmin') {
+      fetchApiData();
+    } else if (role === 'admin') {
+      fetchApiData();
+    } else {
+      Alert.alert('Access Denied', 'You cannot access user data.');
+    }
+  };
 
   const fetchApiData = async () => {
     try {

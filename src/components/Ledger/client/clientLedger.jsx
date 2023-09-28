@@ -18,7 +18,7 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon2 from 'react-native-vector-icons/AntDesign';
 import ModalDropdown from 'react-native-modal-dropdown';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 import {PermissionsAndroid} from 'react-native';
 
@@ -38,13 +38,20 @@ export default class ClientLedger extends Component {
       clientID: null,
       selectedClient: '',
       filteredData: [],
+      userRole: '',
     };
   }
 
   componentDidMount() {
     this.getApiData();
     this.fetchApiClient();
+    this.getUserRole();
   }
+
+  getUserRole = async () => {
+    const role = await AsyncStorage.getItem('userRole');
+    this.setState({userRole: role});
+  };
 
   getApiData = async () => {
     try {
@@ -110,35 +117,38 @@ export default class ClientLedger extends Component {
     if (!hasPermission) {
       return;
     }
+    if (this.state.userRole === 'superadmin') {
+      const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
+      const formattedToDate = moment(toDate).format('YYYY-MM-DD');
 
-    const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
-    const formattedToDate = moment(toDate).format('YYYY-MM-DD');
+      const apiUrl = `${Api_Url}/report/pages/customer/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&customer=${clientID}`;
 
-    const apiUrl = `${Api_Url}/report/pages/customer/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&customer=${clientID}`;
+      try {
+        const response = await axios.get(apiUrl, {
+          responseType: 'arraybuffer', // Ensure the response is treated as binary data
+        });
 
-    try {
-      const response = await axios.get(apiUrl, {
-        responseType: 'arraybuffer', // Ensure the response is treated as binary data
-      });
+        if (response.status === 200) {
+          // Save the PDF data to a file
+          const pdfData = response.data;
+          const pdfData2 = JSON.stringify(pdfData);
+          const filePath = `${RNFS.DownloadDirectoryPath}+ /downloaded.pdf`; // Change the file name and path as needed
 
-      if (response.status === 200) {
-        // Save the PDF data to a file
-        const pdfData = response.data;
-        const pdfData2 = JSON.stringify(pdfData);
-        const filePath = `${RNFS.DownloadDirectoryPath}+ /downloaded.pdf`; // Change the file name and path as needed
+          await RNFS.writeFile(filePath, pdfData2, 'base64');
 
-        await RNFS.writeFile(filePath, pdfData2, 'base64');
-
-        Alert.alert('Download Complete', 'PDF file saved to device.');
-      } else {
-        Alert.alert('Download Error', 'Failed to download PDF file.');
+          Alert.alert('Download Complete', 'PDF file saved to device.');
+        } else {
+          Alert.alert('Download Error', 'Failed to download PDF file.');
+        }
+      } catch (error) {
+        console.error('Error downloading data:', error);
+        Alert.alert(
+          'Download Error',
+          'An error occurred while downloading the PDF.',
+        );
       }
-    } catch (error) {
-      console.error('Error downloading data:', error);
-      Alert.alert(
-        'Download Error',
-        'An error occurred while downloading the PDF.',
-      );
+    } else {
+      Alert.alert('U DONT HAVE PERMISSION TO DOWNLOAD LEDGER!!');
     }
   };
 
