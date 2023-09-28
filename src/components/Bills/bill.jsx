@@ -94,7 +94,10 @@ const Bills = ({navigation}) => {
               onPress={() => navigation.navigate('Home2')}
             />
             <Text style={styles.text}>Bill</Text>
-            <Icon style={styles.Icons} name="person-circle-outline"></Icon>
+            <Icon
+              style={styles.Icons}
+              name="person-circle-outline"
+              onPress={() => navigation.navigate('UserProfile')}></Icon>
           </View>
         </View>
         <View style={styles.SecondContainer}>
