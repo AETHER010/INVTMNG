@@ -35,6 +35,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserData} from './components/Users/userAuth';
+
 export default function AppNavigator() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
