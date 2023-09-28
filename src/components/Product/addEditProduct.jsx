@@ -24,7 +24,6 @@ const NewProduct = ({navigation, route}) => {
   useEffect(() => {
     console.log(route);
     if (route && route.params) {
-      GetSupplierList();
       getProductData();
     }
     GetSupplierList();
@@ -56,6 +55,7 @@ const NewProduct = ({navigation, route}) => {
       setName(response.data.name);
       setSellingPrice(response.data.standard_price.toString());
       setStock(response.data.stock.toString());
+      setSupplierName(response.data.suppliers);
     } catch (error) {
       console.error('API error:', error);
       // Alert.alert('Error', 'An error occurred while getting data.');

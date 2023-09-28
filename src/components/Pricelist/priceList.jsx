@@ -21,18 +21,45 @@ import {useFocusEffect} from '@react-navigation/native';
 const PriceList = ({navigation, route}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState();
-  const [sUbcpid, setSubcpcid] = useState(route.params?.id || null);
+  const [plID, setPlID] = useState(route.params?.cid || null);
 
   const [refreshing, setRefreshing] = useState(false);
 
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     fetchApiData(plID);
+  //   }, []),
+  // );
+
   useFocusEffect(
     React.useCallback(() => {
-      fetchApiData(sUbcpid);
-    }, []),
+      if (plID === null) {
+        retrieveScidFromStorage();
+      } else {
+        saveScidToStorage(plID);
+        fetchApiData(plID);
+      }
+    }, [plID]),
   );
-  // useEffect(() => {
-  //   fetchApiData(sUbcpid);
-  // }, []);
+
+  const retrieveScidFromStorage = async () => {
+    try {
+      const storedScid = await AsyncStorage.getItem('plID');
+      if (storedScid !== null) {
+        setPlID(storedScid);
+      }
+    } catch (error) {
+      console.error('Error retrieving scid:', error);
+    }
+  };
+
+  const saveScidToStorage = async value => {
+    try {
+      await AsyncStorage.setItem('plID', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving scid:', error);
+    }
+  };
 
   const fetchApiData = async id => {
     console.log('Fetching', id);
@@ -66,48 +93,20 @@ const PriceList = ({navigation, route}) => {
   };
 
   const handleNavigation = () => {
-    navigation.navigate('AddPriceList', {sUbcpid});
+    navigation.navigate('AddPriceList');
   };
 
   const handleUpdate = id => {
-    navigation.navigate('AddPriceList', {id, sUbcpid});
+    navigation.navigate('AddPriceList', {id});
   };
 
   const handleRefresh = () => {
     setRefreshing(true);
-    fetchApiData(sUbcpid);
+    fetchApiData(plID);
 
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
-  };
-
-  useEffect(() => {
-    if (sUbcpid === null) {
-      retrieveScidFromStorage();
-    } else {
-      saveScidToStorage(sUbcpid);
-      fetchApiData(sUbcpid);
-    }
-  }, [sUbcpid]);
-
-  const retrieveScidFromStorage = async () => {
-    try {
-      const storedScid = await AsyncStorage.getItem('sUbcpid');
-      if (storedScid !== null) {
-        setSubcpcid(storedScid);
-      }
-    } catch (error) {
-      console.error('Error retrieving scid:', error);
-    }
-  };
-
-  const saveScidToStorage = async value => {
-    try {
-      await AsyncStorage.setItem('scid', JSON.stringify(value));
-    } catch (error) {
-      console.error('Error saving scid:', error);
-    }
   };
 
   return (

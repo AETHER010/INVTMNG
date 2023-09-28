@@ -19,38 +19,40 @@ const NewSubCustomer = ({navigation, route}) => {
   const [customerId, setCustomerId] = useState('');
   const [data, setData] = useState([]);
 
-  const [scid, setScid] = useState(null);
+  const [scid, setScid] = useState('');
 
   useEffect(() => {
     console.log('New Sub Customer', route);
     if (route && route.params) {
-      retrieveScidFromStorage();
-
-      fetchApiData(scid);
+      fetchApiData(route.params.upid);
     }
   }, [scid]);
 
   const retrieveScidFromStorage = async () => {
     try {
-      const storedScid = await AsyncStorage.getItem('SubCid');
-      if (storedScid !== null) {
-        setScid(storedScid);
+      const storedScid = await AsyncStorage.getItem('subCid');
+      const parsedScid = JSON.parse(storedScid);
+
+      if (parsedScid !== null) {
+        setScid(parsedScid);
       }
+      console.log('New Sub Customer', scid);
     } catch (error) {
       console.error('Error retrieving scid:', error);
     }
   };
 
   const fetchApiData = async id => {
+    console.log('Fetching Sub Customer', id);
     try {
       const response = await axios.get(
-        `${Api_url}/accounts/apis/subcustomer/${id}`,
+        `${Api_url}/accounts/apis/subcustomer/update-detail/${id}/`,
       );
-      console.log('API response:', response.data.data[0]);
-      setData(response.data.data[0] || []);
+      console.log('API response:', response.data);
+      setData(response.data);
 
-      setName(response.data.data[0].name);
-      setContact_number(response.data.data[0].contact_number);
+      setName(response.data.name);
+      setContact_number(response.data.contact_number);
     } catch (error) {
       console.error('API error:', error.message);
       // Alert.alert('Error', 'An error occurred while fetching data.');
@@ -58,13 +60,14 @@ const NewSubCustomer = ({navigation, route}) => {
   };
 
   const HandleformSubmit = async () => {
+    retrieveScidFromStorage();
     const formData = {
       name: name,
       contact_number: contact_number,
     };
 
     console.log('Form submit', formData);
-
+    console.log('Form submit', scid);
     try {
       const response = await axios.post(
         `${Api_url}/accounts/apis/subcustomer/${scid}/`,
@@ -79,7 +82,9 @@ const NewSubCustomer = ({navigation, route}) => {
     }
   };
 
-  const handleUpdate = async id => {
+  const handleUpdate = async () => {
+    const id = route.params.upid;
+
     const formData = {
       name: name,
       contact_number: contact_number,
@@ -89,7 +94,7 @@ const NewSubCustomer = ({navigation, route}) => {
 
     try {
       const response = await axios.put(
-        `${Api_url}/accounts/apis/subcustomer/${id}/`,
+        `${Api_url}/accounts/apis/subcustomer/update-detail/${route.params.upid}/`,
         formData,
       );
       console.log('API response:', response.data);
@@ -114,6 +119,7 @@ const NewSubCustomer = ({navigation, route}) => {
             name="arrow-back"
             onPress={() => navigation.navigate('SubCustomer')}
           />
+
           <Text style={styles.text}>New Sub Customer</Text>
           <Icon
             style={styles.Icons}
@@ -122,7 +128,11 @@ const NewSubCustomer = ({navigation, route}) => {
         </View>
       </View>
       <View style={styles.formContainer}>
-        <Text style={styles.text2}>Create Sub Customer</Text>
+        {route && route.params ? (
+          <Text style={styles.text2}>Update Sub Customer</Text>
+        ) : (
+          <Text style={styles.text2}>Create Sub Customer</Text>
+        )}
         <View
           style={{
             flexDirection: 'row',
@@ -151,7 +161,7 @@ const NewSubCustomer = ({navigation, route}) => {
               <Button
                 buttonStyle={styles.Button}
                 title="Update"
-                onPress={() => handleUpdate(data.pk)}
+                onPress={() => handleUpdate()}
               />
             </View>
           ) : (

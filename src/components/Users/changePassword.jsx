@@ -19,8 +19,6 @@ const ChangePassword = ({navigation, route}) => {
   const [cPassword, setCPassword] = useState('');
   const [user, setUser] = useState('');
 
-  const {showAlert} = useAlert();
-
   useEffect(() => {
     console.log('change password', route.params.user.username);
     setUser(route.params.user.username);

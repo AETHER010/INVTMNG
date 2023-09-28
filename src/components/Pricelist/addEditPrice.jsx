@@ -25,41 +25,55 @@ const AddPriceList = ({navigation, route}) => {
   const [standardPrice, setStandardPrice] = useState('');
   const [selectedSupplierName, setSelectedSupplierName] = useState('');
 
-  const [edPrice, setEdPrice] = useState(route.params?.id || null);
+  const [edPrice, setEdPrice] = useState('');
 
   const [cRateError, setCrateError] = useState('');
 
   useEffect(() => {
-    console.log('Add Price List', route.params);
-    GetProductList(route.params.sUbcpid);
-    if (route && route.params.id) {
-      GetPriceList(edPrice);
+    retrieveScidFromStorage();
+    GetProductList(edPrice);
+    console.log('Add Price List', route);
+    if (route && route.params) {
+      GetPriceList(route.params.id);
     }
-  }, []);
+  }, [edPrice]);
+
+  const retrieveScidFromStorage = async () => {
+    try {
+      const storedScid = await AsyncStorage.getItem('plID');
+      const parsed = JSON.parse(storedScid);
+
+      if (parsed !== null) {
+        setEdPrice(parsed);
+      }
+    } catch (error) {
+      console.error('Error retrieving scid:', error);
+    }
+  };
 
   const GetProductList = async id => {
     try {
       const response = await axios.get(
-        `${Api_Url}/accounts/apis/subcustomer/myproduct/list/${id}`,
+        `${Api_Url}/accounts/apis/subcustomer/myproduct/list/${id}/`,
       );
       setData(response.data);
       // console.log('getting products', response.data);
     } catch (error) {
-      console.error('API error:', error);
+      console.error('API error2342:', error);
       // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
   const GetPriceList = async id => {
+    console.log('getting price list', id);
     try {
       const response = await axios.get(
         `${Api_Url}/accounts/apis/subcustomer/product/update/${id}`,
       );
       setUpdateData(response.data);
       setProduct(response.data.product_name);
-      setCrate(response.data.price);
+      setCrate(response.data.price.toString());
       setStandardPrice(response.data.standard_price);
-      setSelectedSupplierName(response.data.product_name);
       console.log('getting products', response.data);
     } catch (error) {
       console.error('API error:', error);
@@ -163,34 +177,6 @@ const AddPriceList = ({navigation, route}) => {
     console.log('getting price', data[index].standard_price);
   };
 
-  useEffect(() => {
-    if (edPrice === null) {
-      retrieveScidFromStorage();
-    } else {
-      saveScidToStorage(edPrice);
-      GetProductList(edPrice);
-    }
-  }, [edPrice]);
-
-  const retrieveScidFromStorage = async () => {
-    try {
-      const storedScid = await AsyncStorage.getItem('edPrice');
-      if (storedScid !== null) {
-        setEdPrice(storedScid);
-      }
-    } catch (error) {
-      console.error('Error retrieving scid:', error);
-    }
-  };
-
-  const saveScidToStorage = async value => {
-    try {
-      await AsyncStorage.setItem('scid', JSON.stringify(value));
-    } catch (error) {
-      console.error('Error saving scid:', error);
-    }
-  };
-
   return (
     <View>
       <View style={styles.SupplierContainer}>
@@ -212,7 +198,7 @@ const AddPriceList = ({navigation, route}) => {
         </View>
       </View>
       <View style={styles.formContainer}>
-        {route.params && route.params.id ? (
+        {route && route.params ? (
           <Text style={styles.text2}>Update Price List</Text>
         ) : (
           <Text style={styles.text2}>Create Price List</Text>
@@ -224,12 +210,12 @@ const AddPriceList = ({navigation, route}) => {
           }}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text style={styles.label}>Product Name:</Text>
-            {route && route.params.id ? (
-              <Text style={styles.textProduct}>{selectedSupplierName} </Text>
+            {route && route.params ? (
+              <Text style={styles.textProduct}>{product} </Text>
             ) : (
               <ModalDropdown
                 style={styles.Input}
-                defaultValue={route.params.id ? product : 'Select Product'}
+                defaultValue="Select Product"
                 options={data.map(item => item.name)}
                 onSelect={index => handleProductSelection(index)}
                 defaultIndex={0}
@@ -249,7 +235,7 @@ const AddPriceList = ({navigation, route}) => {
             <Text style={styles.label}>Customer Rate:</Text>
             <TextInput
               style={styles.Input}
-              value={cRate.toString()}
+              value={cRate}
               onChangeText={text => {
                 setCrate(text);
                 // Clear error message when user edits the input
@@ -259,7 +245,7 @@ const AddPriceList = ({navigation, route}) => {
           </View>
         </View>
         <View style={{flexDirection: 'row'}}>
-          {route.params && route.params.id ? (
+          {route && route.params ? (
             <Button
               buttonStyle={styles.Button}
               title="Update"

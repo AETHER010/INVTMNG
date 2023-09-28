@@ -30,14 +30,13 @@ const SubCustomer = ({navigation, route}) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      // Check if scid is null, and if so, try to retrieve it from AsyncStorage
       if (subCid === null) {
         retrieveScidFromStorage();
       } else {
-        // Save the retrieved scid to AsyncStorage
         saveScidToStorage(subCid);
         fetchApiData(subCid);
       }
+      console.log('Successfully', subCid);
     }, [subCid]),
   );
 
@@ -104,13 +103,12 @@ const SubCustomer = ({navigation, route}) => {
     }
   };
 
-  const handleNavigation = id => {
-    console.log('navigation', id);
-    navigation.navigate('PriceList', {id});
+  const handleNavigation = cid => {
+    navigation.navigate('PriceList', {cid});
   };
 
-  const handleUpdate = async scid => {
-    navigation.navigate('NewSubCustomer', {scid});
+  const handleUpdate = async upid => {
+    navigation.navigate('NewSubCustomer', {upid});
   };
 
   const handleRefresh = () => {
