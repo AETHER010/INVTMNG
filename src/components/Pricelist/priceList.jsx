@@ -84,7 +84,7 @@ const PriceList = ({navigation, route}) => {
       );
 
       Alert.alert('Price list Deleted Successfully');
-      fetchApiData(route.params.id);
+      fetchApiData(plID);
     } catch (error) {
       console.error('Error deleting data:', error);
     } finally {

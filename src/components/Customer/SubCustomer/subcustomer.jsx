@@ -18,7 +18,6 @@ import React from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 
 const SubCustomer = ({navigation, route}) => {
-  // const Api_Url = 'http://192.168.1.70:8000';
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState();
   const [refreshing, setRefreshing] = useState(false);
@@ -40,7 +39,6 @@ const SubCustomer = ({navigation, route}) => {
     }, [subCid]),
   );
 
-  // Function to retrieve scid from AsyncStorage
   const retrieveScidFromStorage = async () => {
     try {
       const storedScid = await AsyncStorage.getItem('SubCid');
@@ -52,7 +50,6 @@ const SubCustomer = ({navigation, route}) => {
     }
   };
 
-  // Function to save scid to AsyncStorage
   const saveScidToStorage = async value => {
     try {
       await AsyncStorage.setItem('subCid', JSON.stringify(value));
@@ -80,27 +77,63 @@ const SubCustomer = ({navigation, route}) => {
   };
 
   const handleEnable = async pk => {
-    try {
-      await axios.post(`${Api_Url}/accounts/apis/subcustomer/enable/${pk}/`);
-      Alert.alert('User enabled successfully');
-      fetchApiData(route.params.id);
-    } catch (error) {
-      console.log('error', error);
-    } finally {
-      setLoading(false);
-    }
+    Alert.alert(
+      'Enable User',
+      'Are you sure you want to enable this user?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Enable',
+          onPress: async () => {
+            try {
+              await axios.post(
+                `${Api_Url}/accounts/apis/subcustomer/enable/${pk}/`,
+              );
+              Alert.alert('User enabled successfully');
+              fetchApiData(route.params.id);
+            } catch (error) {
+              console.log('error', error);
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const handleDisable = async pk => {
-    try {
-      await axios.post(`${Api_Url}/accounts/apis/subcustomer/disable/${pk}/`);
-      Alert.alert('User disabled successfully');
-      fetchApiData(route.params.id);
-    } catch (error) {
-      console.log('error', error);
-    } finally {
-      setLoading(false);
-    }
+    Alert.alert(
+      'Disable User',
+      'Are you sure you want to disable this user?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Disable',
+          onPress: async () => {
+            try {
+              await axios.post(
+                `${Api_Url}/accounts/apis/subcustomer/disable/${pk}/`,
+              );
+              Alert.alert('User disabled successfully');
+              fetchApiData(route.params.id);
+            } catch (error) {
+              console.log('error', error);
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const handleNavigation = cid => {
@@ -129,10 +162,8 @@ const SubCustomer = ({navigation, route}) => {
   const filterData = () => {
     console.log('NewProduct', searchQuery);
     if (searchQuery.trim() === '') {
-      // If the search query is empty, display all data
       setFilteredData(data);
     } else {
-      // Use the Array.filter method to filter data based on the search query
       const filtered = data.filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
@@ -154,7 +185,10 @@ const SubCustomer = ({navigation, route}) => {
               onPress={() => navigation.navigate('Customer')}
             />
             <Text style={styles.text}>Sub Customer</Text>
-            <Icon style={styles.Icons} name="person-circle-outline"></Icon>
+            <Icon
+              style={styles.Icons}
+              name="person-circle-outline"
+              onPress={() => navigation.navigate('UserProfile')}></Icon>
           </View>
         </View>
         <View style={styles.SecondContainer}>
@@ -208,7 +242,7 @@ const SubCustomer = ({navigation, route}) => {
                       name="lock-open-variant-outline"
                       size={18}
                       color="#ff0000"
-                      style={styles.sideIcon}
+                      style={[styles.sideIcon, {color: 'green'}]}
                       onPress={() => handleEnable(item.pk)}
                     />
                   ) : (
@@ -251,8 +285,6 @@ const styles = StyleSheet.create({
   },
   Icons: {
     color: '#fff',
-    // height: 40,
-    // width: 40,
     margin: 10,
     fontSize: 35,
   },
@@ -264,7 +296,6 @@ const styles = StyleSheet.create({
   Search: {
     marginTop: 10,
     flexDirection: 'row',
-    // justifyContent: "space-evenly",
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
     borderRightWidth: 1,
@@ -342,7 +373,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   sideIcon: {
-    // color: "red",
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#3A39A0',

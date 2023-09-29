@@ -55,11 +55,15 @@ const Payment = ({navigation}) => {
           <Icon style={styles.Icons} name="person-circle-outline"></Icon>
         </View>
         <View style={styles.division}>
-          <Text style={styles.text1} onPress={changeSupplier}>
+          <Text
+            style={[styles.text1, action === 'supplier' && styles.selectedText]}
+            onPress={changeSupplier}>
             Supplier
           </Text>
           <View style={styles.text2}></View>
-          <Text style={styles.text1} onPress={changeCustomer}>
+          <Text
+            style={[styles.text1, action !== 'supplier' && styles.selectedText]}
+            onPress={changeCustomer}>
             Clients
           </Text>
         </View>
@@ -200,6 +204,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     margin: 3,
     padding: 4,
+  },
+  selectedText: {
+    color: '#000',
   },
 });
 
