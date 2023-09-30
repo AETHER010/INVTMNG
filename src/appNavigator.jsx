@@ -35,16 +35,18 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserData} from './components/Users/userAuth';
+import jwtDecode from 'jwt-decode';
+import axios from 'axios';
 
 export default function AppNavigator() {
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState('');
   const [userRoles, setUserRoles] = useState('');
 
   useEffect(() => {
     getTokens();
     getUserRole();
-  }, []);
+  }, [user]);
 
   const getUserRole = async () => {
     const role = await AsyncStorage.getItem('userRole');
@@ -55,11 +57,15 @@ export default function AppNavigator() {
   const getTokens = async () => {
     try {
       const token = await getUserData();
+      console.log('token', token);
       setUser(token);
-      console.log(token);
+      if (token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
     } catch (error) {
       console.error('Authentication check error:', error);
     }
+    console.log('token of user', user);
   };
 
   const Stack = createStackNavigator();
