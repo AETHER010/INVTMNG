@@ -34,7 +34,7 @@ const NewPaymentClient = ({navigation}) => {
       const response = await axios.get(
         `${Api_Url}/bill/apis/sales/subcustomer/list/`,
       );
-
+      console.log('djhbfodishfia', response.data);
       setCustomer(response.data);
     } catch (error) {
       console.error('API error:', error);
@@ -43,7 +43,7 @@ const NewPaymentClient = ({navigation}) => {
   };
 
   useEffect(() => {
-    console.log('Selected DOC', selectedDoc);
+    // console.log('Selected DOC', selectedDoc);
   }, [selectedDoc]);
 
   const pickDocument = async () => {
@@ -53,7 +53,7 @@ const NewPaymentClient = ({navigation}) => {
       });
 
       setSelectedDoc(result);
-      console.log('selected file', selectedDoc);
+      // console.log('selected file', selectedDoc);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         console.log('User Exit', err);
@@ -106,7 +106,6 @@ const NewPaymentClient = ({navigation}) => {
 
     setCname(customer[index].pk);
     console.log('data values', customer[index].pk);
-    console.log('customerId', cname);
   };
 
   return (
@@ -121,10 +120,6 @@ const NewPaymentClient = ({navigation}) => {
 
         <View
           style={{
-            // flexDirection: 'row',
-            // flexWrap: 'wrap',
-            // justifyContent: 'space-between',
-            // padding: 5,
             marginTop: 18,
           }}>
           <View
@@ -207,7 +202,7 @@ const NewPaymentClient = ({navigation}) => {
                   padding: 4,
                 }}
                 onPress={pickDocument}>
-                Pick Document
+                Select File
               </Text>
               <View style={{overflow: 'hidden'}}>
                 {selectedDoc.length > 0 ? (
@@ -223,7 +218,7 @@ const NewPaymentClient = ({navigation}) => {
                 ) : (
                   <Text
                     style={{color: 'black', fontSize: 15, paddingVertical: 4}}>
-                    No Doc Chosen
+                    No File Chosen
                   </Text>
                 )}
               </View>
@@ -288,13 +283,12 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   label: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
     color: '#000',
   },
   Input: {
     height: 40,
-    width: 200,
+    width: '60%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,
@@ -321,7 +315,7 @@ const styles = StyleSheet.create({
   },
   fileInput: {
     height: 40,
-    width: 200,
+    width: '60%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

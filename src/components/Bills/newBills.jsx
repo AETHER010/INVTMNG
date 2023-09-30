@@ -77,9 +77,7 @@ const NewBills = ({navigation, route}) => {
       );
       // console.log('API responsed after form submission:', response.data);
       gettingSupplierProducts(supplierId);
-      setPrice('');
-      setProduct([]);
-      setQuantity('');
+
       Alert.alert('Success', 'Product added successfully!');
     } catch (error) {
       console.error('API error:', error);
@@ -96,7 +94,7 @@ const NewBills = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/bill/apis/sales/subcustomer/products/${selectedData.pk}`,
       );
-      // console.log('API response for Product:', response.data);
+      console.log('API response for Product:', response.data);
       setProduct(response.data);
     } catch (error) {
       console.error('API error:', error);
@@ -146,6 +144,7 @@ const NewBills = ({navigation, route}) => {
   };
 
   const handleIssueBill = async () => {
+    console.log('Issue Bill', billId);
     try {
       await axios.post(`${Api_Url}/bill/apis/sales/issue-bill/${billId}/`);
       Alert.alert('Success', 'Bill Issued Successfully');
@@ -231,6 +230,7 @@ const NewBills = ({navigation, route}) => {
         formData,
       );
       Alert.alert('Success', 'Charge Added Successfully');
+      gettingSupplierProducts(supplierId);
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
@@ -265,7 +265,7 @@ const NewBills = ({navigation, route}) => {
             // flexWrap: 'wrap',
             // justifyContent: 'space-between',
             padding: 5,
-            marginTop: 18,
+            marginTop: 10,
           }}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text style={styles.label}>Customer:</Text>
@@ -312,7 +312,6 @@ const NewBills = ({navigation, route}) => {
             <View
               style={{
                 flexDirection: 'row',
-                justifyContent: 'space-between',
               }}>
               <Text style={styles.label}>Cost Price:</Text>
               <TextInput
@@ -354,21 +353,20 @@ const NewBills = ({navigation, route}) => {
                     <View style={[styles.Card, styles.ShadowProps]}>
                       <Text
                         style={{
-                          fontSize: 18,
+                          fontSize: 16,
                           color: '#000',
                           fontWeight: 'bold',
                         }}>
                         {item.product_name}
                       </Text>
-                      <View style={{flexDirection: 'row', marginTop: 4}}>
-                        <Text style={{fontSize: 18, color: '#000', padding: 5}}>
-                          cost Price:
+                      <View style={{flexDirection: 'row'}}>
+                        <Text style={{fontSize: 16, color: '#000'}}>
+                          Cost Price:
                         </Text>
 
                         {action === 'false' ? (
                           <View>
-                            <Text
-                              style={{fontSize: 18, color: '#000', padding: 5}}>
+                            <Text style={{fontSize: 16, color: '#000'}}>
                               {item.per_unit_price}
                             </Text>
                           </View>
@@ -381,13 +379,12 @@ const NewBills = ({navigation, route}) => {
                           />
                         )}
                       </View>
-                      <View style={{flexDirection: 'row', marginTop: 4}}>
-                        <Text style={{fontSize: 18, color: '#000', padding: 3}}>
-                          quantity:
+                      <View style={{flexDirection: 'row'}}>
+                        <Text style={{fontSize: 16, color: '#000'}}>
+                          Quantity:
                         </Text>
                         {action === 'false' ? (
-                          <Text
-                            style={{fontSize: 18, color: '#000', padding: 5}}>
+                          <Text style={{fontSize: 18, color: '#000'}}>
                             {item.quantity}
                           </Text>
                         ) : (
@@ -602,7 +599,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-
+    paddingVertical: 5,
     color: '#000',
   },
   Input: {
@@ -654,7 +651,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   priceInput: {
-    marginLeft: 40,
+    marginLeft: 22,
     height: 40,
     width: 120,
     borderWidth: 2,
@@ -671,8 +668,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   Card: {
-    height: 150,
-    width: 350,
+    width: 380,
     padding: 8,
     margin: 5,
     borderRadius: 10,

@@ -135,16 +135,16 @@ const Bills = ({navigation}) => {
                     Id: {item.billid}
                   </Text>
 
-                  <Text style={{fontSize: 18, color: '#000'}}>
+                  <Text style={{fontSize: 14, color: '#000'}}>
                     {formattedate}
                   </Text>
                 </View>
-                <Text style={{fontSize: 18, color: '#000'}}>
+                <Text style={{fontSize: 18, color: '#000', paddingTop: 3}}>
                   {item.customer}
                 </Text>
                 <View style={styles.card2}>
-                  <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-                    Total Amount: {item.total_price}
+                  <Text style={{fontSize: 16, paddingTop: 4, color: '#000'}}>
+                    Total Amount: {item.grandtotal}
                   </Text>
                   <Button
                     buttonStyle={styles.Button2}

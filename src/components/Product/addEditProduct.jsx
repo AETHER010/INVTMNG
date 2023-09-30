@@ -17,7 +17,7 @@ const NewProduct = ({navigation, route}) => {
   const [name, setName] = useState('');
   const [supplier, setSupplier] = useState('');
   const [sellingPrice, setSellingPrice] = useState('');
-  const [stock, setStock] = useState('');
+
   const [data, setData] = useState([]);
   const [supplierName, setSupplierName] = useState('');
 
@@ -54,7 +54,7 @@ const NewProduct = ({navigation, route}) => {
       // setSelectedSupplierName(response.data.name);
       setName(response.data.name);
       setSellingPrice(response.data.standard_price.toString());
-      setStock(response.data.stock.toString());
+
       setSupplierName(response.data.suppliers);
     } catch (error) {
       console.error('API error:', error);
@@ -67,7 +67,6 @@ const NewProduct = ({navigation, route}) => {
       name: name,
       suppliers: supplier,
       standard_price: sellingPrice,
-      stock: stock,
     };
     console.log(formData);
     try {
@@ -178,22 +177,6 @@ const NewProduct = ({navigation, route}) => {
               value={sellingPrice}
               onChangeText={setSellingPrice}
             />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text style={styles.label}>Stock:</Text>
-            {route && route.params ? (
-              <Text style={styles.Input9}>{stock}</Text>
-            ) : (
-              <TextInput
-                style={styles.Input}
-                value={stock}
-                onChangeText={setStock}
-              />
-            )}
           </View>
         </View>
         <View style={{flexDirection: 'row'}}>

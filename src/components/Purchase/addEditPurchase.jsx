@@ -77,9 +77,7 @@ const NewPurchase = ({navigation, route}) => {
       );
       // console.log('API responsed after form submission:', response.data);
       gettingSupplierProducts(supplierId);
-      setPrice('');
-      setProduct([]);
-      setQuantity('');
+
       Alert.alert('Success', 'Product added successfully!');
     } catch (error) {
       console.error('API error:', error);
@@ -126,7 +124,7 @@ const NewPurchase = ({navigation, route}) => {
       const response = await axios.get(
         `${Api_Url}/bill/apis/purchase/unconfirm/bill/${id}/`,
       );
-      // console.log('API response for unconfirm products:', response.data.data);
+
       setGrandTotal(response.data.data.grand_total);
       setCommission(response.data.data.charge_percentage);
       setChargeBillId(response.data.data.id);
@@ -137,7 +135,7 @@ const NewPurchase = ({navigation, route}) => {
       setBillId(apiData.id);
 
       setUnConfirmProducts(items);
-      // console.log('Product issues bills', unConfirmProducts);
+      console.log('Product issues bills', items);
     } catch (error) {
       console.error('API error:', error);
       // Alert.alert('Error', 'An error occurred while getting Product data.');
@@ -227,7 +225,7 @@ const NewPurchase = ({navigation, route}) => {
         formData,
       );
       Alert.alert('Success', 'Charge Added Successfully');
-      gettingSupplierProducts();
+      gettingSupplierProducts(supplierId);
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
@@ -259,7 +257,7 @@ const NewPurchase = ({navigation, route}) => {
         <View
           style={{
             padding: 5,
-            marginTop: 18,
+            marginTop: 10,
           }}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text style={styles.label}>Supplier:</Text>
@@ -306,7 +304,6 @@ const NewPurchase = ({navigation, route}) => {
             <View
               style={{
                 flexDirection: 'row',
-                justifyContent: 'space-between',
               }}>
               <Text style={styles.label}>Cost Price:</Text>
               <TextInput
@@ -354,15 +351,14 @@ const NewPurchase = ({navigation, route}) => {
                         }}>
                         {item.product_name}
                       </Text>
-                      <View style={{flexDirection: 'row', marginTop: 4}}>
-                        <Text style={{fontSize: 18, color: '#000', padding: 5}}>
-                          cost Price:
+                      <View style={{flexDirection: 'row'}}>
+                        <Text style={{fontSize: 16, color: '#000'}}>
+                          Cost Price:
                         </Text>
 
                         {action === 'false' ? (
                           <View>
-                            <Text
-                              style={{fontSize: 18, color: '#000', padding: 5}}>
+                            <Text style={{fontSize: 16, color: '#000'}}>
                               {item.per_unit_price}
                             </Text>
                           </View>
@@ -375,13 +371,12 @@ const NewPurchase = ({navigation, route}) => {
                           />
                         )}
                       </View>
-                      <View style={{flexDirection: 'row', marginTop: 4}}>
-                        <Text style={{fontSize: 18, color: '#000', padding: 3}}>
-                          quantity:
+                      <View style={{flexDirection: 'row'}}>
+                        <Text style={{fontSize: 16, color: '#000'}}>
+                          Quantity:
                         </Text>
                         {action === 'false' ? (
-                          <Text
-                            style={{fontSize: 18, color: '#000', padding: 5}}>
+                          <Text style={{fontSize: 16, color: '#000'}}>
                             {item.quantity}
                           </Text>
                         ) : (
@@ -596,12 +591,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    fontWeight: 'bold',
     color: '#000',
+    paddingVertical: 4,
   },
   Input: {
     height: 40,
-    width: 250,
+    width: '70%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,
@@ -648,7 +643,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   priceInput: {
-    marginLeft: 40,
+    marginLeft: 22,
     height: 40,
     width: 120,
     borderWidth: 2,
@@ -665,8 +660,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   Card: {
-    height: 150,
-    width: 350,
+    width: 380,
     padding: 8,
     margin: 5,
     borderRadius: 10,

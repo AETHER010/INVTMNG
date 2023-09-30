@@ -42,7 +42,7 @@ const Purchase = ({navigation}) => {
       );
       setData(response.data.data);
       setFilteredData(response.data.data);
-      console.log();
+      console.log('asdjh fgaisudf', response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -138,16 +138,16 @@ const Purchase = ({navigation}) => {
                     Id: {item.billid}
                   </Text>
 
-                  <Text style={{fontSize: 18, color: '#000'}}>
+                  <Text style={{fontSize: 14, color: '#000'}}>
                     {formattedate}
                   </Text>
                 </View>
-                <Text style={{fontSize: 18, color: '#000'}}>
+                <Text style={{fontSize: 18, color: '#000', paddingTop: 3}}>
                   {item.suppliers}
                 </Text>
                 <View style={styles.card2}>
                   <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-                    Total Amount: {item.total_price}
+                    Total Amount: {item.grandtotal}
                   </Text>
                   <Button
                     buttonStyle={styles.Button2}

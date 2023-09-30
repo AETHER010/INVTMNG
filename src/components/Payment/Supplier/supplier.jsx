@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, TextInput} from 'react-native';
+import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
 
 import {useState, useEffect} from 'react';
 import {Button} from 'react-native-elements';
@@ -8,6 +8,7 @@ import {Api_Url} from './../../../utilities/api';
 import React from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
+import moment from 'moment';
 
 const PaymentSupplier = () => {
   const navigation = useNavigation();
@@ -16,6 +17,7 @@ const PaymentSupplier = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
+  const [supDate, setSupDate] = useState('');
 
   // useEffect(() => {
   //   fetchApiDatSupplier();
@@ -32,8 +34,12 @@ const PaymentSupplier = () => {
       const response = await axios.get(
         `${Api_Url}/payment/apis/seller-payments/`,
       );
+      console.log(response.data.data);
       setSupplierData(response.data.data);
       setFilteredData(response.data.data);
+      const date = response.data.data.created_date;
+      const formattedDate = moment(date).format('YYYY-MM-DD');
+      setSupDate(formattedDate);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -53,15 +59,15 @@ const PaymentSupplier = () => {
       // Use the Array.filter method to filter data based on the search query
       const filtered = supplierData.filter(
         item =>
-          item.name &&
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          item.suppliers &&
+          item.suppliers.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredData(filtered);
     }
   };
 
   return (
-    <View>
+    <ScrollView>
       <View style={styles.SecondContainer}>
         <View style={styles.Search}>
           <TextInput
@@ -84,19 +90,17 @@ const PaymentSupplier = () => {
           onPress={() => navigation.navigate('NewPaymentSupplier')}
         />
       </View>
-      {supplierData.map((item, index) => (
+      {filteredData.map((item, index) => (
         <View
           key={index}
           style={{justifyContent: 'center', alignItems: 'center'}}>
           <View style={[styles.Card, styles.ShadowProps]}>
             <View style={styles.card2}>
-              <Text style={{fontSize: 18, color: '#000'}}>
-                {item.suppliers}
+              <Text style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
+                {item.suppliers_name}
               </Text>
 
-              {/* <Text style={{fontSize: 18, color: '#000'}}>
-                      {formattedate}
-                    </Text> */}
+              <Text style={{fontSize: 14, color: '#000'}}>{supDate}</Text>
             </View>
             <View
               style={{
@@ -105,7 +109,7 @@ const PaymentSupplier = () => {
               }}>
               <Text style={{fontSize: 18, color: '#000'}}>Amount:</Text>
               <Text style={{fontSize: 18, color: '#FF0000'}}>
-                {item.amount}
+                Rs. {item.amount}
               </Text>
             </View>
 
@@ -115,7 +119,7 @@ const PaymentSupplier = () => {
           </View>
         </View>
       ))}
-    </View>
+    </ScrollView>
   );
 };
 

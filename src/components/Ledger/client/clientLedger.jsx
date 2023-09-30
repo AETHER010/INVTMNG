@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {Table, TableWrapper, Row} from 'react-native-table-component';
 import {Button} from 'react-native-elements';
@@ -39,6 +40,8 @@ export default class ClientLedger extends Component {
       selectedClient: '',
       filteredData: [],
       userRole: '',
+      refreshing: false,
+      defaultClient: 'Client...',
     };
   }
 
@@ -82,9 +85,9 @@ export default class ClientLedger extends Component {
   fetchApiClient = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/bill/apis/sales/subcustomer/list/`,
+        `${Api_Url}/accounts/apis/customer/?page=1&page_size=100`,
       );
-      const responseData = response.data;
+      const responseData = response.data.data;
       console.log('API error:', responseData);
       this.setState({client: responseData, loading: false});
     } catch (error) {
@@ -191,6 +194,16 @@ export default class ClientLedger extends Component {
     this.setState({data: data});
   };
 
+  handleRefresh = () => {
+    this.setState({refreshing: true});
+
+    this.getApiData();
+    this.setState({defaultClient: 'Suppliers...'});
+    setTimeout(() => {
+      this.setState({refreshing: false});
+    }, 1000);
+  };
+
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
@@ -225,97 +238,106 @@ export default class ClientLedger extends Component {
         : [];
 
     return (
-      <View style={styles.container}>
-        <View style={styles.SecondContainer}>
-          <ModalDropdown
-            style={styles.textDisplay}
-            defaultValue="Clients"
-            options={this.state.client.map(item => item.name)}
-            onSelect={index => this.handleProductSelection(index)}
-            defaultIndex={0}
-            animated={true}
-            isFullWidth={true}
-            textStyle={styles.dropdownText}
-            showsVerticalScrollIndicator={true}
-            dropdownTextStyle={styles.dropdownText2}
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={this.handleRefresh}
           />
-          <TouchableOpacity
-            style={styles.datePickerButton}
-            onPress={() => this.setState({showFromDatePicker: true})}>
-            {fromDate ? (
-              <Text style={{color: '#000'}}>
-                {moment(fromDate).format('MMM DD, YYYY')}
-              </Text>
-            ) : (
-              <Text style={{color: '#000'}}>Select From Date</Text>
-            )}
-          </TouchableOpacity>
-          {showFromDatePicker && (
-            <DateTimePicker
-              value={fromDate}
-              mode="date"
-              display="default"
-              onChange={(event, date) => this.handleDateChange(date, 'from')}
+        }>
+        <View style={styles.container}>
+          <View style={styles.SecondContainer}>
+            <ModalDropdown
+              style={styles.textDisplay}
+              defaultValue={this.state.defaultClient}
+              options={this.state.client.map(item => item.name)}
+              onSelect={index => this.handleProductSelection(index)}
+              defaultIndex={0}
+              animated={true}
+              isFullWidth={true}
+              textStyle={styles.dropdownText}
+              showsVerticalScrollIndicator={true}
+              dropdownTextStyle={styles.dropdownText2}
             />
-          )}
-          <Icon2 style={styles.swapIcon} name="swap"></Icon2>
-          <TouchableOpacity
-            style={styles.datePickerButton}
-            onPress={() => this.setState({showToDatePicker: true})}>
-            {toDate ? (
-              <Text style={{color: '#000'}}>
-                {moment(toDate).format('MMM DD, YYYY')}
-              </Text>
-            ) : (
-              <Text style={{color: '#000'}}>Select To Date</Text>
-            )}
-          </TouchableOpacity>
-          {showToDatePicker && (
-            <DateTimePicker
-              value={toDate}
-              mode="date"
-              display="default"
-              onChange={(event, date) => this.handleDateChange(date, 'to')}
-            />
-          )}
-          <Icon
-            style={styles.Button}
-            name="download"
-            onPress={this.handleDownload}
-          />
-        </View>
-
-        <ScrollView
-          horizontal={true}
-          style={{maxHeight: Dimensions.get('window').height - 200}}>
-          <View>
-            <Table>
-              <Row
-                data={this.state.tableHead}
-                widthArr={this.state.widthArr}
-                style={styles.header}
-                textStyle={styles.text}
+            <TouchableOpacity
+              style={styles.datePickerButton}
+              onPress={() => this.setState({showFromDatePicker: true})}>
+              {fromDate ? (
+                <Text style={{color: '#000'}}>
+                  {moment(fromDate).format('MMM DD, YYYY')}
+                </Text>
+              ) : (
+                <Text style={{color: '#000'}}>Select From Date</Text>
+              )}
+            </TouchableOpacity>
+            {showFromDatePicker && (
+              <DateTimePicker
+                value={fromDate}
+                mode="date"
+                display="default"
+                onChange={(event, date) => this.handleDateChange(date, 'from')}
               />
-            </Table>
-            <ScrollView style={styles.dataWrapper}>
-              <Table>
-                {tableData.map((rowData, index) => (
-                  <Row
-                    key={index}
-                    data={rowData}
-                    widthArr={this.state.widthArr}
-                    style={[
-                      styles.row,
-                      index % 2 && {backgroundColor: '#F7F6E7'},
-                    ]}
-                    textStyle={styles.text}
-                  />
-                ))}
-              </Table>
-            </ScrollView>
+            )}
+            <Icon2 style={styles.swapIcon} name="swap"></Icon2>
+            <TouchableOpacity
+              style={styles.datePickerButton}
+              onPress={() => this.setState({showToDatePicker: true})}>
+              {toDate ? (
+                <Text style={{color: '#000'}}>
+                  {moment(toDate).format('MMM DD, YYYY')}
+                </Text>
+              ) : (
+                <Text style={{color: '#000'}}>Select To Date</Text>
+              )}
+            </TouchableOpacity>
+            {showToDatePicker && (
+              <DateTimePicker
+                value={toDate}
+                mode="date"
+                display="default"
+                onChange={(event, date) => this.handleDateChange(date, 'to')}
+              />
+            )}
+            <Icon
+              style={styles.Button}
+              name="download"
+              onPress={this.handleDownload}
+            />
           </View>
-        </ScrollView>
-      </View>
+
+          <ScrollView
+            horizontal={true}
+            style={{maxHeight: Dimensions.get('window').height - 200}}>
+            <View>
+              <Table>
+                <Row
+                  data={this.state.tableHead}
+                  widthArr={this.state.widthArr}
+                  style={styles.header}
+                  textStyle={styles.text}
+                />
+              </Table>
+              <ScrollView style={styles.dataWrapper}>
+                <Table>
+                  {tableData.map((rowData, index) => (
+                    <Row
+                      key={index}
+                      data={rowData}
+                      widthArr={this.state.widthArr}
+                      style={[
+                        styles.row,
+                        index % 2 && {backgroundColor: '#F7F6E7'},
+                      ]}
+                      textStyle={styles.text}
+                    />
+                  ))}
+                </Table>
+              </ScrollView>
+            </View>
+          </ScrollView>
+        </View>
+      </ScrollView>
     );
   }
 }

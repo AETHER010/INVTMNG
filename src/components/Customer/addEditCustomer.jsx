@@ -110,7 +110,10 @@ const NewCustomer = ({navigation, route}) => {
             onPress={() => navigation.navigate('Customer')}
           />
           <Text style={styles.text}>Customer</Text>
-          <Icon style={styles.Icons} name="person-circle-outline"></Icon>
+          <Icon
+            style={styles.Icons}
+            name="person-circle-outline"
+            onPress={() => navigation.navigate('UserProfile')}></Icon>
         </View>
       </View>
       <View style={styles.formContainer}>

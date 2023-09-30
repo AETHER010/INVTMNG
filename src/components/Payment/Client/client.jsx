@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, TextInput} from 'react-native';
+import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
 
 import {useState, useEffect} from 'react';
 import {Button} from 'react-native-elements';
@@ -8,12 +8,16 @@ import {Api_Url} from '../../../utilities/api';
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {useFocusEffect} from '@react-navigation/native';
+import moment from 'moment';
 
 const PaymentClient = () => {
   const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState('');
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+  const [cumDate, setCumDate] = useState('');
   useFocusEffect(
     React.useCallback(() => {
       fetchApiDataCustomer();
@@ -35,6 +39,9 @@ const PaymentClient = () => {
       );
       setData(response.data.data);
       console.log(response.data.data);
+      const date = response.data.data.created_date;
+      const formattedDate = moment(date).format('YYYY-MM-DD');
+      setCumDate(formattedDate);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -42,64 +49,86 @@ const PaymentClient = () => {
     }
   };
 
+  useEffect(() => {
+    filterData();
+  }, [data, searchQuery]);
+
+  const filterData = () => {
+    if (searchQuery.trim() === '') {
+      // If the search query is empty, display all data
+      setFilteredData(data);
+    } else {
+      // Use the Array.filter method to filter data based on the search query
+      const filtered = data.filter(
+        item =>
+          item.customer &&
+          item.customer.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   return (
-    <View style={styles.clientContainer}>
-      <View style={styles.SecondContainer}>
-        <View style={styles.Search}>
-          <TextInput
-            style={styles.input}
-            placeholder="Search..."
-            placeholderTextColor="#888"
-          />
-          <Icon
-            name="search"
-            size={24}
-            color="#888"
-            style={styles.searchIcon}
+    <ScrollView>
+      <View style={styles.clientContainer}>
+        <View style={styles.SecondContainer}>
+          <View style={styles.Search}>
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              placeholderTextColor="#888"
+              value={searchQuery}
+              onChangeText={text => setSearchQuery(text)}
+            />
+            <Icon
+              name="search"
+              size={24}
+              color="#888"
+              style={styles.searchIcon}
+            />
+          </View>
+          <Button
+            buttonStyle={styles.Button}
+            title="+ Create"
+            onPress={() => navigation.navigate('NewPaymentClient')}
           />
         </View>
-        <Button
-          buttonStyle={styles.Button}
-          title="+ Create"
-          onPress={() => navigation.navigate('NewPaymentClient')}
-        />
-      </View>
-      {data.length === 0 ? (
-        <Text style={styles.noDataText}>No Data Available</Text>
-      ) : (
-        data.map((item, index) => (
-          <View
-            key={index}
-            style={{justifyContent: 'center', alignItems: 'center'}}>
-            <View style={[styles.Card, styles.ShadowProps]}>
-              <View style={styles.card2}>
-                <Text style={{fontSize: 18, color: '#000'}}>
-                  {item.customer}
-                </Text>
+        {filteredData.length === 0 ? (
+          <Text style={styles.noDataText}>No Data Available</Text>
+        ) : (
+          filteredData.map((item, index) => (
+            <View
+              key={index}
+              style={{justifyContent: 'center', alignItems: 'center'}}>
+              <View style={[styles.Card, styles.ShadowProps]}>
+                <View style={styles.card2}>
+                  <Text
+                    style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
+                    {item.customer_name}
+                  </Text>
 
-                {/* <Text style={{fontSize: 18, color: '#000'}}>
-                      {formattedate}
-                    </Text> */}
-              </View>
-              <View
-                style={{
-                  justifyContent: 'space-between',
-                  flexDirection: 'row',
-                }}>
-                <Text style={{fontSize: 18, color: '#000'}}>Amount:</Text>
-                <Text style={{fontSize: 18, color: '#008000'}}>
-                  {item.amount}
+                  <Text style={{fontSize: 14, color: '#000'}}>{cumDate}</Text>
+                </View>
+                <View
+                  style={{
+                    justifyContent: 'space-between',
+                    flexDirection: 'row',
+                  }}>
+                  <Text style={{fontSize: 18, color: '#000'}}>Amount:</Text>
+                  <Text style={{fontSize: 18, color: '#008000'}}>
+                    Rs. {item.amount}
+                  </Text>
+                </View>
+
+                <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
+                  Remarks : {item.remarks}
                 </Text>
               </View>
-
-              <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-                Remarks : {item.remarks}
-              </Text>
             </View>
-          </View>
-        ))
-      )}
-    </View>
+          ))
+        )}
+      </View>
+    </ScrollView>
   );
 };
 

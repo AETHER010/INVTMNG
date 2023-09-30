@@ -84,14 +84,14 @@ const Payment = ({navigation}) => {
             onPress={() => navigation.navigate('NewPayment')}
           />
         </View> */}
-      <ScrollView
+      {/* <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }>
-        <View>
-          {action === 'supplier' ? <Supplier Api_Url={Api_Url} /> : <Client />}
-        </View>
-      </ScrollView>
+        }> */}
+      <View>
+        {action === 'supplier' ? <Supplier Api_Url={Api_Url} /> : <Client />}
+      </View>
+      {/* </ScrollView> */}
     </View>
   );
 };

@@ -21,7 +21,6 @@ const NewPaymentSupplier = ({navigation}) => {
   const [remarks, setRemarks] = useState('');
   const [amount, setAmount] = useState('');
   const [selectedDoc, setSelectedDoc] = useState([]);
-  const [sellingPrice, setLaunchedPrice] = useState('');
   const [evidence, setEvidence] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -55,7 +54,7 @@ const NewPaymentSupplier = ({navigation}) => {
       });
 
       setSelectedDoc(result);
-      console.log('selected file', selectedDoc);
+      setEvidence(result[0].uri);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         console.log('User Exit', err);
@@ -80,6 +79,7 @@ const NewPaymentSupplier = ({navigation}) => {
       suppliers: cname,
       amount: amount,
       remarks: remarks,
+      // proof: evidence,
     };
 
     console.log('formdata', formData);
@@ -221,7 +221,7 @@ const NewPaymentSupplier = ({navigation}) => {
                     padding: 4,
                   }}
                   onPress={pickDocument}>
-                  Pick Document
+                  Select File
                 </Text>
                 <View style={{overflow: 'hidden'}}>
                   {selectedDoc.length > 0 ? (
@@ -241,7 +241,7 @@ const NewPaymentSupplier = ({navigation}) => {
                         fontSize: 15,
                         paddingVertical: 4,
                       }}>
-                      No Doc Chosen
+                      No Files Chosen
                     </Text>
                   )}
                 </View>
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   },
   fileInput: {
     height: 40,
-    width: 200,
+    width: '60%',
     borderWidth: 2,
     borderColor: '#CED4DA',
     borderRadius: 4,

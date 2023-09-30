@@ -52,6 +52,7 @@ const User = ({navigation}) => {
       );
       setData(response.data.data);
       setFilteredData(response.data.data);
+      console.log(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -166,8 +167,8 @@ const User = ({navigation}) => {
     } else {
       const filtered = data.filter(
         item =>
-          item.name &&
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          item.username &&
+          item.username.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredData(filtered);
     }
@@ -341,6 +342,7 @@ const styles = StyleSheet.create({
     margin: 2,
     padding: 7,
     width: 170,
+    color: '#000',
   },
   searchIcon: {
     borderLeftWidth: 2,

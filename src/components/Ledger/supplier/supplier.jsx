@@ -209,6 +209,7 @@ export default class SupplierLedger extends Component {
     this.setState({refreshing: true});
 
     this.getApiData();
+
     this.setState({defaultSupplier: 'Suppliers...'});
     setTimeout(() => {
       this.setState({refreshing: false});

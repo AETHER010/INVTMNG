@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {Table, TableWrapper, Row} from 'react-native-table-component';
 import {Button} from 'react-native-elements';
@@ -38,6 +39,7 @@ export default class ExpenseLedger extends Component {
       selectors: ['Debit', 'Credit'],
       filteredData: [],
       userRole: '',
+      refreshing,
     };
   }
 
@@ -159,6 +161,16 @@ export default class ExpenseLedger extends Component {
     }
   };
 
+  handleRefresh = () => {
+    this.setState({refreshing: true});
+
+    this.getApiData();
+
+    setTimeout(() => {
+      this.setState({refreshing: false});
+    }, 1000);
+  };
+
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
@@ -191,85 +203,94 @@ export default class ExpenseLedger extends Component {
         : [];
 
     return (
-      <View style={styles.container}>
-        <View style={styles.SecondContainer}>
-          <TouchableOpacity
-            style={styles.datePickerButton}
-            onPress={() => this.setState({showFromDatePicker: true})}>
-            {fromDate ? (
-              <Text style={{color: '#000'}}>
-                {moment(fromDate).format('MMM DD, YYYY')}
-              </Text>
-            ) : (
-              <Text style={{color: '#000'}}>Select From Date</Text>
-            )}
-          </TouchableOpacity>
-          {showFromDatePicker && (
-            <DateTimePicker
-              value={fromDate}
-              mode="date"
-              display="default"
-              onChange={(event, date) => this.handleDateChange(date, 'from')}
-            />
-          )}
-          <Icon2 style={styles.swapIcon} name="swap"></Icon2>
-          <TouchableOpacity
-            style={styles.datePickerButton}
-            onPress={() => this.setState({showToDatePicker: true})}>
-            {toDate ? (
-              <Text style={{color: '#000'}}>
-                {moment(toDate).format('MMM DD, YYYY')}
-              </Text>
-            ) : (
-              <Text style={{color: '#000'}}>Select To Date</Text>
-            )}
-          </TouchableOpacity>
-          {showToDatePicker && (
-            <DateTimePicker
-              value={toDate}
-              mode="date"
-              display="default"
-              onChange={(event, date) => this.handleDateChange(date, 'to')}
-            />
-          )}
-          <Icon
-            style={styles.Button}
-            name="download"
-            onPress={this.handleDownload}
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={this.handleRefresh}
           />
-        </View>
-
-        <ScrollView
-          horizontal={true}
-          style={{maxHeight: Dimensions.get('window').height - 200}}>
-          <View>
-            <Table>
-              <Row
-                data={this.state.tableHead}
-                widthArr={this.state.widthArr}
-                style={styles.header}
-                textStyle={styles.text}
+        }>
+        <View style={styles.container}>
+          <View style={styles.SecondContainer}>
+            <TouchableOpacity
+              style={styles.datePickerButton}
+              onPress={() => this.setState({showFromDatePicker: true})}>
+              {fromDate ? (
+                <Text style={{color: '#000'}}>
+                  {moment(fromDate).format('MMM DD, YYYY')}
+                </Text>
+              ) : (
+                <Text style={{color: '#000'}}>Select From Date</Text>
+              )}
+            </TouchableOpacity>
+            {showFromDatePicker && (
+              <DateTimePicker
+                value={fromDate}
+                mode="date"
+                display="default"
+                onChange={(event, date) => this.handleDateChange(date, 'from')}
               />
-            </Table>
-            <ScrollView style={styles.dataWrapper}>
-              <Table>
-                {tableData.map((rowData, index) => (
-                  <Row
-                    key={index}
-                    data={rowData}
-                    widthArr={this.state.widthArr}
-                    style={[
-                      styles.row,
-                      index % 2 && {backgroundColor: '#F7F6E7'},
-                    ]}
-                    textStyle={styles.text}
-                  />
-                ))}
-              </Table>
-            </ScrollView>
+            )}
+            <Icon2 style={styles.swapIcon} name="swap"></Icon2>
+            <TouchableOpacity
+              style={styles.datePickerButton}
+              onPress={() => this.setState({showToDatePicker: true})}>
+              {toDate ? (
+                <Text style={{color: '#000'}}>
+                  {moment(toDate).format('MMM DD, YYYY')}
+                </Text>
+              ) : (
+                <Text style={{color: '#000'}}>Select To Date</Text>
+              )}
+            </TouchableOpacity>
+            {showToDatePicker && (
+              <DateTimePicker
+                value={toDate}
+                mode="date"
+                display="default"
+                onChange={(event, date) => this.handleDateChange(date, 'to')}
+              />
+            )}
+            <Icon
+              style={styles.Button}
+              name="download"
+              onPress={this.handleDownload}
+            />
           </View>
-        </ScrollView>
-      </View>
+
+          <ScrollView
+            horizontal={true}
+            style={{maxHeight: Dimensions.get('window').height - 200}}>
+            <View>
+              <Table>
+                <Row
+                  data={this.state.tableHead}
+                  widthArr={this.state.widthArr}
+                  style={styles.header}
+                  textStyle={styles.text}
+                />
+              </Table>
+              <ScrollView style={styles.dataWrapper}>
+                <Table>
+                  {tableData.map((rowData, index) => (
+                    <Row
+                      key={index}
+                      data={rowData}
+                      widthArr={this.state.widthArr}
+                      style={[
+                        styles.row,
+                        index % 2 && {backgroundColor: '#F7F6E7'},
+                      ]}
+                      textStyle={styles.text}
+                    />
+                  ))}
+                </Table>
+              </ScrollView>
+            </View>
+          </ScrollView>
+        </View>
+      </ScrollView>
     );
   }
 }
