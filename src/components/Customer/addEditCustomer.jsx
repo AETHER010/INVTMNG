@@ -92,10 +92,6 @@ const NewCustomer = ({navigation, route}) => {
     }
   };
 
-  const handlesubcustomer = async id => {
-    navigation.navigate('SubCustomer', {id});
-  };
-
   return (
     <View>
       <View style={styles.SupplierContainer}>
@@ -156,11 +152,6 @@ const NewCustomer = ({navigation, route}) => {
                 buttonStyle={styles.Button}
                 title="Update"
                 onPress={() => handleUpdate()}
-              />
-              <Button
-                buttonStyle={styles.Button2}
-                title="Sub Customer"
-                onPress={() => handlesubcustomer(data.pk)}
               />
             </View>
           ) : (

@@ -32,7 +32,7 @@ export default class SupplierLedger extends Component {
       widthArr: [80, 120, 120, 50, 70, 80],
       data: [],
       loading: true,
-      fromDate: new Date(2010, 0, 1),
+      fromDate: new Date(2022, 0, 1),
       toDate: new Date(),
       showFromDatePicker: false,
       showToDatePicker: false,
@@ -144,10 +144,16 @@ export default class SupplierLedger extends Component {
       const formattedToDate = moment(toDate).format('YYYY-MM-DD');
 
       const apiUrl = `${Api_Url}/report/pages/suppliers/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&suppliers=${supplierID}`;
-
+      const token = await AsyncStorage.getItem('access_token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      console.log(apiUrl);
+      console.log(headers);
       try {
         const response = await axios.get(apiUrl, {
-          responseType: 'arraybuffer', // Ensure the response is treated as binary data
+          responseType: 'arraybuffer',
+          headers,
         });
 
         if (response.status === 200) {
@@ -155,7 +161,7 @@ export default class SupplierLedger extends Component {
           const pdfData = response.data;
           const pdfData2 = JSON.stringify(pdfData);
           console.log(typeof pdfData, 'base64');
-          const filePath = `${RNFS.DownloadDirectoryPath} + /downloaded.pdf`; // Change the file name and path as needed
+          const filePath = `${RNFS.DownloadDirectoryPath}/downloaded.pdf`; // Change the file name and path as needed
 
           await RNFS.writeFile(filePath, pdfData2, 'base64')
             .then(success => {
@@ -386,11 +392,11 @@ const styles = StyleSheet.create({
   },
   datePickerButton: {
     backgroundColor: '#fff',
-    paddingHorizontal: 8,
+    paddingHorizontal: 2,
     paddingVertical: 10,
     borderWidth: 1,
     borderRadius: 9,
-    marginVertical: 10,
+    marginVertical: 9,
     borderColor: '#3A39A0',
   },
   Button: {
@@ -408,7 +414,7 @@ const styles = StyleSheet.create({
     color: '#000',
     marginTop: 9,
     height: 40,
-    width: 130,
+    width: '35%',
     borderWidth: 1,
     borderColor: '#3A39A0',
     borderRadius: 10,

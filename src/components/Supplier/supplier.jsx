@@ -38,6 +38,7 @@ const Supplier = ({navigation}) => {
       );
       setData(response.data.data);
       setFilteredData(response.data.data);
+      console.log(response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -219,6 +220,9 @@ const Supplier = ({navigation}) => {
                     onPress={() => handleUpdate(item.pk)}
                   />
                 </View>
+                <Text style={{fontSize: 14, color: '#000', marginTop: 6}}>
+                  Balance: {item.last_balance}
+                </Text>
               </View>
             </View>
           ))
@@ -291,7 +295,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    width: 380,
+    width: '95%',
     padding: 8,
     margin: 8,
     borderRadius: 10,

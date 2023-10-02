@@ -31,11 +31,9 @@ const NewPaymentClient = ({navigation}) => {
 
   const fetchdataCustomer = async () => {
     try {
-      const response = await axios.get(
-        `${Api_Url}/bill/apis/sales/subcustomer/list/`,
-      );
+      const response = await axios.get(`${Api_Url}/accounts/apis/customer`);
       console.log('djhbfodishfia', response.data);
-      setCustomer(response.data);
+      setCustomer(response.data.data);
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while submitting data.');
@@ -116,7 +114,7 @@ const NewPaymentClient = ({navigation}) => {
         onPress={() => navigation.navigate('Payment')}
       />
       <View style={styles.formContainer}>
-        <Text style={styles.text2}>Create Client</Text>
+        <Text style={styles.text2}>Create Customer Payment</Text>
 
         <View
           style={{
@@ -128,10 +126,10 @@ const NewPaymentClient = ({navigation}) => {
               justifyContent: 'space-between',
               padding: 2,
             }}>
-            <Text style={styles.label}>Client:</Text>
+            <Text style={styles.label}>Customer:</Text>
             <ModalDropdown
               style={styles.Input}
-              defaultValue="Select Client..."
+              defaultValue="Select Customer..."
               options={customer.map(item => item.name)}
               onSelect={index => handleProductSelection(index)}
               defaultIndex={0}

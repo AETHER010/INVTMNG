@@ -534,17 +534,20 @@ const NewBills = ({navigation, route}) => {
               {commission}
             </TextInput>
             <Text style={{color: 'black', marginTop: 3}}>% </Text>
+            <Icon
+              style={styles.Button3}
+              name="check-circle"
+              onPress={handleIssuCharge}
+              size={20}
+            />
           </View>
-          <Button
-            buttonStyle={styles.Button3}
-            title="Add"
-            onPress={handleIssuCharge}
-          />
+
           <Text
             style={{
               fontSize: 16,
               paddingTop: 6,
               color: '#000',
+              fontWeight: 'bold',
             }}>
             Grand Total: {grandTotal}
           </Text>
@@ -634,14 +637,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   Button3: {
-    height: 40,
-    width: 50,
-    fontSize: 14,
-    backgroundColor: '#3A39A0',
-    color: '#000',
-    borderRadius: 10,
-    padding: 8,
-    fontSize: 18,
+    height: 30,
+    width: 30,
+    fontSize: 25,
+    borderColor: '#0000FF',
+    borderWidth: 1,
+    color: '#008000',
+    borderRadius: 5,
+    textAlign: 'center',
+    paddingTop: 2,
   },
   Icons2: {
     color: '#FFF',
@@ -716,7 +720,7 @@ const styles = StyleSheet.create({
   },
   CommisionText: {
     height: 30,
-    width: 80,
+    width: 60,
     padding: 2,
     borderWidth: 1,
     borderColor: '#CED4DA',

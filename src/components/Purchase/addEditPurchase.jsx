@@ -129,7 +129,7 @@ const NewPurchase = ({navigation, route}) => {
       setCommission(response.data.data.charge_percentage);
       setChargeBillId(response.data.data.id);
       setSubtotal(response.data.data.sub_total);
-      // console.log('asdadsasd', response.data.data.charge_percentage);
+      // console.log('asdadsasd', response.data);
       const apiData = response.data.data;
       const items = apiData.unconfirmpurchase_items || [];
       setBillId(apiData.id);
@@ -526,17 +526,19 @@ const NewPurchase = ({navigation, route}) => {
               {commission}
             </TextInput>
             <Text style={{color: 'black', marginTop: 3}}>% </Text>
+            <Icon
+              style={styles.Button3}
+              name="check-circle"
+              onPress={handleIssuCharge}
+            />
           </View>
-          <Button
-            buttonStyle={styles.Button3}
-            title="Add"
-            onPress={handleIssuCharge}
-          />
+
           <Text
             style={{
               fontSize: 16,
               paddingTop: 6,
               color: '#000',
+              fontWeight: 'bold',
             }}>
             Grand Total: {grandTotal}
           </Text>
@@ -626,14 +628,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   Button3: {
-    height: 40,
-    width: 50,
-    fontSize: 14,
-    backgroundColor: '#3A39A0',
-    color: '#000',
-    borderRadius: 10,
-    padding: 8,
-    fontSize: 18,
+    height: 30,
+    width: 30,
+    fontSize: 25,
+    borderColor: '#0000FF',
+    borderWidth: 1,
+    color: '#008000',
+    borderRadius: 5,
+    textAlign: 'center',
+    paddingTop: 2,
   },
   Icons2: {
     color: '#FFF',

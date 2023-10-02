@@ -36,9 +36,8 @@ const Product = ({navigation}) => {
       const response = await axios.get(
         `${Api_Url}/products/apis/products?page=1&page_size=500`,
       );
+
       setData(response.data.data);
-      setFilteredData(response.data.data);
-      console.log(response.data, 'hjdgsfavjashdfva');
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -63,7 +62,7 @@ const Product = ({navigation}) => {
 
   useEffect(() => {
     filterData();
-
+    setFilteredData(data);
     console.log('fasdfbsakdf', filteredData);
   }, [data, searchQuery]);
 
@@ -143,7 +142,7 @@ const Product = ({navigation}) => {
                 <Text style={{fontSize: 18, color: '#000'}}>{item.name}</Text>
                 <View style={styles.card2}>
                   <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-                    Selling Price: RS {item.standard_price}
+                    Selling Price: Rs. {item.standard_price}
                   </Text>
                   <Button
                     buttonStyle={styles.Button2}
@@ -223,7 +222,7 @@ const styles = StyleSheet.create({
   },
   Card: {
     borderRadius: 10,
-    width: 380,
+    width: '95%',
     padding: 8,
     margin: 8,
   },

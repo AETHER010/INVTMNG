@@ -31,7 +31,7 @@ export default class ClientLedger extends Component {
       widthArr: [80, 80, 120, 70, 70, 80],
       data: [],
       loading: true,
-      fromDate: new Date(2010, 0, 1),
+      fromDate: new Date(2022, 0, 1),
       toDate: new Date(),
       showFromDatePicker: false,
       showToDatePicker: false,
@@ -125,10 +125,14 @@ export default class ClientLedger extends Component {
       const formattedToDate = moment(toDate).format('YYYY-MM-DD');
 
       const apiUrl = `${Api_Url}/report/pages/customer/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&customer=${clientID}`;
-
+      const token = await AsyncStorage.getItem('access_token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
       try {
         const response = await axios.get(apiUrl, {
-          responseType: 'arraybuffer', // Ensure the response is treated as binary data
+          responseType: 'arraybuffer',
+          headers, // Ensure the response is treated as binary data
         });
 
         if (response.status === 200) {
@@ -371,7 +375,7 @@ const styles = StyleSheet.create({
   },
   datePickerButton: {
     backgroundColor: '#fff',
-    paddingHorizontal: 8,
+    paddingHorizontal: 2,
     paddingVertical: 10,
     borderWidth: 1,
     borderRadius: 9,

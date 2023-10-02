@@ -42,7 +42,7 @@ const Purchase = ({navigation}) => {
       );
       setData(response.data.data);
       setFilteredData(response.data.data);
-      console.log('asdjh fgaisudf', response.data.data);
+      // console.log('asdjh fgaisudf', response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   Card: {
     borderRadius: 10,
-    width: 380,
+    width: '95%',
     padding: 8,
     margin: 8,
   },

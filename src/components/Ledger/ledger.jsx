@@ -47,7 +47,7 @@ const Ledger = ({navigation}) => {
           <Text
             style={[styles.text1, action === 'client' && styles.selectedText]}
             onPress={handleClientLedger}>
-            Clients
+            Customer
           </Text>
           <View style={styles.text2}></View>
           <Text

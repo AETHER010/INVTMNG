@@ -9,11 +9,7 @@ const HomeDashboard = ({navigation}) => {
       <View style={styles.home}>
         <View style={styles.navContainer}>
           <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-            <Icon
-              style={styles.Icons}
-              name="arrow-back"
-              onPress={() => navigation.navigate('Login')}
-            />
+            <Text style={styles.Icons} />
 
             <Text style={styles.text}>Home</Text>
             <Icon

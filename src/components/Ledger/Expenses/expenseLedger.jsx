@@ -30,7 +30,7 @@ export default class ExpenseLedger extends Component {
       widthArr: [80, 70, 80, 70, 110],
       data: [],
       loading: true,
-      fromDate: new Date(2010, 0, 1),
+      fromDate: new Date(2022, 0, 1),
       toDate: new Date(),
       showFromDatePicker: false,
       showToDatePicker: false,
@@ -39,7 +39,7 @@ export default class ExpenseLedger extends Component {
       selectors: ['Debit', 'Credit'],
       filteredData: [],
       userRole: '',
-      refreshing,
+      refreshing: false,
     };
   }
 
@@ -107,10 +107,14 @@ export default class ExpenseLedger extends Component {
       const formattedToDate = moment(toDate).format('YYYY-MM-DD');
 
       const apiUrl = `${Api_Url}/report/pages/expenses/export-excel/?from_date=${formattedFromDate}&to_date=${formattedToDate}`;
-
+      const token = await AsyncStorage.getItem('access_token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
       try {
         const response = await axios.get(apiUrl, {
-          responseType: 'arraybuffer', // Ensure the response is treated as binary data
+          responseType: 'arraybuffer',
+          headers, // Ensure the response is treated as binary data
         });
 
         if (response.status === 200) {
@@ -118,7 +122,7 @@ export default class ExpenseLedger extends Component {
           const pdfData = response.data;
           const pdfData2 = JSON.stringify(pdfData);
           const filePath = `${RNFS.DownloadDirectoryPath}/downloaded.pdf`; // Change the file name and path as needed
-
+          console.log(`${filePath}`, 'sakuhdfgiask');
           await RNFS.writeFile(filePath, pdfData2, 'base64');
 
           Alert.alert('Download Complete', 'PDF file saved to device.');

@@ -1,4 +1,11 @@
-import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 
 import {useState, useEffect} from 'react';
 import {Button} from 'react-native-elements';
@@ -18,7 +25,7 @@ const PaymentSupplier = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [supDate, setSupDate] = useState('');
-
+  const [refreshing, setRefreshing] = useState(false);
   // useEffect(() => {
   //   fetchApiDatSupplier();
   // }, []);
@@ -66,8 +73,19 @@ const PaymentSupplier = () => {
     }
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
       <View style={styles.SecondContainer}>
         <View style={styles.Search}>
           <TextInput
@@ -168,7 +186,7 @@ const styles = StyleSheet.create({
   },
   Card: {
     borderRadius: 10,
-    width: 380,
+    width: '95%',
     padding: 8,
     margin: 8,
   },

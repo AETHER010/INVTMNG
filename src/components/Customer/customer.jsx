@@ -39,6 +39,7 @@ const Customer = ({navigation}) => {
       );
       setData(response.data.data);
       setFilteredData(response.data.data);
+      console.log(response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -74,6 +75,10 @@ const Customer = ({navigation}) => {
       );
       setFilteredData(filtered);
     }
+  };
+
+  const handlesubcustomer = async id => {
+    navigation.navigate('SubCustomer', {id});
   };
 
   return (
@@ -127,14 +132,23 @@ const Customer = ({navigation}) => {
               key={index}
               style={{justifyContent: 'center', alignItems: 'center'}}>
               <View style={[styles.Card, styles.ShadowProps]}>
-                <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
                   <Text
                     style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
                     {item.name}
                   </Text>
+                  <Button
+                    buttonStyle={styles.Button3}
+                    title="Sub Customer"
+                    onPress={() => handlesubcustomer(item.pk)}
+                  />
                 </View>
                 <View style={styles.card2}>
-                  <Text style={{fontSize: 18, color: '#000', marginTop: 2}}>
+                  <Text style={{fontSize: 14, color: '#000', marginTop: 2}}>
                     Phone Number: {item.contact_number}
                   </Text>
                   <Button
@@ -143,6 +157,9 @@ const Customer = ({navigation}) => {
                     onPress={() => handleUpdate(item.pk)}
                   />
                 </View>
+                <Text style={{fontSize: 14, color: '#000', marginTop: 2}}>
+                  Balance: {item.last_balance}
+                </Text>
               </View>
             </View>
           ))
@@ -214,7 +231,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   Card: {
-    width: 380,
+    width: '92%',
     padding: 8,
     margin: 14,
     borderRadius: 10,
@@ -250,6 +267,17 @@ const styles = StyleSheet.create({
     height: 30,
     padding: 3,
     width: 80,
+  },
+  Button3: {
+    height: 35,
+    width: 110,
+    fontSize: 12,
+    backgroundColor: '#3A39A0',
+    color: '#FFFFFF',
+    borderRadius: 10,
+    padding: 2,
+    fontSize: 18,
+    marginLeft: 8,
   },
 });
 
