@@ -127,6 +127,7 @@ export default class ClientLedger extends Component {
       const apiUrl = `${Api_Url}/report/pages/customer/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&customer=${clientID}`;
       const token = await AsyncStorage.getItem('access_token');
       const headers = {
+        Accept: 'application/pdf',
         Authorization: `Bearer ${token}`,
       };
       try {
@@ -137,10 +138,16 @@ export default class ClientLedger extends Component {
 
         if (response.status === 200) {
           // Save the PDF data to a file
-          const pdfData = response.data;
+          const pdfData = response.request._response;
           const pdfData2 = JSON.stringify(pdfData);
-          const filePath = `${RNFS.DownloadDirectoryPath}+ /downloaded.pdf`; // Change the file name and path as needed
+          const contentDisposition = response.headers['content-disposition'];
+          const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+          let filename = 'downloaded.pdf'; // Default filename
 
+          if (filenameMatch) {
+            filename = filenameMatch[1];
+          }
+          const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`;
           await RNFS.writeFile(filePath, pdfData2, 'base64');
 
           Alert.alert('Download Complete', 'PDF file saved to device.');

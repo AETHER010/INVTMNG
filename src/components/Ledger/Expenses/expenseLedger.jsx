@@ -109,6 +109,7 @@ export default class ExpenseLedger extends Component {
       const apiUrl = `${Api_Url}/report/pages/expenses/export-excel/?from_date=${formattedFromDate}&to_date=${formattedToDate}`;
       const token = await AsyncStorage.getItem('access_token');
       const headers = {
+        Accept: 'application/pdf',
         Authorization: `Bearer ${token}`,
       };
       try {
@@ -119,9 +120,16 @@ export default class ExpenseLedger extends Component {
 
         if (response.status === 200) {
           // Save the PDF data to a file
-          const pdfData = response.data;
-          const pdfData2 = JSON.stringify(pdfData);
-          const filePath = `${RNFS.DownloadDirectoryPath}/downloaded.pdf`; // Change the file name and path as needed
+          const contentDisposition = response.headers['content-disposition'];
+          const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+          let filename = 'downloaded.pdf'; // Default filename
+
+          if (filenameMatch) {
+            filename = filenameMatch[1];
+          }
+          const pdfdata = response.request._response;
+          const pdfData2 = JSON.stringify(pdfdata);
+          const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`; // Change the file name and path as needed
           console.log(`${filePath}`, 'sakuhdfgiask');
           await RNFS.writeFile(filePath, pdfData2, 'base64');
 

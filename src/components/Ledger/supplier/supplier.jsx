@@ -146,10 +146,11 @@ export default class SupplierLedger extends Component {
       const apiUrl = `${Api_Url}/report/pages/suppliers/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&suppliers=${supplierID}`;
       const token = await AsyncStorage.getItem('access_token');
       const headers = {
+        Accept: 'application/pdf',
         Authorization: `Bearer ${token}`,
       };
       console.log(apiUrl);
-      console.log(headers);
+
       try {
         const response = await axios.get(apiUrl, {
           responseType: 'arraybuffer',
@@ -158,11 +159,20 @@ export default class SupplierLedger extends Component {
 
         if (response.status === 200) {
           // Save the PDF data to a file
-          const pdfData = response.data;
-          const pdfData2 = JSON.stringify(pdfData);
-          console.log(typeof pdfData, 'base64');
-          const filePath = `${RNFS.DownloadDirectoryPath}/downloaded.pdf`; // Change the file name and path as needed
 
+          console.log('FILE WRITTEN!', response.headers);
+          const contentDisposition = response.headers['content-disposition'];
+          const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+          let filename = 'downloaded.pdf'; // Default filename
+
+          if (filenameMatch) {
+            filename = filenameMatch[1];
+          }
+          const pdfdata = response.request._response;
+          console.log('PDF WRITTEN!', pdfdata);
+          const pdfData2 = JSON.stringify(pdfdata);
+          // console.log('PDF WRITTEN!', pdfData2);
+          const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`;
           await RNFS.writeFile(filePath, pdfData2, 'base64')
             .then(success => {
               console.log('FILE WRITTEN!');
@@ -171,7 +181,10 @@ export default class SupplierLedger extends Component {
               console.log(err.message);
             });
 
-          Alert.alert('Download Complete', 'PDF file saved to device.');
+          Alert.alert(
+            'Download Complete',
+            `PDF file "${filename}" saved to device.`,
+          );
         } else {
           Alert.alert('Download Error', 'Failed to download PDF file.');
         }
