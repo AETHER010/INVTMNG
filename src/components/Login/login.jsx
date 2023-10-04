@@ -1,13 +1,13 @@
-import {View, StyleSheet, Image, TextInput, Text, Alert} from 'react-native';
-import {Input, Button} from 'react-native-elements';
-import {Icon} from 'react-native-vector-icons/MaterialIcons';
+import { View, StyleSheet, Image, TextInput, Text, Alert } from 'react-native';
+import { Input, Button } from 'react-native-elements';
+import { Icon } from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
-import {useState} from 'react';
+import { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {Api_Url} from '../../utilities/api';
+import { Api_Url } from '../../utilities/api';
 
-const LoginForm = ({navigation}) => {
+const LoginForm = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -82,7 +82,7 @@ const LoginForm = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: "center",
+    justifyContent: "center",
     alignItems: 'center',
     paddingHorizontal: 20,
   },
