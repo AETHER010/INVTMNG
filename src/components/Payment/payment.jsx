@@ -43,7 +43,7 @@ const Payment = ({navigation}) => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View>
       <View style={styles.PaymentContainer}>
         <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
           <Icon
@@ -68,26 +68,7 @@ const Payment = ({navigation}) => {
           </Text>
         </View>
       </View>
-      {/* <View style={styles.SecondContainer}>
-          <View style={styles.Search}>
-            <TextInput style={styles.input} placeholder="Search..." />
-            <Icon
-              name="search"
-              size={24}
-              color="#888"
-              style={styles.searchIcon}
-            />
-          </View>
-          <Button
-            buttonStyle={styles.Button}
-            title="+ Create"
-            onPress={() => navigation.navigate('NewPayment')}
-          />
-        </View> */}
-      {/* <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }> */}
+
       <View>
         {action === 'supplier' ? <Supplier Api_Url={Api_Url} /> : <Client />}
       </View>

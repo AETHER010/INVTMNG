@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -22,6 +23,8 @@ const Product = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
+  const [page, setPage] = useState(1);
+
   useFocusEffect(
     React.useCallback(() => {
       fetchApiData();
@@ -34,12 +37,18 @@ const Product = ({navigation}) => {
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/products/apis/products?page=1&page_size=500`,
+        `${Api_Url}/products/apis/products?page=${page}&page_size=10`,
       );
-
-      setData(response.data.data);
+      console.log(response.data.data, 'jsdbfkjadsfjl');
+      setData(prevData => [...prevData, ...response.data.data]);
+      setFilteredData(prevFilteredData => [
+        ...prevFilteredData,
+        ...response.data.data,
+      ]);
+      setPage(page + 1);
+      // setData(response.data.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -62,12 +71,11 @@ const Product = ({navigation}) => {
 
   useEffect(() => {
     filterData();
-    setFilteredData(data);
-    console.log('fasdfbsakdf', filteredData);
+
+    // console.log('fasdfbsakdf', filteredData);
   }, [data, searchQuery]);
 
   const filterData = () => {
-    console.log('NewProduct', searchQuery);
     if (searchQuery.trim() === '') {
       // If the search query is empty, display all data
       setFilteredData(data);
@@ -78,6 +86,10 @@ const Product = ({navigation}) => {
       );
       setFilteredData(filtered);
     }
+  };
+
+  const handleEndReached = () => {
+    fetchApiData(); // Fetch more data when scrolled to the end
   };
 
   return (
@@ -119,42 +131,42 @@ const Product = ({navigation}) => {
           onPress={() => navigation.navigate('NewProduct')}
         />
       </View>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }>
-        {loading ? (
-          <Text>Loading...</Text>
-        ) : (
-          filteredData.map((item, index) => (
-            <View
-              key={index}
-              style={{justifyContent: 'center', alignItems: 'center'}}>
-              <View style={[styles.Card, styles.ShadowProps]}>
-                <View style={styles.card2}>
-                  <Text style={{fontSize: 18, color: '#000'}}>
-                    Product Id: {item.pk}
-                  </Text>
-                  <Text style={{fontSize: 12, color: '#000'}}>
-                    Stock: {item.stock}
-                  </Text>
-                </View>
-                <Text style={{fontSize: 18, color: '#000'}}>{item.name}</Text>
-                <View style={styles.card2}>
-                  <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-                    Selling Price: Rs. {item.standard_price}
-                  </Text>
-                  <Button
-                    buttonStyle={styles.Button2}
-                    onPress={() => handleUpdate(item.name, item.pk)}
-                    title="View Detaiils"
-                  />
-                </View>
+      <FlatList
+        data={filteredData}
+        renderItem={({item, index}) => (
+          <View
+            key={index}
+            style={{justifyContent: 'center', alignItems: 'center'}}>
+            <View style={[styles.Card, styles.ShadowProps]}>
+              <View style={styles.card2}>
+                <Text style={{fontSize: 18, color: '#000'}}>
+                  Product Id: {item.pk}
+                </Text>
+                <Text style={{fontSize: 12, color: '#000'}}>
+                  Stock: {item.stock}
+                </Text>
+              </View>
+              <Text style={{fontSize: 18, color: '#000'}}>{item.name}</Text>
+              <View style={styles.card2}>
+                <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
+                  Selling Price: Rs. {item.standard_price}
+                </Text>
+                <Button
+                  buttonStyle={styles.Button2}
+                  onPress={() => handleUpdate(item.name, item.pk)}
+                  title="View Detaiils"
+                />
               </View>
             </View>
-          ))
+          </View>
         )}
-      </ScrollView>
+        keyExtractor={item => item.billid}
+        onEndReached={handleEndReached} // Triggered when the user reaches the end
+        onEndReachedThreshold={0.1} // Adjust this threshold as needed
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      />
     </View>
   );
 };
