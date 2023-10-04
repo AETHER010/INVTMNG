@@ -44,6 +44,11 @@ const NewBills = ({navigation, route}) => {
   const [commission, setCommission] = useState('');
   const [subTotal, setSubTotal] = useState('');
 
+  const [lastPurchase, setLastPurchase] = useState('');
+  const [customerPrice, setCustomerPrice] = useState('');
+  const [sdPrice, setSdPrice] = useState('');
+  const [stock, setStock] = useState('');
+
   useEffect(() => {
     fetchApiData();
   }, []);
@@ -107,12 +112,21 @@ const NewBills = ({navigation, route}) => {
     const selectedProduct = product[index];
     const selectedId = selectedProduct.pk;
     setProductId(selectedId);
+    setStock(selectedProduct.stock);
+
     try {
       const response = await axios.get(
         `${Api_Url}/bill/apis/sales/suppliers/products/price/${supplierId}/${selectedProduct.pk}`,
       );
-      // console.log('API response454:', response.data);
-      setPrice(response.data.lastpurchaseprice);
+      console.log('upcofirm response454:', response.data.customerprice);
+      setCustomerPrice(response.data.customerprice);
+      setLastPurchase(response.data.lastpurchaseprice);
+      setSdPrice(response.data.standardprice);
+      if (response.data.customerprice === 'Na') {
+        setPrice(response.data.standardprice);
+      } else {
+        setPrice(response.data.customerprice);
+      }
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while retreving data.');
@@ -251,7 +265,7 @@ const NewBills = ({navigation, route}) => {
             name="arrow-back"
             onPress={() => navigation.navigate('Bills')}
           />
-          <Text style={styles.text}>Bills</Text>
+          <Text style={styles.text}>Sales</Text>
           <Icon2
             style={styles.Icons}
             name="person-circle-outline"
@@ -298,11 +312,20 @@ const NewBills = ({navigation, route}) => {
           </View>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text style={styles.label}>Quantity:</Text>
-            <TextInput
-              style={styles.Input}
-              value={quantity}
-              onChangeText={setQuantity}
-            />
+            <View
+              style={{
+                flexDirection: 'column',
+                width: '70%',
+              }}>
+              <TextInput
+                style={styles.Input9}
+                value={quantity}
+                onChangeText={setQuantity}
+                placeholder="Quantity"
+                placeholderTextColor="#000"
+              />
+              <Text style={{color: 'black', fontSize: 9}}>stock: {stock}</Text>
+            </View>
           </View>
           <View
             style={{
@@ -314,12 +337,20 @@ const NewBills = ({navigation, route}) => {
                 flexDirection: 'row',
               }}>
               <Text style={styles.label}>Cost Price:</Text>
-              <TextInput
-                style={styles.priceInput}
-                value={price !== null ? price.toString() : ''}
-                onChangeText={setPrice}
-                editable={true}
-              />
+              <View
+                style={{
+                  flexDirection: 'column',
+                }}>
+                <TextInput
+                  style={styles.priceInput}
+                  value={price !== null ? price.toString() : ''}
+                  onChangeText={setPrice}
+                  editable={true}
+                />
+                <Text style={{color: 'black', fontSize: 9}}>
+                  CP: {customerPrice} LPP: {lastPurchase} SP: {sdPrice}
+                </Text>
+              </View>
             </View>
             <Button
               buttonStyle={styles.Button2}
@@ -615,6 +646,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: '#000',
   },
+  Input9: {
+    height: 40,
+    width: '100%',
+    borderWidth: 2,
+    borderColor: '#CED4DA',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+
+    color: '#000',
+  },
   Button: {
     height: 40,
     width: 80,
@@ -628,7 +669,7 @@ const styles = StyleSheet.create({
   },
   Button2: {
     height: 40,
-    width: 90,
+    width: 80,
     fontSize: 14,
     backgroundColor: '#3A39A0',
     color: '#000',

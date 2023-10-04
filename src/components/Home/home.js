@@ -25,8 +25,11 @@ const HomeDashboard = ({navigation}) => {
               style={styles.cardImage}
               source={require('../../Images/bills.png')}
             />
-            <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
-              Bill
+            <Card.Title
+              style={{fontSize: 18, marginTop: 6}}
+              title="card title"
+              onPress={() => navigation.navigate('Bills')}>
+              Sales
             </Card.Title>
           </View>
           <View style={[styles.Card, styles.ShadowProps]}>
@@ -150,7 +153,7 @@ const styles = StyleSheet.create({
     // marginRight: 13,
     // marginBottom: 13,
     margin: 12,
-    height: 165,
+    height: 155,
     width: 130,
     justifyContent: 'center',
     alignItems: 'center',

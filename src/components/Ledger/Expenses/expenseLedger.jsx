@@ -85,7 +85,7 @@ export default class ExpenseLedger extends Component {
     const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
     const formattedToDate = moment(toDate).format('YYYY-MM-DD');
     // Filter the data based on the selected supplier and date range
-    const getUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
+    const getUrl = `${Api_Url}/report/apis/ledger/expenses/list/?fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
 
     const response = await axios.get(getUrl);
     const data = response.data.data;
@@ -102,50 +102,48 @@ export default class ExpenseLedger extends Component {
     if (!hasPermission) {
       return;
     }
-    if (this.state.userRole === 'superadmin') {
-      const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
-      const formattedToDate = moment(toDate).format('YYYY-MM-DD');
 
-      const apiUrl = `${Api_Url}/report/pages/expenses/export-excel/?from_date=${formattedFromDate}&to_date=${formattedToDate}`;
-      const token = await AsyncStorage.getItem('access_token');
-      const headers = {
-        Accept: 'application/pdf',
-        Authorization: `Bearer ${token}`,
-      };
-      try {
-        const response = await axios.get(apiUrl, {
-          responseType: 'arraybuffer',
-          headers, // Ensure the response is treated as binary data
-        });
+    const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
+    const formattedToDate = moment(toDate).format('YYYY-MM-DD');
 
-        if (response.status === 200) {
-          // Save the PDF data to a file
-          const contentDisposition = response.headers['content-disposition'];
-          const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-          let filename = 'downloaded.pdf'; // Default filename
+    const apiUrl = `${Api_Url}/report/pages/expenses/export-excel/?from_date=${formattedFromDate}&to_date=${formattedToDate}`;
+    const token = await AsyncStorage.getItem('access_token');
 
-          if (filenameMatch) {
-            filename = filenameMatch[1];
-          }
-          const pdfdata = response.request._response;
-          const pdfData2 = JSON.stringify(pdfdata);
-          const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`; // Change the file name and path as needed
-          console.log(`${filePath}`, 'sakuhdfgiask');
-          await RNFS.writeFile(filePath, pdfData2, 'base64');
+    const headers = {
+      Accept: 'application/pdf',
+      Authorization: `Bearer ${token}`,
+    };
+    try {
+      const response = await axios.get(apiUrl, {
+        responseType: 'arraybuffer',
+        headers, // Ensure the response is treated as binary data
+      });
 
-          Alert.alert('Download Complete', 'PDF file saved to device.');
-        } else {
-          Alert.alert('Download Error', 'Failed to download PDF file.');
+      if (response.status === 200) {
+        // Save the PDF data to a file
+        const contentDisposition = response.headers['content-disposition'];
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        let filename = 'downloaded.pdf'; // Default filename
+
+        if (filenameMatch) {
+          filename = filenameMatch[1];
         }
-      } catch (error) {
-        console.error('Error downloading data:', error);
-        Alert.alert(
-          'Download Error',
-          'An error occurred while downloading the PDF.',
-        );
+        const pdfdata = response.request._response;
+        const pdfData2 = JSON.stringify(pdfdata);
+        const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`; // Change the file name and path as needed
+        console.log(`${filePath}`, 'sakuhdfgiask');
+        await RNFS.writeFile(filePath, pdfData2, 'base64');
+
+        Alert.alert('Download Complete', 'PDF file saved to device.');
+      } else {
+        Alert.alert('Download Error', 'Failed to download PDF file.');
       }
-    } else {
-      Alert.alert('U DONT HAVE PERMISSION TO DOWNLOAD LEDGER!!');
+    } catch (error) {
+      console.error('Error downloading data:', error);
+      Alert.alert(
+        'Download Error',
+        'An error occurred while downloading the PDF.',
+      );
     }
   };
 
@@ -264,11 +262,14 @@ export default class ExpenseLedger extends Component {
                 onChange={(event, date) => this.handleDateChange(date, 'to')}
               />
             )}
-            <Icon
-              style={styles.Button}
-              name="download"
-              onPress={this.handleDownload}
-            />
+            {this.state.userRole === 'admin' ||
+            this.state.userRole === 'superadmin' ? (
+              <Icon
+                style={styles.Button}
+                name="download"
+                onPress={this.handleDownload}
+              />
+            ) : null}
           </View>
 
           <ScrollView

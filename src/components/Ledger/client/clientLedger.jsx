@@ -120,49 +120,46 @@ export default class ClientLedger extends Component {
     if (!hasPermission) {
       return;
     }
-    if (this.state.userRole === 'superadmin') {
-      const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
-      const formattedToDate = moment(toDate).format('YYYY-MM-DD');
 
-      const apiUrl = `${Api_Url}/report/pages/customer/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&customer=${clientID}`;
-      const token = await AsyncStorage.getItem('access_token');
-      const headers = {
-        Accept: 'application/pdf',
-        Authorization: `Bearer ${token}`,
-      };
-      try {
-        const response = await axios.get(apiUrl, {
-          responseType: 'arraybuffer',
-          headers, // Ensure the response is treated as binary data
-        });
+    const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
+    const formattedToDate = moment(toDate).format('YYYY-MM-DD');
 
-        if (response.status === 200) {
-          // Save the PDF data to a file
-          const pdfData = response.request._response;
-          const pdfData2 = JSON.stringify(pdfData);
-          const contentDisposition = response.headers['content-disposition'];
-          const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-          let filename = 'downloaded.pdf'; // Default filename
+    const apiUrl = `${Api_Url}/report/pages/customer/export-pdf/?from_date=${formattedFromDate}&to_date=${formattedToDate}&customer=${clientID}`;
+    const token = await AsyncStorage.getItem('access_token');
+    const headers = {
+      Accept: 'application/pdf',
+      Authorization: `Bearer ${token}`,
+    };
+    try {
+      const response = await axios.get(apiUrl, {
+        responseType: 'arraybuffer',
+        headers, // Ensure the response is treated as binary data
+      });
 
-          if (filenameMatch) {
-            filename = filenameMatch[1];
-          }
-          const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`;
-          await RNFS.writeFile(filePath, pdfData2, 'base64');
+      if (response.status === 200) {
+        // Save the PDF data to a file
+        const pdfData = response.request._response;
+        const pdfData2 = JSON.stringify(pdfData);
+        const contentDisposition = response.headers['content-disposition'];
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        let filename = 'downloaded.pdf'; // Default filename
 
-          Alert.alert('Download Complete', 'PDF file saved to device.');
-        } else {
-          Alert.alert('Download Error', 'Failed to download PDF file.');
+        if (filenameMatch) {
+          filename = filenameMatch[1];
         }
-      } catch (error) {
-        console.error('Error downloading data:', error);
-        Alert.alert(
-          'Download Error',
-          'An error occurred while downloading the PDF.',
-        );
+        const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`;
+        await RNFS.writeFile(filePath, pdfData2, 'base64');
+
+        Alert.alert('Download Complete', 'PDF file saved to device.');
+      } else {
+        Alert.alert('Download Error', 'Failed to download PDF file.');
       }
-    } else {
-      Alert.alert('U DONT HAVE PERMISSION TO DOWNLOAD LEDGER!!');
+    } catch (error) {
+      console.error('Error downloading data:', error);
+      Alert.alert(
+        'Download Error',
+        'An error occurred while downloading the PDF.',
+      );
     }
   };
 
@@ -310,11 +307,14 @@ export default class ClientLedger extends Component {
                 onChange={(event, date) => this.handleDateChange(date, 'to')}
               />
             )}
-            <Icon
-              style={styles.Button}
-              name="download"
-              onPress={this.handleDownload}
-            />
+            {this.state.userRole === 'admin' ||
+            this.state.userRole === 'superadmin' ? (
+              <Icon
+                style={styles.Button}
+                name="download"
+                onPress={this.handleDownload}
+              />
+            ) : null}
           </View>
 
           <ScrollView

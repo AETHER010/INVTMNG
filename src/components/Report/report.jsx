@@ -68,22 +68,6 @@ const Report = ({navigation}) => {
               onPress={() => navigation.navigate('UserProfile')}></Icon>
           </View>
         </View>
-        <View style={styles.SecondContainer}>
-          <View style={styles.Search}>
-            <TextInput style={styles.input} placeholder="Search..." />
-            <Icon
-              name="search"
-              size={24}
-              color="#888"
-              style={styles.searchIcon}
-            />
-          </View>
-          <Button
-            buttonStyle={styles.Button}
-            onPress={() => navigation.navigate('Customer')}
-            title="+ Create"
-          />
-        </View>
         <View>
           <View
             style={{

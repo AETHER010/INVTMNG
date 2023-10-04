@@ -44,6 +44,10 @@ const NewPurchase = ({navigation, route}) => {
   const [commission, setCommission] = useState('');
   const [subTotal, setSubtotal] = useState('');
 
+  const [lastPurchase, setLastPurchase] = useState('');
+  const [customerPrice, setCustomerPrice] = useState('');
+  const [sdPrice, setSdPrice] = useState('');
+
   useEffect(() => {
     fetchApiData();
   }, []);

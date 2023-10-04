@@ -40,7 +40,7 @@ const Bills = ({navigation}) => {
       );
       setData(response.data.data);
       setFilteredData(response.data.data);
-      console.log('formated adfafa', response.data.data);
+      // console.log('formated adfafa', response.data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -93,7 +93,7 @@ const Bills = ({navigation}) => {
               name="arrow-back"
               onPress={() => navigation.navigate('Home2')}
             />
-            <Text style={styles.text}>Bill</Text>
+            <Text style={styles.text}>Sales</Text>
             <Icon
               style={styles.Icons}
               name="person-circle-outline"
