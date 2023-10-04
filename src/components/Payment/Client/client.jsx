@@ -1,4 +1,11 @@
-import {View, Text, StyleSheet, TextInput, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 
 import {useState, useEffect} from 'react';
 import {Button} from 'react-native-elements';
@@ -18,6 +25,8 @@ const PaymentClient = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [cumDate, setCumDate] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
   useFocusEffect(
     React.useCallback(() => {
       fetchApiDataCustomer();
@@ -61,16 +70,27 @@ const PaymentClient = () => {
       // Use the Array.filter method to filter data based on the search query
       const filtered = data.filter(
         item =>
-          item.customer &&
-          item.customer.toLowerCase().includes(searchQuery.toLowerCase()),
+          item.customer_name &&
+          item.customer_name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredData(filtered);
     }
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchApiDataCustomer();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   return (
-    <ScrollView>
-      <View style={styles.clientContainer}>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }>
+      <View style={{flex: 1}}>
         <View style={styles.SecondContainer}>
           <View style={styles.Search}>
             <TextInput

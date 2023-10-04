@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -21,7 +22,7 @@ const Customer = ({navigation}) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-
+  const [page, setPage] = useState(1);
   useFocusEffect(
     React.useCallback(() => {
       fetchApiData();
@@ -35,13 +36,19 @@ const Customer = ({navigation}) => {
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/accounts/apis/customer?page=1&page_size=500`,
+        `${Api_Url}/accounts/apis/customer?page=${page}&page_size=10`,
       );
-      setData(response.data.data);
-      setFilteredData(response.data.data);
-      console.log(response.data);
+      setData(prevData => [...prevData, ...response.data.data]);
+      setFilteredData(prevFilteredData => [
+        ...prevFilteredData,
+        ...response.data.data,
+      ]);
+      setPage(page + 1);
+      // setData(response.data.data);
+      // setFilteredData(response.data.data);
+      // console.log(response.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -81,11 +88,12 @@ const Customer = ({navigation}) => {
     navigation.navigate('SubCustomer', {id});
   };
 
+  const handleEndReached = () => {
+    fetchApiData(); // Fetch more data when scrolled to the end
+  };
+
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }>
+    <View style={{flex: 1}}>
       <View>
         <View style={styles.CustomerContainer}>
           <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -124,10 +132,9 @@ const Customer = ({navigation}) => {
           />
         </View>
 
-        {loading ? (
-          <Text>Loading...</Text>
-        ) : (
-          filteredData.map((item, index) => (
+        <FlatList
+          data={filteredData}
+          renderItem={({item, index}) => (
             <View
               key={index}
               style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -162,10 +169,16 @@ const Customer = ({navigation}) => {
                 </Text>
               </View>
             </View>
-          ))
-        )}
+          )}
+          keyExtractor={item => item.billid}
+          onEndReached={handleEndReached} // Triggered when the user reaches the end
+          onEndReachedThreshold={0.1} // Adjust this threshold as needed
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+        />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -22,6 +23,7 @@ const Bills = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
+  const [page, setPage] = useState(1);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -36,13 +38,19 @@ const Bills = ({navigation}) => {
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/bill/apis/sales/bills/list?page=1&page_size=500`,
+        `${Api_Url}/bill/apis/sales/bills/list?page=${page}&page_size=10`,
       );
-      setData(response.data.data);
-      setFilteredData(response.data.data);
+      setData(prevData => [...prevData, ...response.data.data]);
+      setFilteredData(prevFilteredData => [
+        ...prevFilteredData,
+        ...response.data.data,
+      ]);
+      setPage(page + 1);
+      // setData(response.data.data);
+      // setFilteredData(response.data.data);
       // console.log('formated adfafa', response.data.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -80,11 +88,12 @@ const Bills = ({navigation}) => {
     }
   };
 
+  const handleEndReached = () => {
+    fetchApiData(); // Fetch more data when scrolled to the end
+  };
+
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }>
+    <View>
       <View>
         <View style={styles.PurchaseContainer}>
           <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -122,42 +131,52 @@ const Bills = ({navigation}) => {
             onPress={() => navigation.navigate('NewBills')}
           />
         </View>
-        {loading ? (
-          <Text>Loading...</Text>
-        ) : (
-          filteredData.map((item, index) => (
-            <View
-              key={index}
-              style={{justifyContent: 'center', alignItems: 'center'}}>
-              <View style={[styles.Card, styles.ShadowProps]}>
-                <View style={styles.card2}>
-                  <Text style={{fontSize: 18, color: '#000'}}>
-                    Id: {item.billid}
-                  </Text>
+        <View>
+          <FlatList
+            data={filteredData}
+            renderItem={({item, index}) => (
+              <View
+                key={index}
+                style={{justifyContent: 'center', alignItems: 'center'}}>
+                <View style={[styles.Card, styles.ShadowProps]}>
+                  <View style={styles.card2}>
+                    <Text style={{fontSize: 18, color: '#000'}}>
+                      Id: {item.billid}
+                    </Text>
 
-                  <Text style={{fontSize: 14, color: '#000'}}>
-                    {formattedate}
+                    <Text style={{fontSize: 14, color: '#000'}}>
+                      {formattedate}
+                    </Text>
+                  </View>
+                  <Text style={{fontSize: 18, color: '#000', paddingTop: 3}}>
+                    {item.customer}
                   </Text>
-                </View>
-                <Text style={{fontSize: 18, color: '#000', paddingTop: 3}}>
-                  {item.customer}
-                </Text>
-                <View style={styles.card2}>
-                  <Text style={{fontSize: 16, paddingTop: 4, color: '#000'}}>
-                    Total Amount: {item.grandtotal}
-                  </Text>
-                  <Button
-                    buttonStyle={styles.Button2}
-                    title="View Detaiils"
-                    onPress={() => handleUpdate(item.billid)}
-                  />
+                  <View style={styles.card2}>
+                    <Text style={{fontSize: 16, paddingTop: 4, color: '#000'}}>
+                      Total Amount: {item.grandtotal}
+                    </Text>
+                    <Button
+                      buttonStyle={styles.Button2}
+                      title="View Detaiils"
+                      onPress={() => handleUpdate(item.billid)}
+                    />
+                  </View>
                 </View>
               </View>
-            </View>
-          ))
-        )}
+            )}
+            keyExtractor={item => item.billid}
+            onEndReached={handleEndReached} // Triggered when the user reaches the end
+            onEndReachedThreshold={0.1} // Adjust this threshold as needed
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+              />
+            }
+          />
+        </View>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

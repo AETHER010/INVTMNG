@@ -66,8 +66,8 @@ const PaymentSupplier = () => {
       // Use the Array.filter method to filter data based on the search query
       const filtered = supplierData.filter(
         item =>
-          item.suppliers &&
-          item.suppliers.toLowerCase().includes(searchQuery.toLowerCase()),
+          item.suppliers_name &&
+          item.suppliers_name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredData(filtered);
     }
@@ -75,7 +75,7 @@ const PaymentSupplier = () => {
 
   const handleRefresh = () => {
     setRefreshing(true);
-
+    fetchApiDatSupplier();
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
@@ -83,6 +83,7 @@ const PaymentSupplier = () => {
 
   return (
     <ScrollView
+      style={{paddingBottom: 20}}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
       }>
@@ -143,7 +144,6 @@ const PaymentSupplier = () => {
 
 const styles = StyleSheet.create({
   SecondContainer: {
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
   },

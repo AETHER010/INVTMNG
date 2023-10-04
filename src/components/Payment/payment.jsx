@@ -43,7 +43,7 @@ const Payment = ({navigation}) => {
   };
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <View style={styles.PaymentContainer}>
         <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
           <Icon
