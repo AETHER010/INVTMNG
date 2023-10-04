@@ -45,7 +45,7 @@ const NewPurchase = ({navigation, route}) => {
   const [subTotal, setSubtotal] = useState('');
 
   const [lastPurchase, setLastPurchase] = useState('');
-  const [customerPrice, setCustomerPrice] = useState('');
+  const [stock, setStock] = useState('');
   const [sdPrice, setSdPrice] = useState('');
 
   useEffect(() => {
@@ -116,7 +116,10 @@ const NewPurchase = ({navigation, route}) => {
         `${Api_Url}/bill/apis/purchase/suppliers/products/price/${selectedProduct.pk}`,
       );
       console.log('API response454:', response.data);
-      setPrice(response.data.last_purchase_price);
+      setPrice(response.data.standard_price);
+      setLastPurchase(response.data.last_purchase_price || 'N/a');
+      setSdPrice(response.data.standard_price);
+      setStock(response.data.stock);
     } catch (error) {
       console.error('API error:', error);
       Alert.alert('Error', 'An error occurred while retreving data.');
@@ -294,11 +297,18 @@ const NewPurchase = ({navigation, route}) => {
           </View>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text style={styles.label}>Quantity:</Text>
-            <TextInput
-              style={styles.Input}
-              value={quantity}
-              onChangeText={setQuantity}
-            />
+            <View
+              style={{
+                flexDirection: 'column',
+                width: '70%',
+              }}>
+              <TextInput
+                style={styles.Input9}
+                value={quantity}
+                onChangeText={setQuantity}
+              />
+              <Text style={{color: 'black', fontSize: 9}}>stock: {stock}</Text>
+            </View>
           </View>
           <View
             style={{
@@ -310,12 +320,20 @@ const NewPurchase = ({navigation, route}) => {
                 flexDirection: 'row',
               }}>
               <Text style={styles.label}>Cost Price:</Text>
-              <TextInput
-                style={styles.priceInput}
-                value={price}
-                onChangeText={setPrice}
-                editable={true}
-              />
+              <View
+                style={{
+                  flexDirection: 'column',
+                }}>
+                <TextInput
+                  style={styles.priceInput}
+                  value={price}
+                  onChangeText={setPrice}
+                  editable={true}
+                />
+                <Text style={{color: 'black', fontSize: 9}}>
+                  LPP: {lastPurchase} SP: {sdPrice}
+                </Text>
+              </View>
             </View>
             <Button
               buttonStyle={styles.Button2}
@@ -720,6 +738,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#CED4DA',
     borderRadius: 4,
+    color: '#000',
+  },
+  Input9: {
+    height: 40,
+    width: '100%',
+    borderWidth: 2,
+    borderColor: '#CED4DA',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+
     color: '#000',
   },
 });

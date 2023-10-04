@@ -2,15 +2,32 @@ import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {Card} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useState, useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeDashboard = ({navigation}) => {
+  const [userRoles, setUserRoles] = useState('');
+
+  useEffect(() => {
+    getUserRole();
+  }, []);
+
+  const getUserRole = async () => {
+    const role = await AsyncStorage.getItem('userRole');
+    setUserRoles(role);
+    console.log('role of user', role);
+  };
   return (
     <ScrollView>
       <View style={styles.home}>
         <View style={styles.navContainer}>
-          <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-            <Text style={styles.Icons} />
-
+          <View
+            style={{
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+              paddingTop: 13,
+            }}>
+            <Text style={styles.Icons}> </Text>
             <Text style={styles.text}>Home</Text>
             <Icon
               style={styles.Icons}
@@ -94,17 +111,21 @@ const HomeDashboard = ({navigation}) => {
               Supplier
             </Card.Title>
           </View>
-          <View style={[styles.Card, styles.ShadowProps]}>
-            <Card.Image
-              onPress={() => navigation.navigate('User')}
-              style={styles.cardImage}
-              source={require('../../Images/user.png')}
-              resizeMode="contain"
-            />
-            <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
-              User
-            </Card.Title>
-          </View>
+          {userRoles === 'user' ? null : (
+            <View style={[styles.Card, styles.ShadowProps]}>
+              <Card.Image
+                onPress={() => navigation.navigate('User')}
+                style={styles.cardImage}
+                source={require('../../Images/user.png')}
+                resizeMode="contain"
+              />
+              <Card.Title
+                style={{fontSize: 18, marginTop: 6}}
+                title="card title">
+                User
+              </Card.Title>
+            </View>
+          )}
         </View>
       </View>
     </ScrollView>
@@ -153,7 +174,7 @@ const styles = StyleSheet.create({
     // marginRight: 13,
     // marginBottom: 13,
     margin: 12,
-    height: 155,
+    height: 163,
     width: 130,
     justifyContent: 'center',
     alignItems: 'center',

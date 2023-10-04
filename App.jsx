@@ -55,7 +55,6 @@ export default function App() {
   const getUserRole = async () => {
     const role = await AsyncStorage.getItem('userRole');
     setUserRoles(role);
-    console.log('role of user', role);
   };
 
   const getTokens = async () => {
