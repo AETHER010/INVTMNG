@@ -5,6 +5,7 @@ import {
   TextInput,
   ScrollView,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 
 import {useState, useEffect} from 'react';
@@ -27,6 +28,8 @@ const PaymentClient = () => {
   const [cumDate, setCumDate] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
+  const [page, setPage] = useState(1);
+
   useFocusEffect(
     React.useCallback(() => {
       fetchApiDataCustomer();
@@ -46,8 +49,12 @@ const PaymentClient = () => {
       const response = await axios.get(
         `${Api_Url}/payment/apis/customer-payments/`,
       );
-      setData(response.data.data);
-      console.log(response.data.data);
+      setData(prevData => [...prevData, ...response.data.data]);
+      setFilteredData(prevFilteredData => [
+        ...prevFilteredData,
+        ...response.data.data,
+      ]);
+      setPage(page + 1);
       const date = response.data.data.created_date;
       const formattedDate = moment(date).format('YYYY-MM-DD');
       setCumDate(formattedDate);
@@ -85,70 +92,73 @@ const PaymentClient = () => {
     }, 1000);
   };
 
+  const handleEndReached = () => {
+    fetchApiDataCustomer(); // Fetch more data when scrolled to the end
+  };
+
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }>
-      <View style={{flex: 1}}>
-        <View style={styles.SecondContainer}>
-          <View style={styles.Search}>
-            <TextInput
-              style={styles.input}
-              placeholder="Search..."
-              placeholderTextColor="#888"
-              value={searchQuery}
-              onChangeText={text => setSearchQuery(text)}
-            />
-            <Icon
-              name="search"
-              size={24}
-              color="#888"
-              style={styles.searchIcon}
-            />
-          </View>
-          <Button
-            buttonStyle={styles.Button}
-            title="+ Create"
-            onPress={() => navigation.navigate('NewPaymentClient')}
+    <View>
+      <View style={styles.SecondContainer}>
+        <View style={styles.Search}>
+          <TextInput
+            style={styles.input}
+            placeholder="Search..."
+            placeholderTextColor="#888"
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
+          />
+          <Icon
+            name="search"
+            size={24}
+            color="#888"
+            style={styles.searchIcon}
           />
         </View>
-        {filteredData.length === 0 ? (
-          <Text style={styles.noDataText}>No Data Available</Text>
-        ) : (
-          filteredData.map((item, index) => (
-            <View
-              key={index}
-              style={{justifyContent: 'center', alignItems: 'center'}}>
-              <View style={[styles.Card, styles.ShadowProps]}>
-                <View style={styles.card2}>
-                  <Text
-                    style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
-                    {item.customer_name}
-                  </Text>
+        <Button
+          buttonStyle={styles.Button}
+          title="+ Create"
+          onPress={() => navigation.navigate('NewPaymentClient')}
+        />
+      </View>
+      <FlatList
+        data={filteredData}
+        renderItem={({item, index}) => (
+          <View
+            key={index}
+            style={{justifyContent: 'center', alignItems: 'center'}}>
+            <View style={[styles.Card, styles.ShadowProps]}>
+              <View style={styles.card2}>
+                <Text style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
+                  {item.customer_name}
+                </Text>
 
-                  <Text style={{fontSize: 14, color: '#000'}}>{cumDate}</Text>
-                </View>
-                <View
-                  style={{
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                  }}>
-                  <Text style={{fontSize: 18, color: '#000'}}>Amount:</Text>
-                  <Text style={{fontSize: 18, color: '#008000'}}>
-                    Rs. {item.amount}
-                  </Text>
-                </View>
-
-                <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-                  Remarks : {item.remarks}
+                <Text style={{fontSize: 14, color: '#000'}}>{cumDate}</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                }}>
+                <Text style={{fontSize: 18, color: '#000'}}>Amount:</Text>
+                <Text style={{fontSize: 18, color: '#008000'}}>
+                  Rs. {item.amount}
                 </Text>
               </View>
+
+              <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
+                Remarks : {item.remarks}
+              </Text>
             </View>
-          ))
+          </View>
         )}
-      </View>
-    </ScrollView>
+        keyExtractor={item => item.billid}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.1}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      />
+    </View>
   );
 };
 

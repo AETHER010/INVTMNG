@@ -1,18 +1,16 @@
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
-  ScrollView,
   RefreshControl,
+  FlatList,
 } from 'react-native';
-
-import {useState, useEffect} from 'react';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {Api_Url} from './../../../utilities/api';
-import React from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
@@ -20,15 +18,14 @@ import moment from 'moment';
 const PaymentSupplier = () => {
   const navigation = useNavigation();
   const [supplierData, setSupplierData] = useState([]);
-  const [loading, setLoading] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [supDate, setSupDate] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  // useEffect(() => {
-  //   fetchApiDatSupplier();
-  // }, []);
+
+  const [page, setPage] = useState(1);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -37,13 +34,19 @@ const PaymentSupplier = () => {
   );
 
   const fetchApiDatSupplier = async () => {
+    if (loading) return; // If already loading data, return early
+
     try {
+      setLoading(true);
       const response = await axios.get(
-        `${Api_Url}/payment/apis/seller-payments/`,
+        `${Api_Url}/payment/apis/seller-payments/?page=${page}&page_size=10`,
       );
-      console.log(response.data.data);
-      setSupplierData(response.data.data);
-      setFilteredData(response.data.data);
+      setSupplierData(prevData => [...prevData, ...response.data.data]);
+      setFilteredData(prevFilteredData => [
+        ...prevFilteredData,
+        ...response.data.data,
+      ]);
+      setPage(page + 1);
       const date = response.data.data.created_date;
       const formattedDate = moment(date).format('YYYY-MM-DD');
       setSupDate(formattedDate);
@@ -60,10 +63,8 @@ const PaymentSupplier = () => {
 
   const filterData = () => {
     if (searchQuery.trim() === '') {
-      // If the search query is empty, display all data
       setFilteredData(supplierData);
     } else {
-      // Use the Array.filter method to filter data based on the search query
       const filtered = supplierData.filter(
         item =>
           item.suppliers_name &&
@@ -81,12 +82,12 @@ const PaymentSupplier = () => {
     }, 1000);
   };
 
+  const handleEndReached = () => {
+    fetchApiDatSupplier(); // Fetch more data when scrolled to the end
+  };
+
   return (
-    <ScrollView
-      style={{paddingBottom: 20}}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }>
+    <View style={styles.container}>
       <View style={styles.SecondContainer}>
         <View style={styles.Search}>
           <TextInput
@@ -109,40 +110,57 @@ const PaymentSupplier = () => {
           onPress={() => navigation.navigate('NewPaymentSupplier')}
         />
       </View>
-      {filteredData.map((item, index) => (
-        <View
-          key={index}
-          style={{justifyContent: 'center', alignItems: 'center'}}>
-          <View style={[styles.Card, styles.ShadowProps]}>
-            <View style={styles.card2}>
-              <Text style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
-                {item.suppliers_name}
-              </Text>
+      <FlatList
+        data={filteredData}
+        renderItem={({item, index}) => (
+          <View
+            key={index}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: 100,
+            }}>
+            <View style={[styles.Card, styles.ShadowProps]}>
+              <View style={styles.card2}>
+                <Text style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
+                  {item.suppliers_name}
+                </Text>
 
-              <Text style={{fontSize: 14, color: '#000'}}>{supDate}</Text>
-            </View>
-            <View
-              style={{
-                justifyContent: 'space-between',
-                flexDirection: 'row',
-              }}>
-              <Text style={{fontSize: 18, color: '#000'}}>Amount:</Text>
-              <Text style={{fontSize: 18, color: '#FF0000'}}>
-                Rs. {item.amount}
+                <Text style={{fontSize: 14, color: '#000'}}>{supDate}</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                }}>
+                <Text style={{fontSize: 18, color: '#000'}}>Amount:</Text>
+                <Text style={{fontSize: 18, color: '#FF0000'}}>
+                  Rs. {item.amount}
+                </Text>
+              </View>
+
+              <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
+                Remarks : {item.remarks}
               </Text>
             </View>
-
-            <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
-              Remarks : {item.remarks}
-            </Text>
           </View>
-        </View>
-      ))}
-    </ScrollView>
+        )}
+        keyExtractor={item => item.pk}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.1}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    // Make the main container flexible
+    paddingBottom: 20,
+  },
   SecondContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
@@ -150,17 +168,13 @@ const styles = StyleSheet.create({
   Search: {
     marginTop: 10,
     flexDirection: 'row',
-    // justifyContent: "space-evenly",
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
-    borderRightWidth: 1,
-    borderLeftWidth: 1,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
+    borderWidth: 1,
     height: 40,
     width: 220,
     borderRadius: 9,
-    borderBlockColor: '#3A39A0',
+    borderColor: '#3A39A0',
   },
   input: {
     margin: 2,
@@ -189,12 +203,7 @@ const styles = StyleSheet.create({
     width: '95%',
     padding: 8,
     margin: 8,
-  },
-  ShadowProps: {
-    borderRightWidth: 1,
-    borderLeftWidth: 1,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
+    borderWidth: 1,
     borderColor: '#E2E2E2',
     shadowOffset: {width: 4, height: 6},
     shadowColor: '#CECECE',
@@ -205,22 +214,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 5,
-  },
-  priceButton: {
-    backgroundColor: '#24D14A',
-    height: 30,
-    padding: 3,
-    width: 80,
-  },
-  Button2: {
-    height: 35,
-    width: 100,
-    fontSize: 12,
-    backgroundColor: '#3A39A0',
-    color: '#FFFFFF',
-    borderRadius: 10,
-    margin: 3,
-    padding: 4,
   },
 });
 
