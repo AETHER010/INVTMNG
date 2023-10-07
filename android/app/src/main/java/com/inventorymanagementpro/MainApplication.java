@@ -1,4 +1,4 @@
-package com.inventorymanagement;
+package com.inventorymanagementpro;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

@@ -283,17 +283,21 @@ const NewPurchase = ({navigation, route}) => {
           </View>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text style={styles.label}>Product:</Text>
-            <ModalDropdown
-              style={styles.Input}
-              options={product.map(item => item.name)}
-              onSelect={index => handlePriceSelection(index)}
-              defaultValue="Select product..."
-              defaultIndex={0}
-              animated={true}
-              isFullWidth={true}
-              textStyle={styles.dropdownText}
-              dropdownTextStyle={styles.dropdownText}
-            />
+            {product.length > 0 ? (
+              <ModalDropdown
+                style={styles.Input}
+                options={product.map(item => item.name)}
+                onSelect={index => handlePriceSelection(index)}
+                defaultValue="Select Product..."
+                defaultIndex={0}
+                animated={true}
+                isFullWidth={true}
+                textStyle={styles.dropdownText}
+                dropdownTextStyle={styles.dropdownText}
+              />
+            ) : (
+              <Text style={styles.productInput}>Select Product...</Text>
+            )}
           </View>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text style={styles.label}>Quantity:</Text>
@@ -749,6 +753,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
 
     color: '#000',
+  },
+  productInput: {
+    height: 40,
+    width: '70%',
+    borderWidth: 2,
+    borderColor: '#CED4DA',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    marginBottom: 16,
+    color: '#000',
+    fontSize: 18,
   },
 });
 

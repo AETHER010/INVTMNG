@@ -1,4 +1,4 @@
-package com.inventorymanagement;
+package com.inventorymanagementpro;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
