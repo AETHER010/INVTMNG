@@ -37,13 +37,13 @@ const PaymentClient = () => {
   );
 
   const fetchApiDataCustomer = async () => {
+    console.log('Fetching', page);
     try {
       const response = await axios.get(
-        `${Api_Url}/payment/apis/customer-payments/?page=${page}&page_size=80`,
+        `${Api_Url}/payment/apis/customer-payments/?page=${page}&page_size=10`,
       );
       const newPageData = response.data.data;
       setData(prevData => [...prevData, ...newPageData]);
-
       setPage(page + 1);
       const date = response.data.data.created_date;
       const formattedDate = moment(date).format('YYYY-MM-DD');
@@ -53,7 +53,6 @@ const PaymentClient = () => {
     } finally {
       setLoading(false);
     }
-    console.log('data', data);
   };
 
   useEffect(() => {
@@ -77,10 +76,7 @@ const PaymentClient = () => {
 
   const handleRefresh = () => {
     setRefreshing(true);
-
-    setPage(1);
     fetchApiDataCustomer();
-
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
@@ -117,9 +113,7 @@ const PaymentClient = () => {
       <FlatList
         data={filteredData}
         renderItem={({item, index}) => (
-          <View
-            key={index}
-            style={{justifyContent: 'center', alignItems: 'center'}}>
+          <View key={index} style={{}}>
             <View style={[styles.Card, styles.ShadowProps]}>
               <View style={styles.card2}>
                 <Text style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
@@ -151,6 +145,7 @@ const PaymentClient = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
+        ListFooterComponent={<View style={{height: 550}} />}
       />
     </View>
   );
