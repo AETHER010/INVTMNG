@@ -158,7 +158,6 @@ const PaymentSupplier = () => {
 
 const styles = StyleSheet.create({
   container: {
-    // Make the main container flexible
     paddingBottom: 20,
   },
   SecondContainer: {

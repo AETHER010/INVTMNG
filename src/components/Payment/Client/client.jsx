@@ -36,33 +36,24 @@ const PaymentClient = () => {
     }, []),
   );
 
-  // useEffect(() => {
-  //   fetchApiDataCustomer();
-  //   // const apidate = data.created_date;
-  //   // const formattedDate = moment(apidate).format('YYYY-MM-DD');
-  //   // setFormattedDate(formattedDate);
-  //   // console.log('formated', formattedDate);
-  // }, []);
-
   const fetchApiDataCustomer = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/payment/apis/customer-payments/`,
+        `${Api_Url}/payment/apis/customer-payments/?page=${page}&page_size=80`,
       );
-      setData(prevData => [...prevData, ...response.data.data]);
-      setFilteredData(prevFilteredData => [
-        ...prevFilteredData,
-        ...response.data.data,
-      ]);
+      const newPageData = response.data.data;
+      setData(prevData => [...prevData, ...newPageData]);
+
       setPage(page + 1);
       const date = response.data.data.created_date;
       const formattedDate = moment(date).format('YYYY-MM-DD');
       setCumDate(formattedDate);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
+    console.log('data', data);
   };
 
   useEffect(() => {
@@ -86,7 +77,10 @@ const PaymentClient = () => {
 
   const handleRefresh = () => {
     setRefreshing(true);
+
+    setPage(1);
     fetchApiDataCustomer();
+
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
@@ -97,7 +91,7 @@ const PaymentClient = () => {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.SecondContainer}>
         <View style={styles.Search}>
           <TextInput
@@ -151,7 +145,7 @@ const PaymentClient = () => {
             </View>
           </View>
         )}
-        keyExtractor={item => item.billid}
+        keyExtractor={item => item.id}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.1}
         refreshControl={
@@ -163,30 +157,29 @@ const PaymentClient = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    paddingBottom: 20,
+  },
   SecondContainer: {
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
   },
   Search: {
     marginTop: 10,
     flexDirection: 'row',
-    // justifyContent: "space-evenly",
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
-    borderRightWidth: 1,
-    borderLeftWidth: 1,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
+    borderWidth: 1,
     height: 40,
     width: 220,
     borderRadius: 9,
-    borderBlockColor: '#3A39A0',
+    borderColor: '#3A39A0',
   },
   input: {
     margin: 2,
     padding: 7,
     width: 170,
+    color: '#000',
   },
   searchIcon: {
     borderLeftWidth: 2,
@@ -209,12 +202,7 @@ const styles = StyleSheet.create({
     width: '95%',
     padding: 8,
     margin: 8,
-  },
-  ShadowProps: {
-    borderRightWidth: 1,
-    borderLeftWidth: 1,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
+    borderWidth: 1,
     borderColor: '#E2E2E2',
     shadowOffset: {width: 4, height: 6},
     shadowColor: '#CECECE',
@@ -225,22 +213,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 5,
-  },
-  priceButton: {
-    backgroundColor: '#24D14A',
-    height: 30,
-    padding: 3,
-    width: 80,
-  },
-  Button2: {
-    height: 35,
-    width: 100,
-    fontSize: 12,
-    backgroundColor: '#3A39A0',
-    color: '#FFFFFF',
-    borderRadius: 10,
-    margin: 3,
-    padding: 4,
   },
 });
 

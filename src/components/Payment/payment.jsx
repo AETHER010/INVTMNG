@@ -64,7 +64,7 @@ const Payment = ({navigation}) => {
           <Text
             style={[styles.text1, action !== 'supplier' && styles.selectedText]}
             onPress={changeCustomer}>
-            Clients
+            Customer
           </Text>
         </View>
       </View>

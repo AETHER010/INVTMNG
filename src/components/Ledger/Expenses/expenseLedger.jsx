@@ -40,6 +40,7 @@ export default class ExpenseLedger extends Component {
       filteredData: [],
       userRole: '',
       refreshing: false,
+      page: 1,
     };
   }
 
@@ -53,19 +54,35 @@ export default class ExpenseLedger extends Component {
     this.setState({userRole: role});
   };
 
-  getApiData = async () => {
+  getApiData = async (page = 1) => {
     try {
       const response = await axios.get(
-        `${Api_Url}/report/apis/ledger/expenses/list/?page=1&page_size=100`,
+        `${Api_Url}/report/apis/ledger/expenses/list/?page=${page}&page_size=20`,
       );
       const responseData = response.data.data;
 
       // console.log(responseData, 'dsfhjgsjdhf');
-      this.setState({data: responseData, loading: false});
+      // this.setState({data: responseData, loading: false});
+      const newData =
+        page === 1 ? responseData : [...this.state.data, ...responseData];
+      this.setState({data: newData, loading: false, page});
       this.setState({filteredData: responseData, loading: false});
     } catch (error) {
       console.error('Error fetching data:', error);
       this.setState({loading: false});
+    }
+  };
+
+  handleScroll = async event => {
+    const {layoutMeasurement, contentSize, contentOffset} = event.nativeEvent;
+    const contentHeight = contentSize.height;
+    const yOffset = contentOffset.y;
+    const visibleHeight = layoutMeasurement.height;
+
+    if (yOffset + visibleHeight >= contentHeight - 20) {
+      // Load more data when the user is near the bottom of the table
+      const nextPage = this.state.page + 1;
+      this.getApiData(nextPage);
     }
   };
 
@@ -171,16 +188,6 @@ export default class ExpenseLedger extends Component {
     }
   };
 
-  handleRefresh = () => {
-    this.setState({refreshing: true});
-
-    this.getApiData();
-
-    setTimeout(() => {
-      this.setState({refreshing: false});
-    }, 1000);
-  };
-
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
@@ -213,14 +220,7 @@ export default class ExpenseLedger extends Component {
         : [];
 
     return (
-      <ScrollView
-        style={styles.container}
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.refreshing}
-            onRefresh={this.handleRefresh}
-          />
-        }>
+      <View style={styles.container}>
         <View style={styles.container}>
           <View style={styles.SecondContainer}>
             <TouchableOpacity
@@ -284,7 +284,9 @@ export default class ExpenseLedger extends Component {
                   textStyle={styles.text}
                 />
               </Table>
-              <ScrollView style={styles.dataWrapper}>
+              <ScrollView
+                style={styles.dataWrapper}
+                onScroll={this.handleScroll}>
                 <Table>
                   {tableData.map((rowData, index) => (
                     <Row
@@ -303,7 +305,7 @@ export default class ExpenseLedger extends Component {
             </View>
           </ScrollView>
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }

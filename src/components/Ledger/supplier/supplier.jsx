@@ -28,7 +28,7 @@ export default class SupplierLedger extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tableHead: ['Date', 'Name', 'Particular', 'Credit', 'Debit', 'Balance'],
+      tableHead: ['Date', 'Name', 'Particular', 'Debit', 'Credit', 'Balance'],
       widthArr: [80, 120, 120, 50, 70, 80],
       data: [],
       loading: true,
@@ -39,10 +39,9 @@ export default class SupplierLedger extends Component {
       supplier: [],
       supplierID: null,
       selectedSupplier: '',
-      filteredData: [],
-      refreshing: false,
       defaultSupplier: 'Suppliers...',
       userRole: '',
+      page: 1,
     };
   }
 
@@ -57,18 +56,31 @@ export default class SupplierLedger extends Component {
     this.setState({userRole: role});
   };
 
-  getApiData = async () => {
+  getApiData = async (page = 1) => {
     try {
       const response = await axios.get(
-        `${Api_Url}/report/apis/ledger/suppliers/list/?page=1&page_size=100`,
+        `${Api_Url}/report/apis/ledger/suppliers/list/?page=${page}&page_size=20`,
       );
       const responseData = response.data.data;
-      // console.log('Error fetching data:', response.data.data);
-      this.setState({data: responseData, loading: false});
-      this.setState({filteredData: responseData, loading: false});
+
+      const newData =
+        page === 1 ? responseData : [...this.state.data, ...responseData];
+      this.setState({data: newData, loading: false, page});
     } catch (error) {
-      console.error('Error fetching data:', error);
       this.setState({loading: false});
+    }
+  };
+
+  handleScroll = async event => {
+    const {layoutMeasurement, contentSize, contentOffset} = event.nativeEvent;
+    const contentHeight = contentSize.height;
+    const yOffset = contentOffset.y;
+    const visibleHeight = layoutMeasurement.height;
+
+    if (yOffset + visibleHeight >= contentHeight - 20) {
+      // Load more data when the user is near the bottom of the table
+      const nextPage = this.state.page + 1;
+      this.getApiData(nextPage);
     }
   };
 
@@ -99,34 +111,24 @@ export default class SupplierLedger extends Component {
   handleProductSelection = async index => {
     const selectedData = this.state.supplier[index];
     const selectedProductId = selectedData.pk;
-    console.log('Updated selected id:', selectedData.pk);
 
-    // Use the callback function to ensure that state is updated after the selection
-    this.setState({selectedSupplier: selectedData.name}, () => {
-      console.log('Updated selected supplier:', this.state.selectedSupplier);
-    });
+    this.setState({selectedSupplier: selectedData.name}, () => {});
 
     this.setState({supplierID: selectedProductId}, () => {
-      console.log('Updated supplierID:', this.state.supplierID);
       this.filterData(); // Call filterData after updating the state
     });
   };
 
   filterData = async () => {
     const {fromDate, toDate, supplierID} = this.state;
-    console.log('filterData', supplierID);
-    console.log('filterData', fromDate);
-    console.log('filterData', toDate);
 
     const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
     const formattedToDate = moment(toDate).format('YYYY-MM-DD');
 
-    const getUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?suppliers=${supplierID}&from_date=${formattedFromDate}&to_date=${formattedToDate}`;
-    console.log(getUrl, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
+    const getUrl = `${Api_Url}/report/apis/ledger/suppliers/list/?suppliers=${supplierID}&from_date=${formattedFromDate}&to_date=${formattedToDate}&page_size=100&page=${this.state.page}`;
+
     const response = await axios.get(getUrl);
     const data = response.data.data;
-    console.log(data, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
-    // Update the state with the filtered data
     this.setState({data: data});
   };
 
@@ -148,7 +150,6 @@ export default class SupplierLedger extends Component {
       Accept: 'application/pdf',
       Authorization: `Bearer ${token}`,
     };
-    console.log(apiUrl);
 
     try {
       const response = await axios.get(apiUrl, {
@@ -157,9 +158,6 @@ export default class SupplierLedger extends Component {
       });
 
       if (response.status === 200) {
-        // Save the PDF data to a file
-
-        console.log('FILE WRITTEN!', response.headers);
         const contentDisposition = response.headers['content-disposition'];
         const filenameMatch = contentDisposition.match(/filename="(.+)"/);
         let filename = 'downloaded.pdf'; // Default filename
@@ -168,9 +166,9 @@ export default class SupplierLedger extends Component {
           filename = filenameMatch[1];
         }
         const pdfdata = response.request._response;
-        console.log('PDF WRITTEN!', pdfdata);
+
         const pdfData2 = JSON.stringify(pdfdata);
-        // console.log('PDF WRITTEN!', pdfData2);
+
         const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`;
         await RNFS.writeFile(filePath, pdfData2, 'base64')
           .then(success => {
@@ -188,7 +186,6 @@ export default class SupplierLedger extends Component {
         Alert.alert('Download Error', 'Failed to download PDF file.');
       }
     } catch (error) {
-      console.error('Error downloading data:', error);
       Alert.alert(
         'Download Error',
         'An error occurred while downloading the PDF.',
@@ -220,17 +217,6 @@ export default class SupplierLedger extends Component {
     }
   };
 
-  handleRefresh = () => {
-    this.setState({refreshing: true});
-
-    this.getApiData();
-
-    this.setState({defaultSupplier: 'Suppliers...'});
-    setTimeout(() => {
-      this.setState({refreshing: false});
-    }, 1000);
-  };
-
   render() {
     const {fromDate, toDate, showFromDatePicker, showToDatePicker} = this.state;
     const tableData =
@@ -242,37 +228,32 @@ export default class SupplierLedger extends Component {
               particular,
               _type,
               amount,
-              Credit,
+
               Debit,
+              Credit,
               balance,
             }) => [
               moment(created_date).format('MMM DD, YYYY'), // Fixed date format
               suppliers,
               particular,
-              _type === 'Credit' ? (
-                <Text style={{color: 'green', textAlign: 'center'}}>
-                  {amount}
-                </Text>
-              ) : null,
               _type === 'Debit' ? (
                 <Text style={{color: 'red', textAlign: 'center'}}>
                   {amount}
                 </Text>
               ) : null,
+              _type === 'Credit' ? (
+                <Text style={{color: 'green', textAlign: 'center'}}>
+                  {amount}
+                </Text>
+              ) : null,
+
               balance ? balance : null,
             ],
           )
         : [];
 
     return (
-      <ScrollView
-        style={styles.container}
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.refreshing}
-            onRefresh={this.handleRefresh}
-          />
-        }>
+      <View style={styles.container}>
         <View style={styles.SecondContainer}>
           <ModalDropdown
             style={styles.textDisplay}
@@ -351,7 +332,7 @@ export default class SupplierLedger extends Component {
                 textStyle={styles.text}
               />
             </Table>
-            <ScrollView style={styles.dataWrapper}>
+            <ScrollView style={styles.dataWrapper} onScroll={this.handleScroll}>
               <Table>
                 {tableData.map((rowData, index) => (
                   <Row
@@ -369,7 +350,7 @@ export default class SupplierLedger extends Component {
             </ScrollView>
           </View>
         </ScrollView>
-      </ScrollView>
+      </View>
     );
   }
 }

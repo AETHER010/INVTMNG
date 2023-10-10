@@ -12,11 +12,12 @@ const LoginForm = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  // Axios.get(https://ims.itnepalsoultions.com.pujanrajrai.com.np/accounts/apis/login/);
-
   const handleLogin = async () => {
-    console.log('sjabkjsdf', username, password);
-    setError('');
+    if (!username || !password) {
+      setError('Please enter both username and password.');
+      return;
+    }
+
     try {
       const response = await axios.post(`${Api_Url}/accounts/apis/login/`, {
         username,
@@ -35,10 +36,8 @@ const LoginForm = ({navigation}) => {
         navigation.navigate('Home2');
       }
     } catch (error) {
-      Alert.alert(
-        'Invalid email or password',
-        'Please enter correct credentials',
-      );
+      console.log('error', error.message);
+      setError('Username and password doesnot match');
     }
   };
 
@@ -69,7 +68,7 @@ const LoginForm = ({navigation}) => {
         placeholderTextColor="#00000080"
         onChangeText={text => setPassword(text)}
       />
-      {/* {error ? <Text style={styles.errorText}>{error}</Text> : null} */}
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <Button
         buttonStyle={styles.Button}
         onPress={() => handleLogin()}

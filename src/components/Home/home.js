@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {TouchableOpacity} from 'react-native';
 
 const HomeDashboard = ({navigation}) => {
   const [userRoles, setUserRoles] = useState('');
@@ -36,62 +37,65 @@ const HomeDashboard = ({navigation}) => {
           </View>
         </View>
         <View style={styles.CardContainer}>
-          <View style={[styles.Card, styles.ShadowProps]}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Bills')}
+            style={[styles.Card, styles.ShadowProps]}>
             <Card.Image
-              onPress={() => navigation.navigate('Bills')}
               style={styles.cardImage}
               source={require('../../Images/bills.png')}
             />
-            <Card.Title
-              style={{fontSize: 18, marginTop: 6}}
-              title="card title"
-              onPress={() => navigation.navigate('Bills')}>
+            <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               Sales
             </Card.Title>
-          </View>
-          <View style={[styles.Card, styles.ShadowProps]}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Purchase')}
+            style={[styles.Card, styles.ShadowProps]}>
             <Card.Image
-              onPress={() => navigation.navigate('Purchase')}
               style={styles.cardImage}
               source={require('../../Images/purchase.png')}
             />
             <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               Purchase
             </Card.Title>
-          </View>
-          <View style={[styles.Card, styles.ShadowProps]}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Payment')}
+            style={[styles.Card, styles.ShadowProps]}>
             <Card.Image
-              onPress={() => navigation.navigate('Payment')}
               style={styles.cardImage}
               source={require('../../Images/payment.png')}
             />
             <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               Payment
             </Card.Title>
-          </View>
-          <View style={[styles.Card, styles.ShadowProps]}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Ledger')}
+            style={[styles.Card, styles.ShadowProps]}>
             <Card.Image
-              onPress={() => navigation.navigate('Ledger')}
               style={styles.cardImage}
               source={require('../../Images/Ledger.png')}
             />
             <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               Ledger
             </Card.Title>
-          </View>
-          <View style={[styles.Card, styles.ShadowProps]}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Product')}
+            style={[styles.Card, styles.ShadowProps]}>
             <Card.Image
-              onPress={() => navigation.navigate('Product')}
               style={styles.cardImage}
               source={require('../../Images/product.png')}
             />
             <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               Product
             </Card.Title>
-          </View>
-          <View style={[styles.Card, styles.ShadowProps]}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Customer')}
+            style={[styles.Card, styles.ShadowProps]}>
             <Card.Image
-              onPress={() => navigation.navigate('Customer')}
               style={styles.cardImage}
               source={require('../../Images/customer.png')}
               resizeMode="contain"
@@ -99,10 +103,11 @@ const HomeDashboard = ({navigation}) => {
             <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               Customer
             </Card.Title>
-          </View>
-          <View style={[styles.Card, styles.ShadowProps]}>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Supplier')}
+            style={[styles.Card, styles.ShadowProps]}>
             <Card.Image
-              onPress={() => navigation.navigate('Supplier')}
               style={styles.cardImage}
               source={require('../../Images/supplier.png')}
               resizeMode="contain"
@@ -110,11 +115,12 @@ const HomeDashboard = ({navigation}) => {
             <Card.Title style={{fontSize: 18, marginTop: 6}} title="card title">
               Supplier
             </Card.Title>
-          </View>
+          </TouchableOpacity>
           {userRoles === 'user' ? null : (
-            <View style={[styles.Card, styles.ShadowProps]}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('User')}
+              style={[styles.Card, styles.ShadowProps]}>
               <Card.Image
-                onPress={() => navigation.navigate('User')}
                 style={styles.cardImage}
                 source={require('../../Images/user.png')}
                 resizeMode="contain"
@@ -124,7 +130,7 @@ const HomeDashboard = ({navigation}) => {
                 title="card title">
                 User
               </Card.Title>
-            </View>
+            </TouchableOpacity>
           )}
         </View>
       </View>

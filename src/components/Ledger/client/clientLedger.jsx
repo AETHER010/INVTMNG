@@ -27,7 +27,7 @@ export default class ClientLedger extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tableHead: ['Date', 'Name', 'Particular', 'Credit', 'Debit', 'Balance'],
+      tableHead: ['Date', 'Name', 'Particular', 'Debit', 'Credit', 'Balance'],
       widthArr: [80, 80, 120, 70, 70, 80],
       data: [],
       loading: true,
@@ -42,6 +42,7 @@ export default class ClientLedger extends Component {
       userRole: '',
       refreshing: false,
       defaultClient: 'Client...',
+      page: 1,
     };
   }
 
@@ -56,19 +57,31 @@ export default class ClientLedger extends Component {
     this.setState({userRole: role});
   };
 
-  getApiData = async () => {
+  getApiData = async (page = 1) => {
     try {
       const response = await axios.get(
-        `${Api_Url}/report/apis/ledger/customer/list/?page=1&page_size=100`,
+        `${Api_Url}/report/apis/ledger/customer/list/?page=${page}&page_size=20`,
       );
       const responseData = response.data.data;
-
-      // console.log(responseData, 'dsfhjgsjdhf');
-      this.setState({data: responseData, loading: false});
+      const newData =
+        page === 1 ? responseData : [...this.state.data, ...responseData];
+      this.setState({data: newData, loading: false, page});
       this.setState({filteredData: responseData, loading: false});
     } catch (error) {
-      console.error('Error fetching data:', error);
       this.setState({loading: false});
+    }
+  };
+
+  handleScroll = async event => {
+    const {layoutMeasurement, contentSize, contentOffset} = event.nativeEvent;
+    const contentHeight = contentSize.height;
+    const yOffset = contentOffset.y;
+    const visibleHeight = layoutMeasurement.height;
+
+    if (yOffset + visibleHeight >= contentHeight - 20) {
+      // Load more data when the user is near the bottom of the table
+      const nextPage = this.state.page + 1;
+      this.getApiData(nextPage);
     }
   };
 
@@ -88,11 +101,9 @@ export default class ClientLedger extends Component {
         `${Api_Url}/accounts/apis/customer/?page=1&page_size=100`,
       );
       const responseData = response.data.data;
-      console.log('API error:', responseData);
       this.setState({client: responseData, loading: false});
     } catch (error) {
-      console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while fetching data.');
+      // Alert.alert('Error', 'An error occurred while fetching data.');
     }
   };
 
@@ -100,14 +111,11 @@ export default class ClientLedger extends Component {
     const selectedData = this.state.client[index];
     const selectedProductId = selectedData.pk;
     this.setState({clientID: selectedProductId}, () => {
-      console.log('Updated supplierID:', this.state.clientID);
       this.filterData();
     });
 
     const selectedClient2 = this.state.client[index].name;
-    this.setState({selectedClient: selectedClient2}, () => {
-      console.log('Updated selected client:', this.state.selectedClient);
-    });
+    this.setState({selectedClient: selectedClient2});
 
     this.filterData();
   };
@@ -133,11 +141,10 @@ export default class ClientLedger extends Component {
     try {
       const response = await axios.get(apiUrl, {
         responseType: 'arraybuffer',
-        headers, // Ensure the response is treated as binary data
+        headers,
       });
 
       if (response.status === 200) {
-        // Save the PDF data to a file
         const pdfData = response.request._response;
         const pdfData2 = JSON.stringify(pdfData);
         const contentDisposition = response.headers['content-disposition'];
@@ -155,7 +162,7 @@ export default class ClientLedger extends Component {
         Alert.alert('Download Error', 'Failed to download PDF file.');
       }
     } catch (error) {
-      console.error('Error downloading data:', error);
+      // console.error('Error downloading data:', error);
       Alert.alert(
         'Download Error',
         'An error occurred while downloading the PDF.',
@@ -178,38 +185,23 @@ export default class ClientLedger extends Component {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         return true;
       } else {
-        console.log('Storage permission denied');
         return false;
       }
     } catch (err) {
-      console.warn(err);
       return false;
     }
   };
 
   filterData = async () => {
     const {fromDate, toDate, clientID} = this.state;
-    console.log('filterData', clientID);
-    // Filter the data based on the selected supplier and date range
     const formattedFromDate = moment(fromDate).format('YYYY-MM-DD');
     const formattedToDate = moment(toDate).format('YYYY-MM-DD');
-    const getUrl = `${Api_Url}/report/apis/ledger/customer/list/?customer=${clientID}&from_date=${formattedFromDate}&to_Date=${formattedToDate}`;
+    const getUrl = `${Api_Url}/report/apis/ledger/customer/list/?customer=${clientID}&from_date=${formattedFromDate}&to_Date=${formattedToDate}&page_size=100&page=1`;
 
     const response = await axios.get(getUrl);
+
     const data = response.data.data;
-    console.log(data, 'asdvasdvgaDGVAjdsvVDASLJKDFLASBHDUIF');
-    // Update the state with the filtered data
     this.setState({data: data});
-  };
-
-  handleRefresh = () => {
-    this.setState({refreshing: true});
-
-    this.getApiData();
-    this.setState({defaultClient: 'Suppliers...'});
-    setTimeout(() => {
-      this.setState({refreshing: false});
-    }, 1000);
   };
 
   render() {
@@ -223,37 +215,32 @@ export default class ClientLedger extends Component {
               particular,
               _type,
               amount,
-              Credit,
               Debit,
+              Credit,
+
               balance,
             }) => [
               moment(created_date).format('MMM DD, YYYY'), // Fixed date format
               customer,
               particular,
-              _type === 'Credit' ? (
-                <Text style={{color: 'green', textAlign: 'center'}}>
-                  {amount}
-                </Text>
-              ) : null,
               _type === 'Debit' ? (
                 <Text style={{color: 'red', textAlign: 'center'}}>
                   {amount}
                 </Text>
               ) : null,
+              _type === 'Credit' ? (
+                <Text style={{color: 'green', textAlign: 'center'}}>
+                  {amount}
+                </Text>
+              ) : null,
+
               balance ? balance : null,
             ],
           )
         : [];
 
     return (
-      <ScrollView
-        style={styles.container}
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.refreshing}
-            onRefresh={this.handleRefresh}
-          />
-        }>
+      <View style={styles.container}>
         <View style={styles.container}>
           <View style={styles.SecondContainer}>
             <ModalDropdown
@@ -329,7 +316,9 @@ export default class ClientLedger extends Component {
                   textStyle={styles.text}
                 />
               </Table>
-              <ScrollView style={styles.dataWrapper}>
+              <ScrollView
+                style={styles.dataWrapper}
+                onScroll={this.handleScroll}>
                 <Table>
                   {tableData.map((rowData, index) => (
                     <Row
@@ -348,7 +337,7 @@ export default class ClientLedger extends Component {
             </View>
           </ScrollView>
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }
