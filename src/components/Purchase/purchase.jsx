@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   RefreshControl,
+  FlatList,
 } from 'react-native';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -25,6 +26,8 @@ const Purchase = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
+  const [page, setPage] = useState(1);
+
   useFocusEffect(
     React.useCallback(() => {
       fetchApiData();
@@ -38,13 +41,19 @@ const Purchase = ({navigation}) => {
   const fetchApiData = async () => {
     try {
       const response = await axios.get(
-        `${Api_Url}/bill/apis/purchase/bills/list/?page=1&page_size=500`,
+        `${Api_Url}/bill/apis/purchase/bills/list/?page=${page}&page_size=10`,
       );
-      setData(response.data.data);
-      setFilteredData(response.data.data);
+      // setData(response.data.data);
+      // setFilteredData(response.data.data);
+      setData(prevData => [...prevData, ...response.data.data]);
+      setFilteredData(prevFilteredData => [
+        ...prevFilteredData,
+        ...response.data.data,
+      ]);
+      setPage(page + 1);
       // console.log('asdjh fgaisudf', response.data.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -82,11 +91,12 @@ const Purchase = ({navigation}) => {
     }
   };
 
+  const handleEndReached = () => {
+    fetchApiData(); // Fetch more data when scrolled to the end
+  };
+
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }>
+    <View>
       <View>
         <View style={styles.PurchaseContainer}>
           <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
@@ -125,10 +135,9 @@ const Purchase = ({navigation}) => {
           />
         </View>
 
-        {loading ? (
-          <Text>Loading...</Text>
-        ) : (
-          filteredData.map((item, index) => (
+        <FlatList
+          data={filteredData}
+          renderItem={({item, index}) => (
             <View
               key={index}
               style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -157,10 +166,17 @@ const Purchase = ({navigation}) => {
                 </View>
               </View>
             </View>
-          ))
-        )}
+          )}
+          keyExtractor={item => item.billid}
+          onEndReached={handleEndReached} // Triggered when the user reaches the end
+          onEndReachedThreshold={0.1} // Adjust this threshold as needed
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+          ListFooterComponent={<View style={{height: 450}} />}
+        />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -199,7 +215,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
     height: 40,
-    width: 220,
     borderRadius: 9,
     borderBlockColor: '#3A39A0',
   },
@@ -218,8 +233,6 @@ const styles = StyleSheet.create({
   },
   Button: {
     marginTop: 12,
-    height: 40,
-    width: 80,
     fontSize: 14,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',
@@ -243,14 +256,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   Button2: {
-    height: 35,
-    width: 100,
     fontSize: 12,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',
     borderRadius: 10,
     margin: 3,
-    padding: 4,
+    padding: 5,
   },
   card2: {
     flexDirection: 'row',

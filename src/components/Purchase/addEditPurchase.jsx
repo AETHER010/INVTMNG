@@ -81,7 +81,9 @@ const NewPurchase = ({navigation, route}) => {
       );
       // console.log('API responsed after form submission:', response.data);
       gettingSupplierProducts(supplierId);
-
+      setQuantity('');
+      setPrice('');
+      setProduct([]);
       Alert.alert('Success', 'Product added successfully!');
     } catch (error) {
       console.error('API error:', error);
@@ -632,27 +634,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: '#000',
   },
-  Button: {
-    height: 40,
-    width: 80,
-    fontSize: 14,
-    backgroundColor: '#3A39A0',
-    color: '#FFFFFF',
-    borderRadius: 10,
-    padding: 8,
-    fontSize: 18,
-    marginLeft: 8,
-  },
-  Button2: {
-    height: 40,
-    width: 90,
-    fontSize: 14,
-    backgroundColor: '#3A39A0',
-    color: '#000',
-    borderRadius: 10,
-    padding: 8,
-    fontSize: 18,
-  },
+
   Button3: {
     height: 30,
     width: 30,
@@ -706,14 +688,13 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   Button2: {
-    height: 35,
-    width: 100,
     fontSize: 12,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',
     borderRadius: 10,
     margin: 3,
-    padding: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 22,
   },
   card2: {
     flexDirection: 'row',

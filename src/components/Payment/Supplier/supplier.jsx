@@ -151,6 +151,7 @@ const PaymentSupplier = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
+        ListFooterComponent={<View style={{height: 350}} />}
       />
     </View>
   );
@@ -171,7 +172,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
     borderWidth: 1,
     height: 40,
-    width: 220,
     borderRadius: 9,
     borderColor: '#3A39A0',
   },
@@ -190,8 +190,6 @@ const styles = StyleSheet.create({
   },
   Button: {
     marginTop: 12,
-    height: 40,
-    width: 80,
     fontSize: 14,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',

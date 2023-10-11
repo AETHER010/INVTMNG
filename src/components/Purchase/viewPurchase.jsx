@@ -104,8 +104,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   Card: {
-    height: 120,
-    width: 350,
+    width: '95%',
     padding: 8,
     margin: 14,
     borderRadius: 10,

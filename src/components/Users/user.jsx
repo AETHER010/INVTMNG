@@ -275,7 +275,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
     height: 40,
-    width: 220,
     borderRadius: 9,
     borderBlockColor: '#3A39A0',
   },
@@ -294,8 +293,6 @@ const styles = StyleSheet.create({
   },
   createButton: {
     marginTop: 12,
-    height: 40,
-    width: 80,
     fontSize: 14,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',
@@ -329,12 +326,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   button2: {
-    height: 30,
-    width: 90,
     fontSize: 12,
     color: '#FFFFFF',
     borderRadius: 10,
-    padding: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 14,
   },
 });
 

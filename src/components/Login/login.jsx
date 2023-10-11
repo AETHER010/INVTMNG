@@ -1,4 +1,12 @@
-import {View, StyleSheet, Image, TextInput, Text, Alert} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  TextInput,
+  Text,
+  Alert,
+  Dimensions,
+} from 'react-native';
 import {Input, Button} from 'react-native-elements';
 import {Icon} from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
@@ -37,9 +45,13 @@ const LoginForm = ({navigation}) => {
       }
     } catch (error) {
       console.log('error', error.message);
-      setError('Username and password doesnot match');
+      setError('Username and password do not match');
     }
   };
+
+  const window = Dimensions.get('window');
+  const buttonWidth = window.width * 0.3;
+  const buttonHeight = window.height * 0.05;
 
   return (
     <View style={styles.container}>
@@ -58,7 +70,6 @@ const LoginForm = ({navigation}) => {
         placeholderTextColor="#00000080"
         onChangeText={text => setUsername(text)}
       />
-      {/* </View> */}
       <TextInput
         style={styles.Input}
         placeholder="Password..."
@@ -70,9 +81,12 @@ const LoginForm = ({navigation}) => {
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <Button
-        buttonStyle={styles.Button}
+        buttonStyle={[
+          styles.Button,
+          {width: buttonWidth, height: buttonHeight},
+        ]}
         onPress={() => handleLogin()}
-        title="Login"
+        title="Loginjsdfjaksudrflaisduflasdfijli"
       />
     </View>
   );
@@ -83,27 +97,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // paddingHorizontal: 20,
   },
   Input: {
-    borderRightWidth: 2,
-    borderLeftWidth: 2,
-    borderTopWidth: 2,
-    borderBottomWidth: 2,
-    height: 50,
+    borderWidth: 2,
+    height: 60,
     borderColor: '#9a9ea0',
     borderRadius: 8,
-    height: 60,
     padding: 5,
     width: '95%',
     margin: 8,
-    // flex: 0.7,
   },
   Button: {
     backgroundColor: '#3A39A0',
-    height: 44,
-    width: 111,
-    padding: 5,
     borderRadius: 8,
   },
   Text: {

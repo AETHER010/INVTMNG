@@ -82,7 +82,11 @@ const NewBills = ({navigation, route}) => {
       );
       // console.log('API responsed after form submission:', response.data);
       gettingSupplierProducts(supplierId);
+      setQuantity('');
+      setPrice('');
 
+      setProduct([]);
+      setSupplierId('');
       Alert.alert('Success', 'Product added successfully!');
     } catch (error) {
       console.error('API error:', error);
@@ -158,7 +162,6 @@ const NewBills = ({navigation, route}) => {
   };
 
   const handleIssueBill = async () => {
-    console.log('Issue Bill', billId);
     try {
       await axios.post(`${Api_Url}/bill/apis/sales/issue-bill/${billId}/`);
       Alert.alert('Success', 'Bill Issued Successfully');
@@ -287,7 +290,9 @@ const NewBills = ({navigation, route}) => {
               style={styles.Input}
               defaultValue="Select Customer..."
               options={supplier.map(item => item.name)}
-              onSelect={index => handleProductSelection(index)}
+              onSelect={index => {
+                handleProductSelection(index);
+              }}
               defaultIndex={0}
               animated={true}
               isFullWidth={true}
@@ -325,7 +330,7 @@ const NewBills = ({navigation, route}) => {
                 style={styles.Input9}
                 value={quantity}
                 onChangeText={setQuantity}
-                placeholder="Quantity"
+                placeholder="Enter Quantity"
                 placeholderTextColor="#000"
               />
               <Text style={{color: 'black', fontSize: 9}}>stock: {stock}</Text>
@@ -672,26 +677,14 @@ const styles = StyleSheet.create({
 
     color: '#000',
   },
-  Button: {
-    height: 40,
-    width: 80,
-    fontSize: 14,
-    backgroundColor: '#3A39A0',
-    color: '#FFFFFF',
-    borderRadius: 10,
-    padding: 8,
-    fontSize: 18,
-    marginLeft: 8,
-  },
   Button2: {
-    height: 40,
-    width: 80,
     fontSize: 14,
     backgroundColor: '#3A39A0',
     color: '#000',
     borderRadius: 10,
-    padding: 8,
+    padding: 9,
     fontSize: 18,
+    paddingHorizontal: 18,
   },
   Button3: {
     height: 30,
@@ -744,16 +737,6 @@ const styles = StyleSheet.create({
     shadowColor: '#CECECE',
     shadowOpacity: 0.8,
     shadowRadius: 3,
-  },
-  Button2: {
-    height: 35,
-    width: 100,
-    fontSize: 12,
-    backgroundColor: '#3A39A0',
-    color: '#FFFFFF',
-    borderRadius: 10,
-    margin: 3,
-    padding: 4,
   },
   card2: {
     flexDirection: 'row',

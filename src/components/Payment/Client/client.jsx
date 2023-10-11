@@ -1,3 +1,4 @@
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,27 +8,22 @@ import {
   RefreshControl,
   FlatList,
 } from 'react-native';
-
-import {useState, useEffect} from 'react';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
-import {Api_Url} from '../../../utilities/api';
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import moment from 'moment';
+import {Api_Url} from '../../../utilities/api';
 
 const PaymentClient = () => {
   const navigation = useNavigation();
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState('');
-
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [cumDate, setCumDate] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-
   const [page, setPage] = useState(1);
 
   useFocusEffect(
@@ -37,21 +33,28 @@ const PaymentClient = () => {
   );
 
   const fetchApiDataCustomer = async () => {
-    console.log('Fetching', page);
+    if (loading) return; // Prevent multiple simultaneous requests
+    setLoading(true);
+
     try {
       const response = await axios.get(
         `${Api_Url}/payment/apis/customer-payments/?page=${page}&page_size=10`,
       );
+
       const newPageData = response.data.data;
       setData(prevData => [...prevData, ...newPageData]);
       setPage(page + 1);
-      const date = response.data.data.created_date;
-      const formattedDate = moment(date).format('YYYY-MM-DD');
-      setCumDate(formattedDate);
+
+      if (newPageData.length > 0) {
+        const date = newPageData[0].created_date;
+        const formattedDate = moment(date).format('YYYY-MM-DD');
+        setCumDate(formattedDate);
+      }
     } catch (error) {
       // console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -59,27 +62,26 @@ const PaymentClient = () => {
     filterData();
   }, [data, searchQuery]);
 
-  const filterData = () => {
+  const filterData = async () => {
     if (searchQuery.trim() === '') {
       // If the search query is empty, display all data
       setFilteredData(data);
     } else {
-      // Use the Array.filter method to filter data based on the search query
-      const filtered = data.filter(
-        item =>
-          item.customer_name &&
-          item.customer_name.toLowerCase().includes(searchQuery.toLowerCase()),
+      const response = await axios.get(
+        `${Api_Url}/payment/apis/customer-payments/?search=${encodeURIComponent(
+          searchQuery,
+        )}`,
       );
+
+      const filtered = response.data.data;
       setFilteredData(filtered);
     }
   };
 
   const handleRefresh = () => {
+    if (loading) return; // Prevent refreshing while loading
     setRefreshing(true);
     fetchApiDataCustomer();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
   };
 
   const handleEndReached = () => {
@@ -95,7 +97,10 @@ const PaymentClient = () => {
             placeholder="Search..."
             placeholderTextColor="#888"
             value={searchQuery}
-            onChangeText={text => setSearchQuery(text)}
+            onChangeText={text => {
+              setSearchQuery(text);
+              filterData();
+            }}
           />
           <Icon
             name="search"
@@ -119,7 +124,6 @@ const PaymentClient = () => {
                 <Text style={{fontSize: 18, color: '#000', fontWeight: 'bold'}}>
                   {item.customer_name}
                 </Text>
-
                 <Text style={{fontSize: 14, color: '#000'}}>{cumDate}</Text>
               </View>
               <View
@@ -132,20 +136,19 @@ const PaymentClient = () => {
                   Rs. {item.amount}
                 </Text>
               </View>
-
               <Text style={{fontSize: 16, paddingTop: 6, color: '#000'}}>
                 Remarks : {item.remarks}
               </Text>
             </View>
           </View>
         )}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id.toString()} // Convert id to string
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.1}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
-        ListFooterComponent={<View style={{height: 550}} />}
+        ListFooterComponent={<View style={{height: 350}} />}
       />
     </View>
   );
@@ -166,7 +169,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
     borderWidth: 1,
     height: 40,
-    width: 220,
     borderRadius: 9,
     borderColor: '#3A39A0',
   },
@@ -185,8 +187,6 @@ const styles = StyleSheet.create({
   },
   Button: {
     marginTop: 12,
-    height: 40,
-    width: 80,
     fontSize: 14,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',

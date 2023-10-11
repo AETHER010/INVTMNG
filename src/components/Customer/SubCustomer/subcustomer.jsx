@@ -303,7 +303,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
     height: 40,
-    width: 220,
     borderRadius: 9,
     borderBlockColor: '#3A39A0',
   },
@@ -322,8 +321,6 @@ const styles = StyleSheet.create({
   },
   Button: {
     marginTop: 12,
-    height: 40,
-    width: 80,
     fontSize: 14,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',
@@ -345,16 +342,6 @@ const styles = StyleSheet.create({
     shadowColor: '#CECECE',
     shadowOpacity: 0.8,
     shadowRadius: 3,
-  },
-  Button2: {
-    height: 35,
-    width: 100,
-    fontSize: 12,
-    backgroundColor: '#3A39A0',
-    color: '#FFFFFF',
-    borderRadius: 10,
-    margin: 3,
-    padding: 4,
   },
   card2: {
     flexDirection: 'row',

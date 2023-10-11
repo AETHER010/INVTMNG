@@ -31,7 +31,6 @@ const Bills = ({navigation}) => {
       const apidate = data.created_date;
       const formattedDate = moment(apidate).format('YYYY-MM-DD');
       setFormattedDate(formattedDate);
-      console.log('formated', formattedDate);
     }, []),
   );
 
@@ -84,7 +83,7 @@ const Bills = ({navigation}) => {
           item.customer.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredData(filtered);
-      console.log(filtered, 'asjdfkasdfk');
+      // console.log(filtered, 'asjdfkasdfk');
     }
   };
 
@@ -157,7 +156,7 @@ const Bills = ({navigation}) => {
                     </Text>
                     <Button
                       buttonStyle={styles.Button2}
-                      title="View Detaiils"
+                      title="View Details"
                       onPress={() => handleUpdate(item.billid)}
                     />
                   </View>
@@ -173,6 +172,7 @@ const Bills = ({navigation}) => {
                 onRefresh={handleRefresh}
               />
             }
+            ListFooterComponent={<View style={{height: 450}} />}
           />
         </View>
       </View>
@@ -207,7 +207,6 @@ const styles = StyleSheet.create({
   Search: {
     marginTop: 10,
     flexDirection: 'row',
-    // justifyContent: "space-evenly",
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
     borderRightWidth: 1,
@@ -215,7 +214,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
     height: 40,
-    width: 220,
     borderRadius: 9,
     borderBlockColor: '#3A39A0',
   },
@@ -234,8 +232,6 @@ const styles = StyleSheet.create({
   },
   Button: {
     marginTop: 12,
-    height: 40,
-    width: 80,
     fontSize: 14,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',
@@ -259,14 +255,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   Button2: {
-    height: 35,
-    width: 100,
     fontSize: 12,
     backgroundColor: '#3A39A0',
     color: '#FFFFFF',
     borderRadius: 10,
     margin: 3,
-    padding: 4,
+    padding: 6,
   },
   card2: {
     flexDirection: 'row',
