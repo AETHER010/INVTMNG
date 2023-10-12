@@ -165,11 +165,13 @@ export default class SupplierLedger extends Component {
         if (filenameMatch) {
           filename = filenameMatch[1];
         }
+
+        const uniqueFilename = await this.generateUniqueFilename(filename);
         const pdfdata = response.request._response;
 
         const pdfData2 = JSON.stringify(pdfdata);
 
-        const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`;
+        const filePath = `${RNFS.DownloadDirectoryPath}/${uniqueFilename}`;
         await RNFS.writeFile(filePath, pdfData2, 'base64')
           .then(success => {
             console.log('FILE WRITTEN!');
@@ -193,10 +195,24 @@ export default class SupplierLedger extends Component {
     }
   };
 
+  generateUniqueFilename = async filename => {
+    const directory = RNFS.DownloadDirectoryPath;
+    let uniqueFilename = filename;
+
+    let counter = 1;
+    while (await RNFS.exists(`${directory}/${uniqueFilename}`)) {
+      // If the file with the current name already exists, increment the counter
+      uniqueFilename = `${filename.replace('.pdf', '')}_${counter}.pdf`;
+      counter++;
+    }
+
+    return uniqueFilename;
+  };
+
   requestStoragePermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
         {
           title: 'Storage Permission',
           message: 'App needs access to your storage to download data.',

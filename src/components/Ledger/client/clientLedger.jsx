@@ -154,10 +154,11 @@ export default class ClientLedger extends Component {
         if (filenameMatch) {
           filename = filenameMatch[1];
         }
-        const filePath = `${RNFS.DownloadDirectoryPath}/${filename}`;
+        const uniqueFilename = await this.generateUniqueFilename(filename);
+        const filePath = `${RNFS.DownloadDirectoryPath}/${uniqueFilename}`;
         await RNFS.writeFile(filePath, pdfData2, 'base64');
 
-        Alert.alert('Download Complete', 'PDF file saved to device.');
+        Alert.alert('Download Complete', `PDF ${filename} saved to device.`);
       } else {
         Alert.alert('Download Error', 'Failed to download PDF file.');
       }
@@ -173,7 +174,9 @@ export default class ClientLedger extends Component {
   requestStoragePermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
         {
           title: 'Storage Permission',
           message: 'App needs access to your storage to download data.',
@@ -190,6 +193,20 @@ export default class ClientLedger extends Component {
     } catch (err) {
       return false;
     }
+  };
+
+  generateUniqueFilename = async filename => {
+    const directory = RNFS.DownloadDirectoryPath;
+    let uniqueFilename = filename;
+
+    let counter = 1;
+    while (await RNFS.exists(`${directory}/${uniqueFilename}`)) {
+      // If the file with the current name already exists, increment the counter
+      uniqueFilename = `${filename.replace('.pdf', '')}_${counter}.pdf`;
+      counter++;
+    }
+
+    return uniqueFilename;
   };
 
   filterData = async () => {

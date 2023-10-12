@@ -37,11 +37,32 @@ import {useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserData} from './src/components/Users/userAuth';
 import axios from 'axios';
+import {PERMISSIONS, request, check, RESULTS} from 'react-native-permissions';
+import {PermissionsAndroid, Platform} from 'react-native';
+
+const STORAGE_PERMISSION = Platform.select({
+  android: PERMISSIONS.READ_MEDIA_IMAGES,
+});
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userRoles, setUserRoles] = useState('');
+
+  useEffect(() => {
+    // Check and request storage permission
+    check(STORAGE_PERMISSION).then(storagePermissionStatus => {
+      if (storagePermissionStatus === RESULTS.GRANTED) {
+        console.log('Storage permission granted');
+      } else if (storagePermissionStatus === RESULTS.DENIED) {
+        request(STORAGE_PERMISSION).then(result => {
+          if (result === RESULTS.GRANTED) {
+            console.log('Storage permission granted');
+          }
+        });
+      }
+    });
+  }, []);
 
   useEffect(() => {
     const initializeApp = async () => {

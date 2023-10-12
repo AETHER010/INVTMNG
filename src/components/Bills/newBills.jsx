@@ -193,17 +193,25 @@ const NewBills = ({navigation, route}) => {
   };
 
   const handleDeleteProduct = async id => {
-    try {
-      await axios.delete(
-        `${Api_Url}/bill/apis/sales/update-delete-unconfirm-bill/${id}/`,
-      );
-      Alert.alert('Success', 'Bill Deleted Successfully');
-      gettingSupplierProducts(supplierId);
-    } catch (error) {
-      console.error('API error:', error);
-      // console.error('Error response:', error.response);
-      Alert.alert('Error', 'An error occurred while Deleting Bill.');
-    }
+    Alert.alert('Confirmation', 'Are you sure you want to delete this bill?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: async () => {
+          try {
+            await axios.delete(
+              `${Api_Url}/bill/apis/sales/update-delete-unconfirm-bill/${id}/`,
+            );
+            gettingSupplierProducts(supplierId);
+          } catch (error) {
+            console.error('API error:', error);
+          }
+        },
+      },
+    ]);
   };
 
   const handleUpdateProduct = async id => {
