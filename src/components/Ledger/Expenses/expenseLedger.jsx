@@ -168,8 +168,6 @@ export default class ExpenseLedger extends Component {
   requestStoragePermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
         {
           title: 'Storage Permission',

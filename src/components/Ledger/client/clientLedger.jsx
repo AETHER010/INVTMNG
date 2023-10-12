@@ -171,11 +171,23 @@ export default class ClientLedger extends Component {
     }
   };
 
+  generateUniqueFilename = async filename => {
+    const directory = RNFS.DownloadDirectoryPath;
+    let uniqueFilename = filename;
+
+    let counter = 1;
+    while (await RNFS.exists(`${directory}/${uniqueFilename}`)) {
+      // If the file with the current name already exists, increment the counter
+      uniqueFilename = `${filename.replace('.pdf', '')}_${counter}.pdf`;
+      counter++;
+    }
+
+    return uniqueFilename;
+  };
+
   requestStoragePermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
         {
           title: 'Storage Permission',
@@ -193,20 +205,6 @@ export default class ClientLedger extends Component {
     } catch (err) {
       return false;
     }
-  };
-
-  generateUniqueFilename = async filename => {
-    const directory = RNFS.DownloadDirectoryPath;
-    let uniqueFilename = filename;
-
-    let counter = 1;
-    while (await RNFS.exists(`${directory}/${uniqueFilename}`)) {
-      // If the file with the current name already exists, increment the counter
-      uniqueFilename = `${filename.replace('.pdf', '')}_${counter}.pdf`;
-      counter++;
-    }
-
-    return uniqueFilename;
   };
 
   filterData = async () => {
