@@ -83,7 +83,7 @@ const NewPurchase = ({navigation, route}) => {
       gettingSupplierProducts(supplierId);
       setQuantity('');
       setPrice('');
-      setProduct([]);
+
       Alert.alert('Success', 'Product added successfully!');
     } catch (error) {
       console.error('API error:', error);
@@ -118,7 +118,7 @@ const NewPurchase = ({navigation, route}) => {
         `${Api_Url}/bill/apis/purchase/suppliers/products/price/${selectedProduct.pk}`,
       );
       console.log('API response454:', response.data);
-      setPrice(response.data.standard_price);
+      setPrice(response.data.last_purchase_price);
       setLastPurchase(response.data.last_purchase_price || 'N/a');
       setSdPrice(response.data.standard_price);
       setStock(response.data.stock);
@@ -313,7 +313,7 @@ const NewPurchase = ({navigation, route}) => {
                 value={quantity}
                 onChangeText={setQuantity}
               />
-              <Text style={{color: 'black', fontSize: 9}}>stock: {stock}</Text>
+              <Text style={{color: 'black', fontSize: 12}}>Stock: {stock}</Text>
             </View>
           </View>
           <View
@@ -332,11 +332,11 @@ const NewPurchase = ({navigation, route}) => {
                 }}>
                 <TextInput
                   style={styles.priceInput}
-                  value={price}
+                  value={price !== null ? price.toString() : ''}
                   onChangeText={setPrice}
                   editable={true}
                 />
-                <Text style={{color: 'black', fontSize: 9}}>
+                <Text style={{color: 'black', fontSize: 12}}>
                   LPP: {lastPurchase} SP: {sdPrice}
                 </Text>
               </View>
@@ -359,11 +359,11 @@ const NewPurchase = ({navigation, route}) => {
                 <Text
                   style={{
                     color: '#000',
-                    justifyContent: 'center',
+                    textAlign: 'center',
                     fontSize: 20,
                     margin: 5,
                   }}>
-                  No unconfirmed products available!!!
+                  Products Not Selected.
                 </Text>
               ) : (
                 unConfirmProducts.map((item, index) => (

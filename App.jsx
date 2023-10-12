@@ -44,12 +44,17 @@ export default function App() {
   const [userRoles, setUserRoles] = useState('');
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const initializeApp = async () => {
+      try {
+        await getTokens();
+        await getUserRole();
+      } catch (error) {
+        console.error('Initialization error:', error);
+      }
+      setIsLoading(false); // Update isLoading after initialization
+    };
 
-    getTokens();
-    getUserRole();
+    initializeApp();
   }, []);
 
   const getUserRole = async () => {

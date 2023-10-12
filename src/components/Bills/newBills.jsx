@@ -84,9 +84,6 @@ const NewBills = ({navigation, route}) => {
       gettingSupplierProducts(supplierId);
       setQuantity('');
       setPrice('');
-
-      setProduct([]);
-      setSupplierId('');
       Alert.alert('Success', 'Product added successfully!');
     } catch (error) {
       console.error('API error:', error);
@@ -330,10 +327,8 @@ const NewBills = ({navigation, route}) => {
                 style={styles.Input9}
                 value={quantity}
                 onChangeText={setQuantity}
-                placeholder="Enter Quantity"
-                placeholderTextColor="#000"
               />
-              <Text style={{color: 'black', fontSize: 9}}>stock: {stock}</Text>
+              <Text style={{color: 'black', fontSize: 12}}>Stock: {stock}</Text>
             </View>
           </View>
           <View
@@ -356,7 +351,7 @@ const NewBills = ({navigation, route}) => {
                   onChangeText={setPrice}
                   editable={true}
                 />
-                <Text style={{color: 'black', fontSize: 9}}>
+                <Text style={{color: 'black', fontSize: 12}}>
                   CP: {customerPrice} LPP: {lastPurchase} SP: {sdPrice}
                 </Text>
               </View>
@@ -379,11 +374,11 @@ const NewBills = ({navigation, route}) => {
                 <Text
                   style={{
                     color: '#000',
-                    justifyContent: 'center',
+                    textAlign: 'center',
                     fontSize: 20,
                     margin: 5,
                   }}>
-                  No unconfirmed products available!!!
+                  Products Not Selected.
                 </Text>
               ) : (
                 unConfirmProducts.map((item, index) => (

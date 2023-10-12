@@ -22,7 +22,7 @@ const LoginForm = ({navigation}) => {
 
   const handleLogin = async () => {
     if (!username || !password) {
-      setError('Please enter both username and password.');
+      setError('Please enter both Username and Password.');
       return;
     }
 
@@ -45,13 +45,13 @@ const LoginForm = ({navigation}) => {
       }
     } catch (error) {
       console.log('error', error.message);
-      setError('Username and password do not match');
+      setError('Username and Password do not match');
     }
   };
 
-  const window = Dimensions.get('window');
-  const buttonWidth = window.width * 0.3;
-  const buttonHeight = window.height * 0.05;
+  // const window = Dimensions.get('window');
+  // const buttonWidth = window.width * 0.3;
+  // const buttonHeight = window.height * 0.05;
 
   return (
     <View style={styles.container}>
@@ -81,12 +81,10 @@ const LoginForm = ({navigation}) => {
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <Button
-        buttonStyle={[
-          styles.Button,
-          {width: buttonWidth, height: buttonHeight},
-        ]}
+        buttonStyle={styles.Button8}
+        titleStyle={styles.buttonTextStyle}
         onPress={() => handleLogin()}
-        title="Loginjsdfjaksudrflaisduflasdfijli"
+        title="Login"
       />
     </View>
   );
@@ -107,14 +105,20 @@ const styles = StyleSheet.create({
     width: '95%',
     margin: 8,
   },
-  Button: {
+  Button8: {
+    marginTop: 10,
     backgroundColor: '#3A39A0',
     borderRadius: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  buttonTextStyle: {
+    fontSize: 20,
   },
   Text: {
     margin: 5,
     paddingBottom: 8,
-    fontSize: 16,
+    fontSize: 18,
     color: '#000',
   },
   image: {
