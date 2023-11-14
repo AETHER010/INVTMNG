@@ -39,7 +39,7 @@ const NewPaymentSupplier = ({navigation}) => {
       setCustomer(response.data);
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
@@ -95,11 +95,11 @@ const NewPaymentSupplier = ({navigation}) => {
         formData,
       );
       console.log('API response:', response.data);
-      Alert.alert('Success', 'Data submitted successfully!');
+      Alert.alert('Success', 'Payment For Supplier Added successfully!');
       navigation.navigate('Payment');
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 

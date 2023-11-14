@@ -77,19 +77,34 @@ const PriceList = ({navigation, route}) => {
   };
 
   const handleDelete = async id => {
-    console.log(id);
-    try {
-      await axios.delete(
-        `${Api_Url}/accounts/apis/subcustomer/myproduct/delete/${id}/`,
-      );
+    Alert.alert(
+      'Confirm Deletion',
+      'Are you sure you want to delete this price list?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              await axios.delete(
+                `${Api_Url}/accounts/apis/subcustomer/myproduct/delete/${id}/`,
+              );
 
-      Alert.alert('Price list Deleted Successfully');
-      fetchApiData(plID);
-    } catch (error) {
-      console.error('Error deleting data:', error);
-    } finally {
-      setLoading(false);
-    }
+              Alert.alert('Price List Deleted Successfully!');
+              fetchApiData(plID);
+            } catch (error) {
+              console.error('Error deleting data:', error);
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ],
+      {cancelable: true},
+    );
   };
 
   const handleNavigation = () => {

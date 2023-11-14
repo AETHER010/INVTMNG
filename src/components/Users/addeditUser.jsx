@@ -40,11 +40,11 @@ const NewUser = ({navigation}) => {
         formData,
       );
       console.log('API response:', response.data);
-      Alert.alert('Success', 'Data submitted successfully!');
+      Alert.alert('Success', 'User Created successfully!');
       navigation.navigate('User');
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 

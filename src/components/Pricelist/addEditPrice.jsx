@@ -138,11 +138,14 @@ const AddPriceList = ({navigation, route}) => {
           formData,
         );
         console.log('API response:', response.data);
-        Alert.alert('Success', 'Data submitted successfully!');
+        Alert.alert(
+          'Success',
+          'Price List for Customer is added successfully!',
+        );
         navigation.navigate('PriceList');
       } catch (error) {
         console.error('API error:', error);
-        Alert.alert('Error', 'An error occurred while submitting data.');
+        // Alert.alert('Error', 'An error occurred while submitting data.');
       }
     }
   };
@@ -158,11 +161,11 @@ const AddPriceList = ({navigation, route}) => {
         formData,
       );
       console.log('API response:', response.data);
-      Alert.alert('Success', 'Data submitted successfully!');
+      Alert.alert('Success', 'Price List For Customer Updated successfully!');
       navigation.navigate('PriceList');
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 

@@ -60,7 +60,7 @@ const NewPurchase = ({navigation, route}) => {
       setSupplier(response.data);
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while fetching data.');
+      // Alert.alert('Error', 'An error occurred while fetching data.');
     }
   };
 
@@ -87,7 +87,7 @@ const NewPurchase = ({navigation, route}) => {
       Alert.alert('Success', 'Product added successfully!');
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
@@ -104,7 +104,7 @@ const NewPurchase = ({navigation, route}) => {
       setProduct(response.data);
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while retreving data.');
+      // Alert.alert('Error', 'An error occurred while retreving data.');
     }
     gettingSupplierProducts(selectedData.pk);
   };
@@ -124,7 +124,7 @@ const NewPurchase = ({navigation, route}) => {
       setStock(response.data.stock);
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while retreving data.');
+      // Alert.alert('Error', 'An error occurred while retreving data.');
     }
   };
 
@@ -151,16 +151,34 @@ const NewPurchase = ({navigation, route}) => {
     }
   };
 
-  const handleIssueBill = async () => {
-    try {
-      await axios.post(`${Api_Url}/bill/apis/purchase/issue-bill/${billId}/`);
-      Alert.alert('Success', 'Bill Issued Successfully');
-      navigation.navigate('Purchase');
-    } catch (error) {
-      console.error('API error:', error);
-      // console.error('Error response:', error.response);
-      Alert.alert('Error', 'An error occurred while Issuing Bill.');
-    }
+  const handleIssueBill = () => {
+    Alert.alert(
+      'Confirm Bill Issue',
+      'Are you sure you want to issue this bill?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Issue',
+          onPress: async () => {
+            try {
+              await axios.post(
+                `${Api_Url}/bill/apis/purchase/issue-bill/${billId}/`,
+              );
+              Alert.alert('Success', 'Bill Issued Successfully');
+              navigation.navigate('Purchase');
+            } catch (error) {
+              console.error('API error:', error);
+              // console.error('Error response:', error.response);
+              // Alert.alert('Error', 'An error occurred while Issuing Bill.');
+            }
+          },
+        },
+      ],
+      {cancelable: true},
+    );
   };
 
   useEffect(() => {
@@ -205,7 +223,7 @@ const NewPurchase = ({navigation, route}) => {
               gettingSupplierProducts(supplierId);
             } catch (error) {
               console.error('API error:', error);
-              Alert.alert('Error', 'An error occurred while Deleting Bill.');
+              // Alert.alert('Error', 'An error occurred while Deleting Bill.');
             }
           },
         },
@@ -234,7 +252,7 @@ const NewPurchase = ({navigation, route}) => {
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
-      Alert.alert('Error', 'An error occurred while Updaing product.');
+      // Alert.alert('Error', 'An error occurred while Updaing product.');
     }
   };
 
@@ -253,7 +271,7 @@ const NewPurchase = ({navigation, route}) => {
     } catch (error) {
       console.error('API error:', error);
       // console.error('Error response:', error.response);
-      Alert.alert('Error', 'An error occurred while addin product.');
+      // Alert.alert('Error', 'An error occurred while addin product.');
     }
   };
 

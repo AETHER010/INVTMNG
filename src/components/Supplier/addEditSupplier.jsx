@@ -39,7 +39,7 @@ const NewSupplier = ({navigation, route}) => {
       setContact_number(response.data.contact_number || '');
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
@@ -57,11 +57,11 @@ const NewSupplier = ({navigation, route}) => {
         formData,
       );
       console.log('API response:', response.data);
-      Alert.alert('Success', 'Data submitted successfully!');
+      Alert.alert('Success', 'Supplier Created successfully!');
       navigation.navigate('Supplier');
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
@@ -79,11 +79,11 @@ const NewSupplier = ({navigation, route}) => {
         formData,
       );
       console.log('API response:', response.data);
-      Alert.alert('Success', 'Data Updated successfully!');
+      Alert.alert('Success', 'Supplier Updated successfully!');
       navigation.navigate('Supplier');
     } catch (error) {
       console.error('API error:', error);
-      Alert.alert('Error', 'An error occurred while submitting data.');
+      // Alert.alert('Error', 'An error occurred while submitting data.');
     }
   };
 
